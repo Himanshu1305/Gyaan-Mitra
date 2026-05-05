@@ -10,8 +10,10 @@ import FileUpload, { UploadedFile } from "@/components/ui/FileUpload";
 /* ─── Options ───────────────────────────────────────────────── */
 const SUBJECTS = ["Mathematics", "Science", "Social Studies", "Hindi", "English", "EVS", "Other"];
 const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
+const WORKSHEET_TYPES = ["Practice", "Revision", "Homework", "Activity", "Multi-level — Three Levels"];
+const DIFFICULTIES = ["Easy", "Medium", "Mixed"];
+const NUM_QUESTIONS = ["5", "10", "15", "20"];
 const BOARDS = ["CBSE", "ICSE", "State Board"];
-const DURATIONS = ["30 minutes", "40 minutes", "45 minutes", "60 minutes"];
 
 /* ─── SelectField ───────────────────────────────────────────── */
 function SelectField({
@@ -42,13 +44,15 @@ function SelectField({
 }
 
 /* ─── Page ──────────────────────────────────────────────────── */
-export default function LessonPlansPage() {
+export default function WorksheetsPage() {
   const [form, setForm] = useState({
     subject: "Mathematics",
     grade: "Class 6",
     topic: "",
+    worksheetType: "Practice",
+    difficulty: "Medium",
+    numQuestions: "10",
     board: "CBSE",
-    duration: "45 minutes",
     additionalInstructions: "",
   });
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
@@ -75,7 +79,7 @@ export default function LessonPlansPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/lesson-plan", {
+      const res = await fetch("/api/worksheet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, fileData }),
@@ -128,16 +132,16 @@ export default function LessonPlansPage() {
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-primary text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
             </svg>
-            AI Lesson Plan Generator
+            AI Worksheet Creator
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-            Build a complete lesson plan{" "}
+            Create a perfect worksheet{" "}
             <span className="text-primary">in seconds</span>
           </h1>
           <p className="mt-3 text-secondary-200 text-base">
-            Fill in the details below — or upload your textbook chapter — and let Gyaan Mitra do the planning.
+            Choose your options — or upload your textbook chapter — and get a print-ready worksheet with answer key.
           </p>
         </div>
       </section>
@@ -146,7 +150,7 @@ export default function LessonPlansPage() {
       <section className="flex-1 py-10 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <h2 className="text-lg font-bold text-secondary mb-6">Lesson Details</h2>
+            <h2 className="text-lg font-bold text-secondary mb-6">Worksheet Details</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <SelectField label="Subject" value={form.subject} onChange={set("subject")} options={SUBJECTS} />
@@ -162,7 +166,7 @@ export default function LessonPlansPage() {
                     type="text"
                     value={form.topic}
                     onChange={(e) => setForm((f) => ({ ...f, topic: e.target.value }))}
-                    placeholder="e.g. Fractions and Decimals, Photosynthesis, The Mughal Empire"
+                    placeholder="e.g. Fractions, Photosynthesis, The Indian Constitution"
                     className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                   />
                   <MicButton onResult={appendToField("topic")} />
@@ -173,8 +177,10 @@ export default function LessonPlansPage() {
                 )}
               </div>
 
-              <SelectField label="Board"    value={form.board}    onChange={set("board")}    options={BOARDS} />
-              <SelectField label="Duration" value={form.duration} onChange={set("duration")} options={DURATIONS} />
+              <SelectField label="Worksheet Type"    value={form.worksheetType} onChange={set("worksheetType")} options={WORKSHEET_TYPES} />
+              <SelectField label="Difficulty"        value={form.difficulty}    onChange={set("difficulty")}    options={DIFFICULTIES} />
+              <SelectField label="Number of Questions" value={form.numQuestions} onChange={set("numQuestions")} options={NUM_QUESTIONS} />
+              <SelectField label="Board"             value={form.board}         onChange={set("board")}         options={BOARDS} />
 
               {/* Additional instructions + mic */}
               <div className="sm:col-span-2">
@@ -187,7 +193,7 @@ export default function LessonPlansPage() {
                     value={form.additionalInstructions}
                     onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
                     rows={3}
-                    placeholder="e.g. Include a group activity, focus on real-life examples, class has 40 students…"
+                    placeholder="e.g. Include diagram-based questions, focus on word problems, add a bonus question…"
                     className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
                   />
                   <MicButton onResult={appendToField("additionalInstructions")} />
@@ -211,14 +217,14 @@ export default function LessonPlansPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                   </svg>
-                  Generating your lesson plan…
+                  Generating your worksheet…
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  Generate Lesson Plan
+                  Generate Worksheet
                 </>
               )}
             </button>
@@ -235,7 +241,7 @@ export default function LessonPlansPage() {
 
             {/* Trust tags */}
             <div className="mt-5 flex flex-wrap gap-3 justify-center text-xs text-gray-400">
-              {["No login required", "CBSE · ICSE · State Board", "Powered by Claude AI"].map((tag) => (
+              {["No login required", "CBSE · ICSE · State Board", "Includes answer key"].map((tag) => (
                 <span key={tag} className="flex items-center gap-1">
                   <svg className="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -257,19 +263,19 @@ export default function LessonPlansPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold text-secondary text-sm">Building your lesson plan…</p>
+                  <p className="font-semibold text-secondary text-sm">Creating your worksheet…</p>
                   <p className="text-xs text-gray-400 mt-0.5">This usually takes 10–20 seconds</p>
                 </div>
               </div>
               <div className="space-y-3 animate-pulse">
-                <div className="h-5 bg-gray-100 rounded w-2/5" />
+                <div className="h-5 bg-gray-100 rounded w-3/5" />
                 <div className="h-3 bg-gray-100 rounded w-full" />
                 <div className="h-3 bg-gray-100 rounded w-4/5" />
                 <div className="h-3 bg-gray-100 rounded w-full" />
-                <div className="h-5 bg-gray-100 rounded w-1/3 mt-5" />
-                <div className="h-3 bg-gray-100 rounded w-3/5" />
-                <div className="h-3 bg-gray-100 rounded w-4/5" />
+                <div className="h-3 bg-gray-100 rounded w-3/4 mt-4" />
+                <div className="h-3 bg-gray-100 rounded w-full" />
                 <div className="h-3 bg-gray-100 rounded w-2/3" />
+                <div className="h-3 bg-gray-100 rounded w-full" />
               </div>
             </div>
           )}
@@ -283,13 +289,13 @@ export default function LessonPlansPage() {
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                   </div>
                   <div>
-                    <p className="font-bold text-secondary text-sm">Lesson Plan Generated</p>
+                    <p className="font-bold text-secondary text-sm">Worksheet Generated</p>
                     <p className="text-xs text-gray-400">
-                      {form.subject} · {form.grade} · {form.topic} · {form.board}
+                      {form.subject} · {form.grade} · {form.topic} · {form.worksheetType}
                     </p>
                   </div>
                 </div>
@@ -338,7 +344,7 @@ export default function LessonPlansPage() {
                 onClick={() => { setResult(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 className="text-sm text-secondary hover:text-primary font-medium transition-colors"
               >
-                ← Generate another lesson plan
+                ← Generate another worksheet
               </button>
             </div>
           )}

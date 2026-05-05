@@ -1,15 +1,46 @@
 import { anthropic } from "@/lib/anthropic";
+import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
 
+interface FileData {
+  type: "pdf" | "image" | "text";
+  data?: string;
+  text?: string;
+  mimeType?: string;
+  filename: string;
+}
+
 export async function POST(req: NextRequest) {
-  const { subject, grade, topic, board, duration, additionalInstructions } =
-    await req.json();
+  const {
+    subject,
+    grade,
+    topic,
+    board,
+    duration,
+    additionalInstructions,
+    fileData,
+  }: {
+    subject: string;
+    grade: string;
+    topic: string;
+    board: string;
+    duration: string;
+    additionalInstructions?: string;
+    fileData?: FileData;
+  } = await req.json();
 
   if (!topic?.trim()) {
     return new Response("Topic is required", { status: 400 });
   }
+
+  const chapterNote =
+    fileData?.type === "text" && fileData.text
+      ? `\n\n**Uploaded Chapter Content (from "${fileData.filename}"):**\n${fileData.text.slice(0, 8000)}`
+      : fileData
+      ? `\n\nA file named "${fileData.filename}" has been uploaded as reference material. Use its content to tailor the lesson plan to the specific chapter.`
+      : "";
 
   const prompt = `You are an expert teacher trainer and curriculum designer specialising in Indian school education. Create a detailed, ready-to-use lesson plan for a classroom teacher.
 
@@ -19,7 +50,7 @@ export async function POST(req: NextRequest) {
 - Topic: ${topic}
 - Board: ${board}
 - Duration: ${duration}
-${additionalInstructions?.trim() ? `- Additional Instructions: ${additionalInstructions.trim()}` : ""}
+${additionalInstructions?.trim() ? `- Additional Instructions: ${additionalInstructions.trim()}` : ""}${chapterNote}
 
 Generate a structured lesson plan using the sections below. Keep timings realistic for a ${duration} class. Write in clear, practical language a teacher can directly follow.
 
@@ -62,11 +93,38 @@ Key curriculum alignments, chapter references, or pedagogy notes specific to ${b
 
 Format clearly using headings, bullet points, and timing labels. Make it immediately usable.`;
 
-  const stream = anthropic.messages.stream({
-    model: "claude-sonnet-4-6",
-    max_tokens: 2500,
-    messages: [{ role: "user", content: prompt }],
-  });
+  // Build multimodal content array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const content: any[] = [];
+
+  if (fileData?.type === "image" && fileData.data && fileData.mimeType) {
+    content.push({
+      type: "image",
+      source: { type: "base64", media_type: fileData.mimeType, data: fileData.data },
+    });
+  }
+
+  if (fileData?.type === "pdf" && fileData.data) {
+    content.push({
+      type: "document",
+      source: { type: "base64", media_type: "application/pdf", data: fileData.data },
+    });
+  }
+
+  content.push({ type: "text", text: prompt });
+
+  const stream = anthropic.messages.stream(
+    {
+      model: "claude-sonnet-4-6",
+      max_tokens: 2500,
+      messages: [
+        { role: "user", content: content as Anthropic.MessageParam["content"] },
+      ],
+    },
+    fileData?.type === "pdf"
+      ? { headers: { "anthropic-beta": "pdfs-2024-09-25" } }
+      : undefined
+  );
 
   const encoder = new TextEncoder();
 
