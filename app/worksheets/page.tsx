@@ -10,6 +10,7 @@ import ChapterUpload, { UploadedFile } from "@/components/ui/ChapterUpload";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import { getUsageThisMonth, FREE_LIMIT } from "@/lib/usage";
+import { getFriendlyError } from "@/lib/api-errors";
 
 const SUBJECTS = ["Mathematics", "Science", "Social Studies", "Hindi", "English", "EVS", "Other"];
 const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
@@ -18,6 +19,17 @@ const DIFFICULTIES = ["Easy", "Medium", "Mixed"];
 const BOARDS = ["CBSE", "ICSE", "State Board"];
 
 interface QuestionMix { mcq: number; shortTwo: number; shortThree: number; longFour: number; longFive: number; }
+
+function cleanOutput(text: string): string {
+  return text
+    .replace(/&emsp;/g, "   ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
 
 function formatDateTitle(d: Date): string {
   const day = String(d.getDate()).padStart(2, "0");
@@ -173,8 +185,8 @@ export default function WorksheetsPage() {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        if (chunk.startsWith("__STREAM_ERROR__")) { setApiError(chunk.replace("__STREAM_ERROR__", "").trim() || "Generation failed."); setResult(""); break; }
-        fullText += chunk;
+        if (chunk.startsWith("__STREAM_ERROR__")) { setApiError(getFriendlyError({ message: chunk.replace("__STREAM_ERROR__", "").trim() })); setResult(""); break; }
+        fullText += cleanOutput(chunk);
         setResult(fullText);
         if (firstChunk && resultRef.current) { firstChunk = false; resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" }); }
       }
@@ -186,7 +198,7 @@ export default function WorksheetsPage() {
       }
       if (user) getUsageThisMonth(user.id).then(setUsage);
     } catch (err: unknown) {
-      setApiError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setApiError(getFriendlyError(err));
     } finally { setLoading(false); }
   };
 
@@ -385,7 +397,10 @@ export default function WorksheetsPage() {
             {apiError && (
               <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
-                <p className="text-sm text-red-700">{apiError}</p>
+                <div className="flex-1">
+                  <p className="text-sm text-red-700">{apiError}</p>
+                  <button onClick={() => { setApiError(""); handleGenerate(); }} className="mt-2 text-xs font-semibold text-red-600 hover:text-red-800 underline">Try Again</button>
+                </div>
               </div>
             )}
             <div className="mt-5 flex flex-wrap gap-3 justify-center text-xs text-gray-400">

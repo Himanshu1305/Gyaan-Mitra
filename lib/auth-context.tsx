@@ -60,12 +60,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     });
-    return { error: error ? friendlyAuthError(error.message) : null };
+    if (error) return { error: friendlyAuthError(error.message) };
+
+    // Create profile record immediately after signup
+    if (data.user) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from("profiles").upsert([{
+          id: data.user.id,
+          email: data.user.email,
+          full_name: fullName,
+          subscription_tier: "free",
+          is_admin: false,
+          communication_preferences: { newsletters: true, product_updates: true, teaching_tips: true },
+        }], { onConflict: "id" });
+      } catch { /* trigger may have already created it — non-critical */ }
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {

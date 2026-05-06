@@ -13,6 +13,12 @@
 -- Run this if saved_content table already exists:
 -- ALTER TABLE saved_content ADD COLUMN IF NOT EXISTS linked_id uuid;
 
+-- ── Admin & settings columns (run these if tables already exist) ────────────
+-- Run this: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_admin boolean default false;
+-- Run this: UPDATE profiles SET is_admin = true WHERE email = 'usdvisionai@gmail.com';
+-- Run this: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS communication_preferences jsonb default '{"newsletters": true, "product_updates": true, "teaching_tips": true}'::jsonb;
+-- Run this: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS subscription_tier text default 'free'; (may already exist)
+
 -- ── Profiles table ──────────────────────────────────────────
 -- Stores additional user data beyond what auth.users provides
 CREATE TABLE IF NOT EXISTS profiles (
@@ -20,6 +26,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   full_name text,
   email text,
   subscription_tier text default 'free',
+  is_admin boolean default false,
+  communication_preferences jsonb default '{"newsletters": true, "product_updates": true, "teaching_tips": true}'::jsonb,
   created_at timestamptz default now()
 );
 
@@ -87,11 +95,14 @@ CREATE POLICY "Users can delete own content"
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, email)
+  INSERT INTO public.profiles (id, full_name, email, subscription_tier, is_admin, communication_preferences)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data->>'full_name',
-    NEW.email
+    NEW.email,
+    'free',
+    false,
+    '{"newsletters": true, "product_updates": true, "teaching_tips": true}'::jsonb
   );
   RETURN NEW;
 END;

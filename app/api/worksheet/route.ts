@@ -141,6 +141,12 @@ Adjust question formats based on ${difficulty} difficulty.`;
 
   const formPrompt = `You are an experienced teacher creating a worksheet for Indian school students.
 
+IMPORTANT FORMATTING RULES: Never use HTML entities like &emsp; &nbsp; &amp; or any HTML tags in your response. Use plain text only. For MCQ options use this exact format:
+(a) option one   (b) option two   (c) option three   (d) option four
+Use regular spaces between options. Never use HTML.
+
+CRITICAL: In the WORKSHEET section (between ===WORKSHEET START=== and ===WORKSHEET END===), there must be ZERO answers, ZERO answer lines, ZERO "Answer: ______" lines, ZERO hints. The worksheet section contains ONLY questions, marks, and instructions. All answers, answer keys, marking schemes, and model answers go ONLY in the ANSWER KEY section (between ===ANSWER KEY START=== and ===ANSWER KEY END===). This separation is absolute — no exceptions.
+
 Subject: ${subject}
 Grade: ${grade}
 Board: ${board}

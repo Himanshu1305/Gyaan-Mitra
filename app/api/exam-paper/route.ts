@@ -119,7 +119,15 @@ export async function POST(req: NextRequest) {
     mix.longFive > 0 ? `  - Section E — Long Answer 5 marks: ${mix.longFive} questions` : null,
   ].filter(Boolean).join("\n");
 
-  const qualityRequirements = `
+  const formattingRules = `
+IMPORTANT FORMATTING RULES: Never use HTML entities like &emsp; &nbsp; &amp; or any HTML tags in your response. Use plain text only. For MCQ options use this exact format:
+(a) option one   (b) option two   (c) option three   (d) option four
+Use regular spaces between options. Never use HTML.
+
+CRITICAL: In the QUESTION PAPER section (between ===QUESTION PAPER START=== and ===QUESTION PAPER END===), there must be ZERO answers, ZERO answer lines, ZERO "Answer: ______" lines, ZERO hints. The question paper section contains ONLY questions, marks, and instructions. All answers, answer keys, marking schemes, and model answers go ONLY in the ANSWER KEY section (between ===ANSWER KEY START=== and ===ANSWER KEY END===). This separation is absolute — no exceptions.`;
+
+  const qualityRequirements = `${formattingRules}
+
 Important quality requirements: (1) Every question must be clear, unambiguous, and grade-appropriate. (2) The answer key must cover EVERY question — no exceptions. (3) Marks must add up correctly to ${calcTotal}. (4) Follow the exact ${board} format specified. (5) Use Indian names, places, and contexts in word problems.${subject === "Science" ? " For Science papers: include at least 2 diagram-based questions — write the question and add '(Draw and label a diagram)' or specify the diagram name for the teacher to draw before printing." : ""}${subject === "Mathematics" ? " For Maths papers: include at least one real-life Indian context word problem per section — like GST calculation, field measurement, or cricket statistics. The answer key must show full working." : ""}`;
 
   const subjectInstruction = `\n${qualityRequirements}${noChapterNote}`;

@@ -92,6 +92,10 @@ export async function POST(req: NextRequest) {
 
   const formPrompt = `You are an expert teacher trainer and curriculum designer specialising in Indian school education. Create a detailed, ready-to-use lesson plan for a classroom teacher.
 
+IMPORTANT FORMATTING RULES: Never use HTML entities like &emsp; &nbsp; &amp; or any HTML tags in your response. Use plain text only. For MCQ options use this exact format:
+(a) option one   (b) option two   (c) option three   (d) option four
+Use regular spaces between options. Never use HTML.
+
 **Lesson Details:**
 - Subject: ${subject}
 - Grade: ${grade}

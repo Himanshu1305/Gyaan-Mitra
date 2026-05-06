@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { supabase } from "@/lib/supabase";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -15,11 +16,19 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [adminUser, setAdminUser] = useState(false);
   const { user, signOut, loading } = useAuth();
+
+  useEffect(() => {
+    if (!user) { setAdminUser(false); return; }
+    supabase.from("profiles").select("is_admin").eq("id", user.id).single()
+      .then(({ data }) => setAdminUser(data?.is_admin === true));
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
     setMenuOpen(false);
+    setAdminUser(false);
   };
 
   const displayName = user?.user_metadata?.full_name
@@ -63,6 +72,20 @@ export default function Navbar() {
                     >
                       Hi, {displayName}
                     </Link>
+                    <Link
+                      href="/settings"
+                      className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
+                    >
+                      Settings
+                    </Link>
+                    {adminUser && (
+                      <Link
+                        href="/admin"
+                        className="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors"
+                      >
+                        Admin
+                      </Link>
+                    )}
                     <button
                       onClick={handleSignOut}
                       className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:text-secondary hover:border-secondary transition-colors"
@@ -124,17 +147,18 @@ export default function Navbar() {
           ))}
           {user ? (
             <>
-              <Link
-                href="/dashboard"
-                className="block text-sm font-medium text-secondary"
-                onClick={() => setMenuOpen(false)}
-              >
+              <Link href="/dashboard" className="block text-sm font-medium text-secondary" onClick={() => setMenuOpen(false)}>
                 Dashboard ({displayName})
               </Link>
-              <button
-                onClick={handleSignOut}
-                className="block w-full text-left text-sm font-medium text-gray-600"
-              >
+              <Link href="/settings" className="block text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}>
+                Settings
+              </Link>
+              {adminUser && (
+                <Link href="/admin" className="block text-sm font-semibold text-red-600" onClick={() => setMenuOpen(false)}>
+                  Admin
+                </Link>
+              )}
+              <button onClick={handleSignOut} className="block w-full text-left text-sm font-medium text-gray-600">
                 Sign Out
               </button>
             </>
