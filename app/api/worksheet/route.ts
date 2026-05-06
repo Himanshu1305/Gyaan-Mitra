@@ -149,34 +149,26 @@ Worksheet Type: ${worksheetType}
 Difficulty: ${difficulty}${chapterNote}
 ${additionalInstructions?.trim() ? `Additional Instructions: ${additionalInstructions.trim()}` : ""}
 
-Create a complete, well-formatted worksheet using the structure below.
-
-## Worksheet
-
+Create a complete, well-formatted worksheet. The worksheet header should include:
 **Subject:** ${subject} | **Grade:** ${grade} | **Topic:** ${topic} | **Board:** ${board} | **Total Marks:** ${totalMarks}
-
 **Name:** _________________________________ | **Date:** _____________ | **Roll No.:** _______
 
----
-
-## Instructions for Students
-[Write 2–3 clear, grade-appropriate instructions]
-
-## Questions
+Include 2–3 clear student instructions, then all questions with clear section headings and marks.
 
 ${questionFormatGuide}
 
-Use simple language appropriate for ${grade} students. Include Indian-context names, places, and examples where relevant (e.g. Ramesh, Priya, Delhi, cricket, rupees). Number every question clearly. Group questions by type with clear section headings and marks.
+Use simple language appropriate for ${grade} students. Include Indian-context names, places, and examples (e.g. Ramesh, Priya, Delhi, cricket, rupees). Number every question clearly.
 
----
+Structure your output EXACTLY like this — use these delimiters precisely:
 
-## Answer Key
+===WORKSHEET START===
+[Complete worksheet — questions only, no answers. Include header, student instructions, and all questions.]
+===WORKSHEET END===
 
-**[Complete Answer Key — for teacher use only]**
-
-Provide correct answers for every question. For MCQs state the letter and answer. For fill-in-the-blank give the exact word(s). For short/long answers give a model answer with marks breakdown.
-
-Format the worksheet clearly with proper spacing between questions. Make it print-ready.`;
+===ANSWER KEY START===
+[ FOR TEACHER USE ONLY ]
+[Complete answer key for every question. For MCQs: state letter and answer. For short/long answers: model answer with marks breakdown. Do not skip any question.]
+===ANSWER KEY END===`;
 
   const finalPrompt = mode === "custom" ? customPrompt! + chapterNote : formPrompt;
 

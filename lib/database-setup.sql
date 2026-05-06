@@ -10,6 +10,9 @@
 -- 3. Optionally disable "Confirm email" for faster testing
 -- 4. Then run this SQL in the SQL Editor
 
+-- Run this if saved_content table already exists:
+-- ALTER TABLE saved_content ADD COLUMN IF NOT EXISTS linked_id uuid;
+
 -- ── Profiles table ──────────────────────────────────────────
 -- Stores additional user data beyond what auth.users provides
 CREATE TABLE IF NOT EXISTS profiles (
@@ -32,13 +35,16 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
 
 -- ── Saved content table ──────────────────────────────────────
 -- Stores generated content that users choose to save
+-- content_type: 'lesson-plan' | 'worksheet' | 'question-paper' | 'answer-key'
+-- linked_id: for answer-key records, points to the parent question-paper record
 CREATE TABLE IF NOT EXISTS saved_content (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users,
-  content_type text,        -- 'lesson-plan' | 'worksheet' | 'exam-paper'
+  content_type text,
   title text,
   input_data jsonb,
   output_content text,
+  linked_id uuid,
   created_at timestamptz default now()
 );
 

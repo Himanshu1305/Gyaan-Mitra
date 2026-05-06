@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     examType,
     board,
     chapters,
-    totalMarks,
+    difficulty = "Standard",
     duration,
     questionMix,
     additionalInstructions,
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     examType: string;
     board: string;
     chapters: string;
-    totalMarks: number;
+    difficulty?: string;
     duration: string;
     questionMix?: QuestionMix;
     additionalInstructions?: string;
@@ -107,6 +107,10 @@ export async function POST(req: NextRequest) {
       ? `\n\nA file named "${fileData.filename}" has been uploaded as reference. Use its content to set questions from the uploaded chapters.`
       : "";
 
+  const noChapterNote = !fileData
+    ? `\n\nNo specific textbook content was provided. The teacher mentioned: "${chapters}". Generate questions based on standard NCERT curriculum for ${grade} ${subject}. If chapters are vague (e.g. "all chapters"), distribute questions evenly across all major topics of the standard NCERT syllabus for this class and subject. After each question, add in brackets which chapter/topic it is from.`
+    : "";
+
   const mixLines = [
     mix.mcq > 0 ? `  - Section A — MCQs (1 mark each): ${mix.mcq} questions` : null,
     mix.shortTwo > 0 ? `  - Section B — Short Answer 2 marks: ${mix.shortTwo} questions` : null,
@@ -115,7 +119,90 @@ export async function POST(req: NextRequest) {
     mix.longFive > 0 ? `  - Section E — Long Answer 5 marks: ${mix.longFive} questions` : null,
   ].filter(Boolean).join("\n");
 
-  const formPrompt = `You are an expert teacher creating an exam paper for Indian school students. Create a complete, print-ready exam paper.
+  const qualityRequirements = `
+Important quality requirements: (1) Every question must be clear, unambiguous, and grade-appropriate. (2) The answer key must cover EVERY question — no exceptions. (3) Marks must add up correctly to ${calcTotal}. (4) Follow the exact ${board} format specified. (5) Use Indian names, places, and contexts in word problems.${subject === "Science" ? " For Science papers: include at least 2 diagram-based questions — write the question and add '(Draw and label a diagram)' or specify the diagram name for the teacher to draw before printing." : ""}${subject === "Mathematics" ? " For Maths papers: include at least one real-life Indian context word problem per section — like GST calculation, field measurement, or cricket statistics. The answer key must show full working." : ""}`;
+
+  const subjectInstruction = `\n${qualityRequirements}${noChapterNote}`;
+
+  // Difficulty-level instruction
+  let difficultyInstruction = "";
+  if (difficulty === "Easy") {
+    difficultyInstruction = "Difficulty: Create an accessible paper with approximately 70% straightforward recall and basic application questions, 20% medium questions, and 10% challenging questions. Use simple, clear language throughout.";
+  } else if (difficulty === "Challenging") {
+    difficultyInstruction = "Difficulty: Create a rigorous paper with approximately 20% recall questions, 40% application questions, and 40% higher-order thinking, analysis, and evaluation questions. Include complex word problems and multi-step questions.";
+  } else {
+    difficultyInstruction = "Difficulty: Create a balanced paper with approximately 40% easy recall questions, 40% medium application questions, and 20% challenging higher-order questions.";
+  }
+
+  // Output structure directive
+  const outputStructure = `
+Structure your output EXACTLY like this — use these delimiters precisely:
+
+===QUESTION PAPER START===
+[Complete formatted question paper — questions only, no answers, proper sections, marks per question, general instructions at top]
+===QUESTION PAPER END===
+
+===ANSWER KEY START===
+[ FOR TEACHER USE ONLY ]
+[Complete answer key with model answers and marking scheme for every single question — do not skip any question]
+===ANSWER KEY END===`;
+
+  const allThreeOutputStructure = `
+Structure your output EXACTLY like this — use these delimiters precisely:
+
+===EASY QUESTION PAPER START===
+[Complete Easy-level question paper]
+===EASY QUESTION PAPER END===
+===EASY ANSWER KEY START===
+[ FOR TEACHER USE ONLY — EASY PAPER ]
+[Complete answer key for Easy paper]
+===EASY ANSWER KEY END===
+
+===STANDARD QUESTION PAPER START===
+[Complete Standard-level question paper]
+===STANDARD QUESTION PAPER END===
+===STANDARD ANSWER KEY START===
+[ FOR TEACHER USE ONLY — STANDARD PAPER ]
+[Complete answer key for Standard paper]
+===STANDARD ANSWER KEY END===
+
+===CHALLENGING QUESTION PAPER START===
+[Complete Challenging-level question paper]
+===CHALLENGING QUESTION PAPER END===
+===CHALLENGING ANSWER KEY START===
+[ FOR TEACHER USE ONLY — CHALLENGING PAPER ]
+[Complete answer key for Challenging paper]
+===CHALLENGING ANSWER KEY END===`;
+
+  let formPrompt: string;
+
+  if (difficulty === "All Three Levels") {
+    formPrompt = `You are an expert teacher creating exam papers for Indian school students. Generate THREE complete exam papers at different difficulty levels.
+
+**Exam Details (apply to all three papers):**
+- Subject: ${subject}
+- Grade: ${grade}
+- Board: ${board}
+- Exam Type: ${examType}
+- Chapters / Topics Covered: ${chapters}
+- Total Marks per paper: ${calcTotal}
+- Duration: ${duration}
+${additionalInstructions?.trim() ? `- Additional Instructions: ${additionalInstructions.trim()}` : ""}${chapterNote}
+
+**Question Mix (same for all three papers):**
+${mixLines}
+
+**Paper 1 — Easy:** Create an accessible paper with approximately 70% straightforward recall and basic application questions, 20% medium questions, and 10% challenging questions. Use simple language.
+
+**Paper 2 — Standard:** Create a balanced paper with approximately 40% easy recall questions, 40% medium application questions, and 20% challenging higher-order questions.
+
+**Paper 3 — Challenging:** Create a rigorous paper with approximately 20% recall questions, 40% application questions, and 40% higher-order thinking, analysis, and evaluation questions. Include complex word problems.
+
+${subjectInstruction}
+
+${allThreeOutputStructure}`;
+  } else {
+    formPrompt = `You are an expert teacher creating an exam paper for Indian school students. Create a complete, print-ready exam paper.
 
 **Exam Details:**
 - Subject: ${subject}
@@ -123,43 +210,26 @@ export async function POST(req: NextRequest) {
 - Board: ${board}
 - Exam Type: ${examType}
 - Chapters / Topics Covered: ${chapters}
-- Total Marks: ${totalMarks} (Question mix total: ${calcTotal})
+- Total Marks: ${calcTotal}
 - Duration: ${duration}
+- ${difficultyInstruction}
 ${additionalInstructions?.trim() ? `- Additional Instructions: ${additionalInstructions.trim()}` : ""}${chapterNote}
 
-Generate the exam paper using the structure below. Set questions only from the chapters listed above. Use clear, grade-appropriate language.
-
----
-
-## ${subject} — ${examType}
-
-**Grade:** ${grade} | **Board:** ${board} | **Total Marks:** ${totalMarks} | **Time Allowed:** ${duration}
-
-**Student Name:** _________________________________ &nbsp;&nbsp; **Roll No.:** _______ &nbsp;&nbsp; **Date:** _____________
-
----
-
-### General Instructions
-1. All questions are compulsory.
-2. Read each question carefully before answering.
-3. Write neat and legible answers.
-[Add 1–2 more subject-specific instructions]
-
----
-
+**Question Mix:**
 ${mixLines}
 
-[Create all questions section by section, with clear section headings, question numbers, and marks for each question. For MCQs include 4 options labelled A–D. Use Indian-context names and examples (Ramesh, Priya, Delhi, rupees, etc.). Ensure questions cover the chapters listed.]
+Set questions only from the chapters listed above. Use clear, grade-appropriate language.
 
----
+The exam paper header should be:
+**${subject} — ${examType}**
+Grade: ${grade} | Board: ${board} | Total Marks: ${calcTotal} | Time Allowed: ${duration}
 
-## Answer Key & Marking Scheme
+**Student Name:** _________________________________ | **Roll No.:** _______ | **Date:** _____________
 
-**[For Teacher Use Only]**
+${subjectInstruction}
 
-Provide the correct answer for every question. For MCQs: state the letter and full answer. For short/long answers: give a model answer with marks breakdown (e.g. 1 mark for definition, 1 mark for example).
-
-Format the paper clearly with proper spacing. Make it print-ready.`;
+${outputStructure}`;
+  }
 
   const finalPrompt = mode === "custom" ? customPrompt! + chapterNote : formPrompt;
 
@@ -182,10 +252,12 @@ Format the paper clearly with proper spacing. Make it print-ready.`;
 
   content.push({ type: "text", text: finalPrompt });
 
+  const maxTokens = difficulty === "All Three Levels" ? 8000 : 3500;
+
   const stream = anthropic.messages.stream(
     {
       model: "claude-sonnet-4-6",
-      max_tokens: 3500,
+      max_tokens: maxTokens,
       messages: [
         { role: "user", content: content as Anthropic.MessageParam["content"] },
       ],
