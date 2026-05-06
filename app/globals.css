@@ -17,3 +17,91 @@ body {
     text-wrap: balance;
   }
 }
+
+/* ── Print styles ─────────────────────────────────────────── */
+@media print {
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the print content area */
+  #print-content,
+  #print-content * {
+    visibility: visible;
+  }
+
+  #print-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+    padding: 2cm;
+  }
+
+  /* Clean heading styles in print */
+  #print-content h1,
+  #print-content h2 {
+    color: #1B3A6B;
+    page-break-after: avoid;
+  }
+
+  #print-content h2 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4pt;
+    margin-top: 16pt;
+  }
+
+  #print-content h3,
+  #print-content h4 {
+    page-break-after: avoid;
+    color: #333;
+  }
+
+  /* Avoid page breaks inside blocks */
+  #print-content p,
+  #print-content li {
+    page-break-inside: avoid;
+  }
+
+  #print-content ul,
+  #print-content ol {
+    margin-left: 20pt;
+  }
+
+  /* Gyaan Mitra print header/footer */
+  .print-only-header {
+    display: block !important;
+    text-align: center;
+    border-bottom: 2px solid #FF9933;
+    padding-bottom: 10pt;
+    margin-bottom: 20pt;
+    font-size: 11pt;
+    color: #666;
+  }
+
+  .print-only-footer {
+    display: block !important;
+    text-align: center;
+    border-top: 1px solid #ccc;
+    padding-top: 10pt;
+    margin-top: 20pt;
+    font-size: 10pt;
+    color: #888;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+  }
+}
+
+/* Hide print-only elements on screen */
+.print-only-header,
+.print-only-footer {
+  display: none;
+}

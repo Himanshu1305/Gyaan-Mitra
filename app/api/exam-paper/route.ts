@@ -1,8 +1,17 @@
 import { anthropic } from "@/lib/anthropic";
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
+
+const FREE_LIMIT = 5;
+
+function monthYear(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
 
 interface QuestionMix {
   mcq: number;
@@ -56,6 +65,35 @@ export async function POST(req: NextRequest) {
   } else {
     if (!chapters?.trim()) {
       return new Response("Chapters covered is required", { status: 400 });
+    }
+  }
+
+  // Auth & usage-limit check
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  let userId: string | null = null;
+  let userSupa: ReturnType<typeof createClient> | null = null;
+
+  if (token) {
+    const { data: { user } } = await supabase.auth.getUser(token);
+    if (user) {
+      userId = user.id;
+      userSupa = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { global: { headers: { Authorization: `Bearer ${token}` } } }
+      );
+      const { count } = await userSupa
+        .from("usage_tracking")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("month_year", monthYear());
+      if ((count ?? 0) >= FREE_LIMIT) {
+        return new Response(
+          "You have used all 5 free generations this month. Upgrade to Premium for unlimited access.",
+          { status: 429 }
+        );
+      }
     }
   }
 
@@ -158,6 +196,7 @@ Format the paper clearly with proper spacing. Make it print-ready.`;
   );
 
   const encoder = new TextEncoder();
+  let streamSucceeded = false;
 
   const readable = new ReadableStream({
     async start(controller) {
@@ -167,11 +206,22 @@ Format the paper clearly with proper spacing. Make it print-ready.`;
             controller.enqueue(encoder.encode(event.delta.text));
           }
         }
+        streamSucceeded = true;
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : "Generation failed. Please try again.";
         controller.enqueue(encoder.encode(`__STREAM_ERROR__${message}`));
       } finally {
         controller.close();
+        if (userId && streamSucceeded && userSupa) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (userSupa as any).from("usage_tracking").insert([{
+              user_id: userId,
+              feature_used: "exam-paper",
+              month_year: monthYear(),
+            }]);
+          } catch { /* non-critical */ }
+        }
       }
     },
   });

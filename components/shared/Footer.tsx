@@ -14,13 +14,16 @@ export default function Footer() {
             <p className="mt-3 text-sm text-primary font-medium">gyaanmitra.com</p>
           </div>
 
-          {/* Links */}
+          {/* Tools & Pages */}
           <div>
             <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Tools</h4>
             <ul className="space-y-2 text-sm text-secondary-200">
               <li><Link href="/lesson-plans" className="hover:text-primary transition-colors">Lesson Plan Generator</Link></li>
               <li><Link href="/worksheets" className="hover:text-primary transition-colors">Worksheet Creator</Link></li>
+              <li><Link href="/exam-papers" className="hover:text-primary transition-colors">Exam Paper Generator</Link></li>
               <li><Link href="/prompt-library" className="hover:text-primary transition-colors">Prompt Library</Link></li>
+              <li><Link href="/pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
+              <li><Link href="/about" className="hover:text-primary transition-colors">About</Link></li>
             </ul>
           </div>
 

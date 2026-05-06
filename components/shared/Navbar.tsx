@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -14,6 +15,16 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    setMenuOpen(false);
+  };
+
+  const displayName = user?.user_metadata?.full_name
+    ? (user.user_metadata.full_name as string).split(" ")[0]
+    : user?.email?.split("@")[0] ?? "";
 
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
@@ -40,14 +51,43 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* CTA + mobile toggle */}
+          {/* CTA + auth + mobile toggle */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/lesson-plans"
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
-            >
-              Get Started Free
-            </Link>
+            {!loading && (
+              <>
+                {user ? (
+                  <div className="hidden sm:flex items-center gap-3">
+                    <Link
+                      href="/dashboard"
+                      className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
+                    >
+                      Hi, {displayName}
+                    </Link>
+                    <button
+                      onClick={handleSignOut}
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:text-secondary hover:border-secondary transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="hidden sm:flex items-center gap-2">
+                    <Link
+                      href="/login"
+                      className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      href="/signup"
+                      className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
+                    >
+                      Get Started Free
+                    </Link>
+                  </div>
+                )}
+              </>
+            )}
 
             {/* Hamburger */}
             <button
@@ -82,13 +122,40 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/lesson-plans"
-            className="block w-full text-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
-            onClick={() => setMenuOpen(false)}
-          >
-            Get Started Free
-          </Link>
+          {user ? (
+            <>
+              <Link
+                href="/dashboard"
+                className="block text-sm font-medium text-secondary"
+                onClick={() => setMenuOpen(false)}
+              >
+                Dashboard ({displayName})
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="block w-full text-left text-sm font-medium text-gray-600"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="block text-sm font-medium text-gray-700"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="block w-full text-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                Get Started Free
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
