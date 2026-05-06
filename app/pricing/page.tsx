@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import { seoConfig } from "@/app/seo-config";
+
+export const metadata: Metadata = {
+  title: seoConfig.pricing.title,
+  description: seoConfig.pricing.description,
+  keywords: seoConfig.pricing.keywords,
+};
 
 const FREE_FEATURES = [
   "5 AI generations per month",

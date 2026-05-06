@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import { blogPosts, CATEGORY_COLORS } from "@/lib/blog-posts";
 
 /* ─── Contact form ───────────────────────────────────────────── */
 function ContactForm() {
@@ -304,6 +305,43 @@ export default function AboutPage() {
                     Buy the Book
                   </Link>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Read Our Latest Articles ── */}
+        <section className="py-4 px-4 pb-14">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-10">
+              <div className="inline-flex items-center gap-2 bg-primary-50 text-primary text-xs font-semibold px-3 py-1 rounded-full mb-5">
+                From the Blog
+              </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-secondary">Read Our Latest Articles</h2>
+                <Link
+                  href="/blog"
+                  className="text-sm font-semibold text-primary hover:text-primary-600 transition-colors"
+                >
+                  View all →
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                {blogPosts.slice(0, 3).map((post) => (
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className="group rounded-xl border border-gray-100 bg-gray-50 hover:bg-primary-50 hover:border-primary-200 p-5 transition-all duration-200 flex flex-col"
+                  >
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full inline-block mb-3 ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
+                      {post.category}
+                    </span>
+                    <h3 className="text-sm font-bold text-secondary group-hover:text-primary transition-colors leading-snug mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-auto pt-2">{post.readTime}</p>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>

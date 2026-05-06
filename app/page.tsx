@@ -1,6 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import { blogPosts, CATEGORY_COLORS } from "@/lib/blog-posts";
+import { seoConfig } from "@/app/seo-config";
+
+export const metadata: Metadata = {
+  title: seoConfig.home.title,
+  description: seoConfig.home.description,
+  keywords: seoConfig.home.keywords,
+};
 
 const features = [
   {
@@ -61,9 +70,97 @@ const features = [
   },
 ];
 
+const whyPoints = [
+  {
+    icon: "⏱",
+    title: "Save 8+ Hours Every Week",
+    body: "Teachers across India report saving 2 hours per lesson plan. Multiply that by four lessons a week and you get your evenings back.",
+  },
+  {
+    icon: "🎓",
+    title: "Built for the Indian Curriculum",
+    body: "Gyaan Mitra knows CBSE, ICSE, and State Board syllabi. Every output is aligned to NEP 2020 competency goals — not generic AI filler.",
+  },
+  {
+    icon: "🌐",
+    title: "Works in English, Hindi, and Hinglish",
+    body: "Generate content in the language you actually teach in. Switch between English and Hindi in one click — no re-prompting needed.",
+  },
+];
+
+const howItWorksSteps = [
+  {
+    step: "1",
+    title: "Choose Your Tool",
+    body: "Pick from Lesson Plan Generator, Worksheet Creator, or Exam Paper Generator.",
+  },
+  {
+    step: "2",
+    title: "Fill in the Details",
+    body: "Enter subject, grade, topic, and any specific requirements. It takes under a minute.",
+  },
+  {
+    step: "3",
+    title: "Get Your Content",
+    body: "AI generates complete, curriculum-aligned content in seconds. Copy, edit, or download as PDF.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Is Gyaan Mitra free to use?",
+    a: "Yes, Gyaan Mitra is free for all teachers in India. You get 5 free AI generations every month with no credit card required. A premium plan for unlimited access is available at ₹499/year.",
+  },
+  {
+    q: "Which boards does Gyaan Mitra support?",
+    a: "Gyaan Mitra supports CBSE, ICSE, and all major State Boards across India. The content is aligned with the National Education Policy (NEP) 2020 framework.",
+  },
+  {
+    q: "Can I use Gyaan Mitra to create Hindi lesson plans?",
+    a: "Yes. You can generate lesson plans, worksheets, and exam papers in English, Hindi, or a mix of both. Simply mention your language preference when filling in the form.",
+  },
+  {
+    q: "How is Gyaan Mitra different from ChatGPT?",
+    a: "Gyaan Mitra is purpose-built for Indian teachers. Unlike ChatGPT, it understands the Indian curriculum, uses the right board-specific formats, and gives you structured output ready to print — without any prompt engineering on your part.",
+  },
+  {
+    q: "Can I edit the generated content?",
+    a: "Absolutely. Every piece of content generated is fully editable. You can copy the text, modify it in Word or Google Docs, and tailor it to your classroom needs.",
+  },
+  {
+    q: "Does Gyaan Mitra work on mobile?",
+    a: "Yes, Gyaan Mitra works on any device — phone, tablet, or computer. No app download needed. Just open gyaanmitra.com in your browser and start creating.",
+  },
+  {
+    q: "Is the generated content accurate and curriculum-aligned?",
+    a: "The AI is prompted to follow CBSE, ICSE, and NEP 2020 guidelines. We recommend reviewing the output before use, as AI can occasionally make errors — especially for highly specific or regional topics.",
+  },
+  {
+    q: "How do I get more than 5 free generations per month?",
+    a: "You can upgrade to Gyaan Mitra Premium for ₹499/year, which gives you unlimited generations. This works out to less than ₹42 per month — far less than the cost of a single printed book.",
+  },
+];
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
+const recentPosts = blogPosts.slice(0, 3);
+
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       <Navbar />
 
       {/* ── Hero ── */}
@@ -77,13 +174,13 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-secondary leading-tight text-balance">
-              Your AI Teaching Partner{" "}
-              <span className="text-primary">is Here</span>
+              India&apos;s Best AI Tool for Teachers{" "}
+              <span className="text-primary">— Save Hours Every Week</span>
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-gray-600 leading-relaxed text-balance">
-              Save hours every week on lesson plans, worksheets, and exam papers.
-              Gyaan Mitra is built for teachers across India.
+              Create lesson plans, worksheets, and exam papers in minutes — not hours.
+              Gyaan Mitra is built for CBSE, ICSE, and State Board teachers across India.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -105,7 +202,17 @@ export default function HomePage() {
             </div>
 
             {/* Trust bar */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
+            <div className="mt-10 py-4 px-6 bg-white/70 rounded-2xl border border-gray-100 shadow-sm inline-block">
+              <p className="text-sm font-semibold text-gray-600 text-center">
+                Trusted by teachers across India &mdash;&nbsp;
+                <span className="text-secondary">CBSE</span> &nbsp;&middot;&nbsp;
+                <span className="text-secondary">ICSE</span> &nbsp;&middot;&nbsp;
+                <span className="text-secondary">State Boards</span> &nbsp;&middot;&nbsp;
+                <span className="text-primary font-bold">Aligned with NEP 2020</span>
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
               <span className="flex items-center gap-1.5">
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -122,9 +229,32 @@ export default function HomePage() {
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                CBSE · ICSE · State Board
+                CBSE &middot; ICSE &middot; State Board
               </span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why Teachers Love Gyaan Mitra ── */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-secondary">
+              Why Teachers Love Gyaan Mitra
+            </h2>
+            <p className="mt-3 text-gray-500 text-lg">
+              Real benefits that make a real difference in the classroom
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {whyPoints.map((pt) => (
+              <div key={pt.title} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div className="text-4xl mb-4">{pt.icon}</div>
+                <h3 className="text-xl font-bold text-secondary mb-3">{pt.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{pt.body}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -147,15 +277,12 @@ export default function HomePage() {
                 key={feature.title}
                 className="group relative bg-white border border-gray-100 rounded-2xl p-8 shadow-sm hover:shadow-lg hover:border-primary-200 transition-all duration-200"
               >
-                {/* Icon */}
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary-50 text-primary mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-200">
                   {feature.icon}
                 </div>
-
                 <h3 className="text-xl font-bold text-secondary mb-2">{feature.title}</h3>
                 <p className="text-primary font-semibold text-sm mb-3">{feature.description}</p>
                 <p className="text-gray-500 text-sm leading-relaxed mb-6">{feature.detail}</p>
-
                 <Link
                   href={feature.href}
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-secondary hover:text-primary transition-colors"
@@ -166,6 +293,123 @@ export default function HomePage() {
                   </svg>
                 </Link>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section className="bg-gradient-to-br from-secondary via-secondary-700 to-secondary-800 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white">How It Works</h2>
+            <p className="mt-3 text-secondary-200 text-lg">
+              From blank page to ready-to-use content in under 60 seconds
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {howItWorksSteps.map((s, i) => (
+              <div key={s.step} className="relative text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-white text-2xl font-extrabold mb-5 shadow-lg shadow-primary/30">
+                  {s.step}
+                </div>
+                {i < howItWorksSteps.length - 1 && (
+                  <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] right-[-calc(50%-2rem)] h-0.5 bg-white/20" />
+                )}
+                <h3 className="text-xl font-bold text-white mb-3">{s.title}</h3>
+                <p className="text-secondary-200 text-sm leading-relaxed">{s.body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <Link
+              href="/lesson-plans"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-600 transition-colors shadow-lg shadow-primary/40"
+            >
+              Try It Now — Free
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── From Our Blog ── */}
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-secondary">From Our Blog</h2>
+            <p className="mt-3 text-gray-500 text-lg">
+              Practical guides on AI, NEP 2020, and teaching smarter
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {recentPosts.map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="group bg-white border border-gray-100 rounded-2xl p-7 shadow-sm hover:shadow-lg hover:border-primary-200 transition-all duration-200 flex flex-col"
+              >
+                <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-block mb-4 ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
+                  {post.category}
+                </span>
+                <h3 className="text-base font-bold text-secondary mb-3 group-hover:text-primary transition-colors leading-snug">
+                  {post.title}
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed flex-1 mb-4">{post.excerpt}</p>
+                <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <span>{post.date}</span>
+                  <span>&middot;</span>
+                  <span>{post.readTime}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border-2 border-secondary text-secondary font-semibold text-sm hover:bg-secondary hover:text-white transition-colors"
+            >
+              Read All Articles
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-secondary">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-3 text-gray-500 text-lg">
+              Everything teachers ask before getting started
+            </p>
+          </div>
+          <div className="space-y-3">
+            {faqs.map((faq) => (
+              <details
+                key={faq.q}
+                className="group bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
+              >
+                <summary className="flex items-center justify-between gap-4 px-7 py-5 cursor-pointer list-none select-none">
+                  <span className="font-semibold text-secondary text-sm sm:text-base">{faq.q}</span>
+                  <svg
+                    className="w-5 h-5 text-gray-400 flex-shrink-0 group-open:rotate-180 transition-transform duration-200"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="px-7 pb-6">
+                  <p className="text-gray-600 text-sm leading-relaxed">{faq.a}</p>
+                </div>
+              </details>
             ))}
           </div>
         </div>
@@ -184,7 +428,7 @@ export default function HomePage() {
             href="/lesson-plans"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-600 transition-colors shadow-lg shadow-primary/40"
           >
-            Get Started — It&apos;s Free
+            Get Started &mdash; It&apos;s Free
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

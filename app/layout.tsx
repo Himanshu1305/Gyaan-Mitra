@@ -10,9 +10,35 @@ const geistSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Gyaan Mitra — AI for Teachers",
-  description:
-    "Save hours every week on lesson plans, worksheets, and exam papers. Gyaan Mitra is built for teachers across India.",
+  title: {
+    default: "Gyaan Mitra — Best AI Tool for Teachers in India",
+    template: "%s | Gyaan Mitra",
+  },
+  description: "India's best AI tool for teachers. Create lesson plans, worksheets, and exam papers in minutes. Free to use. Aligned with NEP 2020.",
+  keywords: ["AI for teachers India", "best AI tool for teachers", "lesson plan generator India", "AI worksheet maker", "NEP 2020 teaching tools"],
+  authors: [{ name: "Himanshu Dixit", url: "https://gyaanmitra.com/about" }],
+  creator: "Gyaan Mitra",
+  metadataBase: new URL("https://gyaanmitra.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://gyaanmitra.com",
+    siteName: "Gyaan Mitra",
+    title: "Gyaan Mitra — Best AI Tool for Teachers in India",
+    description: "India's best AI tool for teachers. Create lesson plans, worksheets, and exam papers in minutes. Free to use. Aligned with NEP 2020.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Gyaan Mitra — AI for Teachers" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gyaan Mitra — Best AI Tool for Teachers in India",
+    description: "India's best AI tool for teachers. Create lesson plans, worksheets, and exam papers in minutes.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
 };
 
 export default function RootLayout({

@@ -1,0 +1,9 @@
+Add a 1200x630 PNG image here named og-image.png for social sharing previews.
+
+Recommended specs:
+- Size: 1200 x 630 pixels
+- Format: PNG
+- File name: og-image.png
+- Content: Gyaan Mitra logo, tagline "India's Best AI Tool for Teachers", and a clean background in saffron/deep blue brand colours.
+
+This image appears when the site is shared on WhatsApp, Twitter, LinkedIn, and Facebook.
