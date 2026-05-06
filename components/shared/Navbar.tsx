@@ -7,6 +7,7 @@ const navLinks = [
   { label: "Home", href: "/" },
   { label: "Lesson Plans", href: "/lesson-plans" },
   { label: "Worksheets", href: "/worksheets" },
+  { label: "Exam Papers", href: "/exam-papers" },
   { label: "Prompt Library", href: "/prompt-library" },
   { label: "About", href: "/about" },
 ];

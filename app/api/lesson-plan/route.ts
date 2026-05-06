@@ -14,6 +14,8 @@ interface FileData {
 
 export async function POST(req: NextRequest) {
   const {
+    mode,
+    customPrompt,
     subject,
     grade,
     topic,
@@ -22,6 +24,8 @@ export async function POST(req: NextRequest) {
     additionalInstructions,
     fileData,
   }: {
+    mode?: "form" | "custom";
+    customPrompt?: string;
     subject: string;
     grade: string;
     topic: string;
@@ -31,8 +35,14 @@ export async function POST(req: NextRequest) {
     fileData?: FileData;
   } = await req.json();
 
-  if (!topic?.trim()) {
-    return new Response("Topic is required", { status: 400 });
+  if (mode === "custom") {
+    if (!customPrompt?.trim()) {
+      return new Response("Prompt is required", { status: 400 });
+    }
+  } else {
+    if (!topic?.trim()) {
+      return new Response("Topic is required", { status: 400 });
+    }
   }
 
   const chapterNote =
@@ -42,7 +52,7 @@ export async function POST(req: NextRequest) {
       ? `\n\nA file named "${fileData.filename}" has been uploaded as reference material. Use its content to tailor the lesson plan to the specific chapter.`
       : "";
 
-  const prompt = `You are an expert teacher trainer and curriculum designer specialising in Indian school education. Create a detailed, ready-to-use lesson plan for a classroom teacher.
+  const formPrompt = `You are an expert teacher trainer and curriculum designer specialising in Indian school education. Create a detailed, ready-to-use lesson plan for a classroom teacher.
 
 **Lesson Details:**
 - Subject: ${subject}
@@ -93,6 +103,8 @@ Key curriculum alignments, chapter references, or pedagogy notes specific to ${b
 
 Format clearly using headings, bullet points, and timing labels. Make it immediately usable.`;
 
+  const finalPrompt = mode === "custom" ? customPrompt! + chapterNote : formPrompt;
+
   // Build multimodal content array
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const content: any[] = [];
@@ -111,7 +123,7 @@ Format clearly using headings, bullet points, and timing labels. Make it immedia
     });
   }
 
-  content.push({ type: "text", text: prompt });
+  content.push({ type: "text", text: finalPrompt });
 
   const stream = anthropic.messages.stream(
     {
@@ -132,16 +144,12 @@ Format clearly using headings, bullet points, and timing labels. Make it immedia
     async start(controller) {
       try {
         for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
+          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
             controller.enqueue(encoder.encode(event.delta.text));
           }
         }
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : "Generation failed. Please try again.";
+        const message = err instanceof Error ? err.message : "Generation failed. Please try again.";
         controller.enqueue(encoder.encode(`__STREAM_ERROR__${message}`));
       } finally {
         controller.close();

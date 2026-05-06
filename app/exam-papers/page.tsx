@@ -10,9 +10,9 @@ import FileUpload, { UploadedFile } from "@/components/ui/FileUpload";
 /* ─── Options ───────────────────────────────────────────────── */
 const SUBJECTS = ["Mathematics", "Science", "Social Studies", "Hindi", "English", "EVS", "Other"];
 const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
-const WORKSHEET_TYPES = ["Practice", "Revision", "Homework", "Activity", "Multi-level — Three Levels"];
-const DIFFICULTIES = ["Easy", "Medium", "Mixed"];
+const EXAM_TYPES = ["Unit Test", "Half-Yearly Exam", "Annual Exam", "Class Test"];
 const BOARDS = ["CBSE", "ICSE", "State Board"];
+const DURATIONS = ["1 hour", "1.5 hours", "2 hours", "2.5 hours", "3 hours"];
 
 interface QuestionMix {
   mcq: number;
@@ -44,14 +44,8 @@ function SelectField({ label, value, onChange, options }: {
 function QuestionMixInput({ mix, onChange }: { mix: QuestionMix; onChange: (m: QuestionMix) => void }) {
   const totalMarks = mix.mcq * 1 + mix.shortTwo * 2 + mix.shortThree * 3 + mix.longFour * 4 + mix.longFive * 5;
 
-  const row = (
-    label: string,
-    marks: string,
-    key: keyof QuestionMix,
-    max: number,
-    color: string
-  ) => (
-    <div className="flex items-center gap-3">
+  const row = (label: string, marks: string, key: keyof QuestionMix, max: number, color: string) => (
+    <div key={key} className="flex items-center gap-3">
       <div className="flex-1">
         <p className="text-sm font-medium text-gray-700">{label}</p>
         <p className="text-xs text-gray-400">{marks}</p>
@@ -81,7 +75,7 @@ function QuestionMixInput({ mix, onChange }: { mix: QuestionMix; onChange: (m: Q
         {row("Long Answer", "4 marks each", "longFour", 10, "bg-orange-100 text-orange-700")}
         {row("Long Answer", "5 marks each", "longFive", 10, "bg-red-100 text-red-700")}
         <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
-          <span className="text-sm font-semibold text-secondary">Total Marks</span>
+          <span className="text-sm font-semibold text-secondary">Question Mix Total</span>
           <span className="text-lg font-extrabold text-primary">{totalMarks}</span>
         </div>
       </div>
@@ -109,17 +103,18 @@ function TabToggle({ mode, onChange }: { mode: "form" | "custom"; onChange: (m: 
 }
 
 /* ─── Page ──────────────────────────────────────────────────── */
-export default function WorksheetsPage() {
+export default function ExamPapersPage() {
   const [mode, setMode] = useState<"form" | "custom">("form");
   const [customPrompt, setCustomPrompt] = useState("");
 
   const [form, setForm] = useState({
     subject: "Mathematics",
-    grade: "Class 6",
-    topic: "",
-    worksheetType: "Practice",
-    difficulty: "Medium",
+    grade: "Class 8",
+    examType: "Unit Test",
     board: "CBSE",
+    chapters: "",
+    totalMarks: 25,
+    duration: "1 hour",
     additionalInstructions: "",
   });
 
@@ -128,41 +123,41 @@ export default function WorksheetsPage() {
     shortTwo: 3,
     shortThree: 2,
     longFour: 1,
-    longFive: 1,
+    longFive: 0,
   });
 
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [copied, setCopied] = useState(false);
-  const [topicError, setTopicError] = useState("");
+  const [chaptersError, setChaptersError] = useState("");
   const [promptError, setPromptError] = useState("");
   const [apiError, setApiError] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const set = (key: string) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
-  const appendToField = (field: "topic" | "additionalInstructions") => (text: string) =>
+  const set = (key: string) => (v: string | number) => setForm((f) => ({ ...f, [key]: v }));
+  const appendToField = (field: "chapters" | "additionalInstructions") => (text: string) =>
     setForm((f) => ({ ...f, [field]: f[field] ? f[field] + " " + text : text }));
   const appendToCustom = (text: string) =>
     setCustomPrompt((p) => p ? p + " " + text : text);
 
   const handleGenerate = async () => {
-    if (mode === "form" && !form.topic.trim()) {
-      setTopicError("Please enter a topic before generating.");
+    if (mode === "form" && !form.chapters.trim()) {
+      setChaptersError("Please enter the chapters covered before generating.");
       return;
     }
     if (mode === "custom" && !customPrompt.trim()) {
       setPromptError("Please enter your prompt before generating.");
       return;
     }
-    setTopicError("");
+    setChaptersError("");
     setPromptError("");
     setApiError("");
     setResult("");
     setLoading(true);
 
     try {
-      const res = await fetch("/api/worksheet", {
+      const res = await fetch("/api/exam-paper", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mode, customPrompt, ...form, questionMix, fileData }),
@@ -205,8 +200,6 @@ export default function WorksheetsPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const totalMarks = questionMix.mcq * 1 + questionMix.shortTwo * 2 + questionMix.shortThree * 3 + questionMix.longFour * 4 + questionMix.longFive * 5;
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
       <Navbar />
@@ -217,16 +210,16 @@ export default function WorksheetsPage() {
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-primary text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            AI Worksheet Creator
+            AI Exam Paper Generator
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-            Create a perfect worksheet{" "}
+            Create a full exam paper{" "}
             <span className="text-primary">in seconds</span>
           </h1>
           <p className="mt-3 text-secondary-200 text-base">
-            Fill the form or paste your own prompt — get a print-ready worksheet with answer key.
+            Unit tests, half-yearly and annual papers with answer key — ready to print.
           </p>
         </div>
       </section>
@@ -235,37 +228,50 @@ export default function WorksheetsPage() {
       <section className="flex-1 py-10 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <TabToggle mode={mode} onChange={(m) => { setMode(m); setTopicError(""); setPromptError(""); setApiError(""); }} />
+            <TabToggle mode={mode} onChange={(m) => { setMode(m); setChaptersError(""); setPromptError(""); setApiError(""); }} />
 
             {mode === "form" ? (
               <>
-                <h2 className="text-lg font-bold text-secondary mb-6">Worksheet Details</h2>
+                <h2 className="text-lg font-bold text-secondary mb-6">Exam Paper Details</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <SelectField label="Subject" value={form.subject} onChange={set("subject")} options={SUBJECTS} />
-                  <SelectField label="Grade"   value={form.grade}   onChange={set("grade")}   options={GRADES} />
+                  <SelectField label="Subject"   value={form.subject}   onChange={set("subject")}   options={SUBJECTS} />
+                  <SelectField label="Grade"     value={form.grade}     onChange={set("grade")}     options={GRADES} />
+                  <SelectField label="Exam Type" value={form.examType}  onChange={set("examType")}  options={EXAM_TYPES} />
+                  <SelectField label="Board"     value={form.board}     onChange={set("board")}     options={BOARDS} />
 
-                  {/* Topic */}
+                  {/* Chapters Covered */}
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-semibold text-secondary mb-1.5">
-                      Topic <span className="text-primary">*</span>
+                      Chapters / Topics Covered <span className="text-primary">*</span>
                     </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={form.topic}
-                        onChange={(e) => setForm((f) => ({ ...f, topic: e.target.value }))}
-                        placeholder="e.g. Fractions, Photosynthesis, The Indian Constitution"
-                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+                    <div className="flex gap-2 items-start">
+                      <textarea
+                        value={form.chapters}
+                        onChange={(e) => setForm((f) => ({ ...f, chapters: e.target.value }))}
+                        rows={3}
+                        placeholder="e.g. Chapter 3: Rational Numbers, Chapter 4: Practical Geometry, Chapter 5: Data Handling"
+                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
                       />
-                      <MicButton onResult={appendToField("topic")} />
+                      <MicButton onResult={appendToField("chapters")} />
                     </div>
-                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
-                    {topicError && <p className="mt-1 text-xs text-red-500 font-medium">{topicError}</p>}
+                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak chapter names.</p>
+                    {chaptersError && <p className="mt-1 text-xs text-red-500 font-medium">{chaptersError}</p>}
                   </div>
 
-                  <SelectField label="Worksheet Type" value={form.worksheetType} onChange={set("worksheetType")} options={WORKSHEET_TYPES} />
-                  <SelectField label="Difficulty"     value={form.difficulty}    onChange={set("difficulty")}    options={DIFFICULTIES} />
-                  <SelectField label="Board"          value={form.board}         onChange={set("board")}         options={BOARDS} />
+                  {/* Total Marks */}
+                  <div>
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">Total Marks</label>
+                    <input
+                      type="number"
+                      min={5}
+                      max={100}
+                      value={form.totalMarks}
+                      onChange={(e) => setForm((f) => ({ ...f, totalMarks: Math.max(5, Math.min(100, parseInt(e.target.value) || 25)) }))}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary transition"
+                    />
+                  </div>
+
+                  <SelectField label="Duration" value={form.duration} onChange={set("duration")} options={DURATIONS} />
 
                   {/* Question Mix */}
                   <QuestionMixInput mix={questionMix} onChange={setQuestionMix} />
@@ -280,7 +286,7 @@ export default function WorksheetsPage() {
                         value={form.additionalInstructions}
                         onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
                         rows={3}
-                        placeholder="e.g. Include diagram-based questions, focus on word problems…"
+                        placeholder="e.g. Include a map-based question, focus on Chapter 4, add internal choice in long answers…"
                         className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
                       />
                       <MicButton onResult={appendToField("additionalInstructions")} />
@@ -295,14 +301,14 @@ export default function WorksheetsPage() {
               <>
                 <h2 className="text-lg font-bold text-secondary mb-2">Your Custom Prompt</h2>
                 <p className="text-sm text-gray-500 mb-5">
-                  Write your own worksheet prompt — be as specific as you like. The AI will follow your instructions exactly.
+                  Describe exactly the exam paper you need — subject, chapters, marks, question types. The AI will follow your instructions exactly.
                 </p>
                 <div className="flex gap-2 items-start mb-2">
                   <textarea
                     value={customPrompt}
                     onChange={(e) => setCustomPrompt(e.target.value)}
                     rows={10}
-                    placeholder="e.g. Create a Science worksheet for Class 8 CBSE on the topic of 'Cell Structure'. Include 5 labelling diagrams, 3 short answer questions, and 2 true/false questions. Add an answer key at the end."
+                    placeholder="e.g. Create a 25-mark CBSE Class 8 Mathematics Unit Test on Rational Numbers and Practical Geometry. Include 5 MCQs (1 mark each), 3 short answer questions (2 marks each), 2 short answer (3 marks each), and 1 long answer (5 marks). Include an answer key at the end."
                     className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
                   />
                   <MicButton onResult={appendToCustom} />
@@ -325,14 +331,14 @@ export default function WorksheetsPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                   </svg>
-                  Generating your worksheet…
+                  Generating your exam paper…
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  Generate Worksheet
+                  Generate Exam Paper
                 </>
               )}
             </button>
@@ -347,7 +353,7 @@ export default function WorksheetsPage() {
             )}
 
             <div className="mt-5 flex flex-wrap gap-3 justify-center text-xs text-gray-400">
-              {["No login required", "CBSE · ICSE · State Board", "Includes answer key"].map((tag) => (
+              {["No login required", "CBSE · ICSE · State Board", "Includes answer key & marking scheme"].map((tag) => (
                 <span key={tag} className="flex items-center gap-1">
                   <svg className="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -369,16 +375,17 @@ export default function WorksheetsPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold text-secondary text-sm">Creating your worksheet…</p>
-                  <p className="text-xs text-gray-400 mt-0.5">This usually takes 10–20 seconds</p>
+                  <p className="font-semibold text-secondary text-sm">Creating your exam paper…</p>
+                  <p className="text-xs text-gray-400 mt-0.5">This usually takes 15–25 seconds</p>
                 </div>
               </div>
               <div className="space-y-3 animate-pulse">
                 <div className="h-5 bg-gray-100 rounded w-3/5" />
                 <div className="h-3 bg-gray-100 rounded w-full" />
                 <div className="h-3 bg-gray-100 rounded w-4/5" />
+                <div className="h-5 bg-gray-100 rounded w-2/5 mt-4" />
                 <div className="h-3 bg-gray-100 rounded w-full" />
-                <div className="h-3 bg-gray-100 rounded w-3/4 mt-4" />
+                <div className="h-3 bg-gray-100 rounded w-3/4" />
                 <div className="h-3 bg-gray-100 rounded w-full" />
                 <div className="h-3 bg-gray-100 rounded w-2/3" />
               </div>
@@ -393,14 +400,14 @@ export default function WorksheetsPage() {
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                   </div>
                   <div>
-                    <p className="font-bold text-secondary text-sm">Worksheet Generated</p>
+                    <p className="font-bold text-secondary text-sm">Exam Paper Generated</p>
                     <p className="text-xs text-gray-400">
                       {mode === "form"
-                        ? `${form.subject} · ${form.grade} · ${form.topic} · ${totalMarks} marks`
+                        ? `${form.subject} · ${form.grade} · ${form.examType} · ${form.totalMarks} marks`
                         : "Custom prompt"}
                     </p>
                   </div>
@@ -432,7 +439,7 @@ export default function WorksheetsPage() {
                 onClick={() => { setResult(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 className="text-sm text-secondary hover:text-primary font-medium transition-colors"
               >
-                ← Generate another worksheet
+                ← Generate another exam paper
               </button>
             </div>
           )}

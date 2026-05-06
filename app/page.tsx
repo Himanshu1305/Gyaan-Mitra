@@ -35,11 +35,25 @@ const features = [
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+      </svg>
+    ),
+    title: "Exam Paper Generator",
+    description: "Create unit tests, half-yearly and annual papers instantly",
+    detail:
+      "Generate complete exam papers for any subject and grade — with MCQs, short and long answers — plus a full answer key and marking scheme.",
+    href: "/exam-papers",
+    cta: "Create Exam Paper",
+  },
+  {
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
           d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
       </svg>
     ),
     title: "Prompt Library",
-    description: "55+ ready-to-use prompts for every subject and grade",
+    description: "78 ready-to-use prompts for every subject and grade",
     detail:
       "Browse a curated library of AI prompts for lesson planning, parent communication, student feedback, exam prep, and classroom activities.",
     href: "/prompt-library",
@@ -127,7 +141,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (
               <div
                 key={feature.title}

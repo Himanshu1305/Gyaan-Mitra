@@ -4,6 +4,14 @@ import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
 
+interface QuestionMix {
+  mcq: number;
+  shortTwo: number;
+  shortThree: number;
+  longFour: number;
+  longFive: number;
+}
+
 interface FileData {
   type: "pdf" | "image" | "text";
   data?: string;
@@ -13,31 +21,45 @@ interface FileData {
 }
 
 export async function POST(req: NextRequest) {
+  const body = await req.json();
   const {
+    mode,
+    customPrompt,
     subject,
     grade,
     topic,
     worksheetType,
     difficulty,
-    numQuestions,
+    questionMix,
     board,
     additionalInstructions,
     fileData,
   }: {
+    mode?: "form" | "custom";
+    customPrompt?: string;
     subject: string;
     grade: string;
     topic: string;
     worksheetType: string;
     difficulty: string;
-    numQuestions: string;
+    questionMix?: QuestionMix;
     board: string;
     additionalInstructions?: string;
     fileData?: FileData;
-  } = await req.json();
+  } = body;
 
-  if (!topic?.trim()) {
-    return new Response("Topic is required", { status: 400 });
+  if (mode === "custom") {
+    if (!customPrompt?.trim()) {
+      return new Response("Prompt is required", { status: 400 });
+    }
+  } else {
+    if (!topic?.trim()) {
+      return new Response("Topic is required", { status: 400 });
+    }
   }
+
+  const mix: QuestionMix = questionMix ?? { mcq: 10, shortTwo: 0, shortThree: 0, longFour: 0, longFive: 0 };
+  const totalMarks = mix.mcq * 1 + mix.shortTwo * 2 + mix.shortThree * 3 + mix.longFour * 4 + mix.longFive * 5;
 
   const chapterNote =
     fileData?.type === "text" && fileData.text
@@ -46,32 +68,54 @@ export async function POST(req: NextRequest) {
       ? `\n\nA file named "${fileData.filename}" has been uploaded. Use its content to make the worksheet specific to the uploaded chapter.`
       : "";
 
+  const mixLines = [
+    mix.mcq > 0 ? `- **MCQs (1 mark each):** ${mix.mcq} questions (4 options A–D)` : null,
+    mix.shortTwo > 0 ? `- **Short Answer – 2 marks:** ${mix.shortTwo} questions` : null,
+    mix.shortThree > 0 ? `- **Short Answer – 3 marks:** ${mix.shortThree} questions` : null,
+    mix.longFour > 0 ? `- **Long Answer – 4 marks:** ${mix.longFour} questions` : null,
+    mix.longFive > 0 ? `- **Long Answer – 5 marks:** ${mix.longFive} questions` : null,
+  ].filter(Boolean).join("\n");
+
   const questionFormatGuide =
     worksheetType === "Multi-level — Three Levels"
-      ? `Divide the ${numQuestions} questions into three sections:
-- **Section A – Basic (Easy):** Simple recall and recognition questions (approx. ${Math.ceil(parseInt(numQuestions) * 0.4)} questions)
-- **Section B – Intermediate:** Application and understanding questions (approx. ${Math.floor(parseInt(numQuestions) * 0.35)} questions)
-- **Section C – Advanced:** Analysis, evaluation, or creative questions (approx. ${Math.floor(parseInt(numQuestions) * 0.25)} questions)`
-      : worksheetType === "Activity"
-      ? `Create ${numQuestions} activity-based tasks — include hands-on activities, observations, investigations, or creative projects appropriate for ${grade}.`
-      : `Create ${numQuestions} questions using a mix of formats: MCQs (with 4 options labelled A–D), fill-in-the-blanks, and short-answer questions. Adjust the ratio based on ${difficulty} difficulty.`;
+      ? `Divide the questions into three sections:
+- **Section A – Basic (Easy):** Simple recall and recognition questions
+- **Section B – Intermediate:** Application and understanding questions
+- **Section C – Advanced:** Analysis, evaluation, or creative questions
 
-  const prompt = `You are an experienced teacher creating a worksheet for Indian school students.
+Question Mix across all sections:
+${mixLines}
+
+Total Marks: ${totalMarks}`
+      : worksheetType === "Activity"
+      ? `Create activity-based tasks matching this question mix:
+${mixLines}
+
+Total Marks: ${totalMarks}
+
+Include hands-on activities, observations, investigations, or creative projects appropriate for ${grade}.`
+      : `Create questions using the following mix:
+${mixLines}
+
+Total Marks: ${totalMarks}
+
+Adjust question formats based on ${difficulty} difficulty.`;
+
+  const formPrompt = `You are an experienced teacher creating a worksheet for Indian school students.
 
 Subject: ${subject}
 Grade: ${grade}
 Board: ${board}
 Topic: ${topic}
 Worksheet Type: ${worksheetType}
-Difficulty: ${difficulty}
-Number of Questions: ${numQuestions}${chapterNote}
+Difficulty: ${difficulty}${chapterNote}
 ${additionalInstructions?.trim() ? `Additional Instructions: ${additionalInstructions.trim()}` : ""}
 
 Create a complete, well-formatted worksheet using the structure below.
 
 ## Worksheet
 
-**Subject:** ${subject} | **Grade:** ${grade} | **Topic:** ${topic} | **Board:** ${board}
+**Subject:** ${subject} | **Grade:** ${grade} | **Topic:** ${topic} | **Board:** ${board} | **Total Marks:** ${totalMarks}
 
 **Name:** _________________________________ | **Date:** _____________ | **Roll No.:** _______
 
@@ -84,7 +128,7 @@ Create a complete, well-formatted worksheet using the structure below.
 
 ${questionFormatGuide}
 
-Use simple language appropriate for ${grade} students. Include Indian-context names, places, and examples where relevant (e.g. Ramesh, Priya, Delhi, cricket, rupees). Number every question clearly.
+Use simple language appropriate for ${grade} students. Include Indian-context names, places, and examples where relevant (e.g. Ramesh, Priya, Delhi, cricket, rupees). Number every question clearly. Group questions by type with clear section headings and marks.
 
 ---
 
@@ -92,9 +136,11 @@ Use simple language appropriate for ${grade} students. Include Indian-context na
 
 **[Complete Answer Key — for teacher use only]**
 
-Provide correct answers for every question. For MCQs state the letter and answer. For fill-in-the-blank give the exact word(s). For short answers give a model answer.
+Provide correct answers for every question. For MCQs state the letter and answer. For fill-in-the-blank give the exact word(s). For short/long answers give a model answer with marks breakdown.
 
 Format the worksheet clearly with proper spacing between questions. Make it print-ready.`;
+
+  const finalPrompt = mode === "custom" ? customPrompt! + chapterNote : formPrompt;
 
   // Build multimodal content array
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -114,7 +160,7 @@ Format the worksheet clearly with proper spacing between questions. Make it prin
     });
   }
 
-  content.push({ type: "text", text: prompt });
+  content.push({ type: "text", text: finalPrompt });
 
   const stream = anthropic.messages.stream(
     {
@@ -135,16 +181,12 @@ Format the worksheet clearly with proper spacing between questions. Make it prin
     async start(controller) {
       try {
         for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
+          if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
             controller.enqueue(encoder.encode(event.delta.text));
           }
         }
       } catch (err: unknown) {
-        const message =
-          err instanceof Error ? err.message : "Generation failed. Please try again.";
+        const message = err instanceof Error ? err.message : "Generation failed. Please try again.";
         controller.enqueue(encoder.encode(`__STREAM_ERROR__${message}`));
       } finally {
         controller.close();

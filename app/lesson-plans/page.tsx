@@ -14,16 +14,8 @@ const BOARDS = ["CBSE", "ICSE", "State Board"];
 const DURATIONS = ["30 minutes", "40 minutes", "45 minutes", "60 minutes"];
 
 /* ─── SelectField ───────────────────────────────────────────── */
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  options: string[];
+function SelectField({ label, value, onChange, options }: {
+  label: string; value: string; onChange: (v: string) => void; options: string[];
 }) {
   return (
     <div>
@@ -33,16 +25,36 @@ function SelectField({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
       >
-        {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
-        ))}
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
+    </div>
+  );
+}
+
+/* ─── Tab toggle ─────────────────────────────────────────────── */
+function TabToggle({ mode, onChange }: { mode: "form" | "custom"; onChange: (m: "form" | "custom") => void }) {
+  return (
+    <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+      {(["form", "custom"] as const).map((m) => (
+        <button
+          key={m}
+          onClick={() => onChange(m)}
+          className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all ${
+            mode === m ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-secondary"
+          }`}
+        >
+          {m === "form" ? "Fill Form" : "Use My Own Prompt"}
+        </button>
+      ))}
     </div>
   );
 }
 
 /* ─── Page ──────────────────────────────────────────────────── */
 export default function LessonPlansPage() {
+  const [mode, setMode] = useState<"form" | "custom">("form");
+  const [customPrompt, setCustomPrompt] = useState("");
+
   const [form, setForm] = useState({
     subject: "Mathematics",
     grade: "Class 6",
@@ -56,20 +68,27 @@ export default function LessonPlansPage() {
   const [result, setResult] = useState("");
   const [copied, setCopied] = useState(false);
   const [topicError, setTopicError] = useState("");
+  const [promptError, setPromptError] = useState("");
   const [apiError, setApiError] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
   const set = (key: string) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
-
   const appendToField = (field: "topic" | "additionalInstructions") => (text: string) =>
     setForm((f) => ({ ...f, [field]: f[field] ? f[field] + " " + text : text }));
+  const appendToCustom = (text: string) =>
+    setCustomPrompt((p) => p ? p + " " + text : text);
 
   const handleGenerate = async () => {
-    if (!form.topic.trim()) {
+    if (mode === "form" && !form.topic.trim()) {
       setTopicError("Please enter a topic before generating.");
       return;
     }
+    if (mode === "custom" && !customPrompt.trim()) {
+      setPromptError("Please enter your prompt before generating.");
+      return;
+    }
     setTopicError("");
+    setPromptError("");
     setApiError("");
     setResult("");
     setLoading(true);
@@ -78,7 +97,7 @@ export default function LessonPlansPage() {
       const res = await fetch("/api/lesson-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, fileData }),
+        body: JSON.stringify({ mode, customPrompt, ...form, fileData }),
       });
 
       if (!res.ok) throw new Error("Server error. Please try again.");
@@ -137,7 +156,7 @@ export default function LessonPlansPage() {
             <span className="text-primary">in seconds</span>
           </h1>
           <p className="mt-3 text-secondary-200 text-base">
-            Fill in the details below — or upload your textbook chapter — and let Gyaan Mitra do the planning.
+            Fill the form or paste your own prompt — let Gyaan Mitra do the planning.
           </p>
         </div>
       </section>
@@ -146,58 +165,79 @@ export default function LessonPlansPage() {
       <section className="flex-1 py-10 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <h2 className="text-lg font-bold text-secondary mb-6">Lesson Details</h2>
+            <TabToggle mode={mode} onChange={(m) => { setMode(m); setTopicError(""); setPromptError(""); setApiError(""); }} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <SelectField label="Subject" value={form.subject} onChange={set("subject")} options={SUBJECTS} />
-              <SelectField label="Grade"   value={form.grade}   onChange={set("grade")}   options={GRADES} />
+            {mode === "form" ? (
+              <>
+                <h2 className="text-lg font-bold text-secondary mb-6">Lesson Details</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <SelectField label="Subject" value={form.subject} onChange={set("subject")} options={SUBJECTS} />
+                  <SelectField label="Grade"   value={form.grade}   onChange={set("grade")}   options={GRADES} />
 
-              {/* Topic + mic */}
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-semibold text-secondary mb-1.5">
-                  Topic <span className="text-primary">*</span>
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={form.topic}
-                    onChange={(e) => setForm((f) => ({ ...f, topic: e.target.value }))}
-                    placeholder="e.g. Fractions and Decimals, Photosynthesis, The Mughal Empire"
-                    className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
-                  />
-                  <MicButton onResult={appendToField("topic")} />
+                  {/* Topic */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">
+                      Topic <span className="text-primary">*</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={form.topic}
+                        onChange={(e) => setForm((f) => ({ ...f, topic: e.target.value }))}
+                        placeholder="e.g. Fractions and Decimals, Photosynthesis, The Mughal Empire"
+                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+                      />
+                      <MicButton onResult={appendToField("topic")} />
+                    </div>
+                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
+                    {topicError && <p className="mt-1 text-xs text-red-500 font-medium">{topicError}</p>}
+                  </div>
+
+                  <SelectField label="Board"    value={form.board}    onChange={set("board")}    options={BOARDS} />
+                  <SelectField label="Duration" value={form.duration} onChange={set("duration")} options={DURATIONS} />
+
+                  {/* Additional Instructions */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">
+                      Additional Instructions <span className="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <div className="flex gap-2 items-start">
+                      <textarea
+                        value={form.additionalInstructions}
+                        onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
+                        rows={3}
+                        placeholder="e.g. Include a group activity, focus on real-life examples, class has 40 students…"
+                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
+                      />
+                      <MicButton onResult={appendToField("additionalInstructions")} />
+                    </div>
+                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
+                  </div>
+
+                  <FileUpload value={fileData} onChange={setFileData} />
                 </div>
-                <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
-                {topicError && (
-                  <p className="mt-1 text-xs text-red-500 font-medium">{topicError}</p>
-                )}
-              </div>
-
-              <SelectField label="Board"    value={form.board}    onChange={set("board")}    options={BOARDS} />
-              <SelectField label="Duration" value={form.duration} onChange={set("duration")} options={DURATIONS} />
-
-              {/* Additional instructions + mic */}
-              <div className="sm:col-span-2">
-                <label className="block text-sm font-semibold text-secondary mb-1.5">
-                  Additional Instructions{" "}
-                  <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <div className="flex gap-2 items-start">
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-bold text-secondary mb-2">Your Custom Prompt</h2>
+                <p className="text-sm text-gray-500 mb-5">
+                  Write your own lesson plan prompt — be as specific as you like. The AI will follow your instructions exactly.
+                </p>
+                <div className="flex gap-2 items-start mb-2">
                   <textarea
-                    value={form.additionalInstructions}
-                    onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
-                    rows={3}
-                    placeholder="e.g. Include a group activity, focus on real-life examples, class has 40 students…"
-                    className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    rows={10}
+                    placeholder="e.g. Create a 45-minute lesson plan for Class 7 CBSE Science on 'Heat and Temperature'. Include a hands-on activity using thermometers, a think-pair-share discussion, and a formative assessment. Class has 35 students."
+                    className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none"
                   />
-                  <MicButton onResult={appendToField("additionalInstructions")} />
+                  <MicButton onResult={appendToCustom} />
                 </div>
-                <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
-              </div>
-
-              {/* File upload */}
-              <FileUpload value={fileData} onChange={setFileData} />
-            </div>
+                <p className="text-xs text-gray-400 mb-5">Tap mic to speak your prompt.</p>
+                {promptError && <p className="mb-3 text-xs text-red-500 font-medium">{promptError}</p>}
+                <FileUpload value={fileData} onChange={setFileData} />
+              </>
+            )}
 
             {/* Generate button */}
             <button
@@ -223,7 +263,6 @@ export default function LessonPlansPage() {
               )}
             </button>
 
-            {/* API error banner */}
             {apiError && (
               <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -233,7 +272,6 @@ export default function LessonPlansPage() {
               </div>
             )}
 
-            {/* Trust tags */}
             <div className="mt-5 flex flex-wrap gap-3 justify-center text-xs text-gray-400">
               {["No login required", "CBSE · ICSE · State Board", "Powered by Claude AI"].map((tag) => (
                 <span key={tag} className="flex items-center gap-1">
@@ -277,7 +315,6 @@ export default function LessonPlansPage() {
           {/* ── Result ── */}
           {result && (
             <div ref={resultRef} className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm overflow-hidden">
-              {/* Result header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-blue-50">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -289,49 +326,33 @@ export default function LessonPlansPage() {
                   <div>
                     <p className="font-bold text-secondary text-sm">Lesson Plan Generated</p>
                     <p className="text-xs text-gray-400">
-                      {form.subject} · {form.grade} · {form.topic} · {form.board}
+                      {mode === "form"
+                        ? `${form.subject} · ${form.grade} · ${form.topic} · ${form.board}`
+                        : "Custom prompt"}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {loading && (
-                    <span className="text-xs text-primary font-medium animate-pulse">Streaming…</span>
-                  )}
+                  {loading && <span className="text-xs text-primary font-medium animate-pulse">Streaming…</span>}
                   <button
                     onClick={handleCopy}
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-secondary text-white text-xs font-semibold hover:bg-secondary-600 transition-colors"
                   >
                     {copied ? (
-                      <>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        Copied!
-                      </>
+                      <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>Copied!</>
                     ) : (
-                      <>
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        Copy
-                      </>
+                      <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copy</>
                     )}
                   </button>
                 </div>
               </div>
-
-              {/* Content */}
               <div className="px-6 sm:px-8 py-6">
                 <MarkdownContent text={result} />
-                {loading && (
-                  <span className="inline-block w-0.5 h-4 bg-primary animate-pulse ml-0.5 -mb-0.5" />
-                )}
+                {loading && <span className="inline-block w-0.5 h-4 bg-primary animate-pulse ml-0.5 -mb-0.5" />}
               </div>
             </div>
           )}
 
-          {/* Try again */}
           {result && !loading && (
             <div className="mt-4 text-center">
               <button
