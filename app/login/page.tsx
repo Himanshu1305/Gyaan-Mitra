@@ -23,9 +23,7 @@ export default function LoginPage() {
     setLoading(true);
     const { error } = await signIn(email.trim(), password);
     if (error) {
-      setError(error === "Invalid login credentials"
-        ? "Incorrect email or password. Please try again."
-        : error);
+      setError(error);
       setLoading(false);
     } else {
       router.push("/dashboard");

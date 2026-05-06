@@ -13,6 +13,17 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+function friendlyAuthError(msg: string): string {
+  if (msg === "Invalid login credentials") return "Incorrect email or password. Please try again.";
+  if (msg.toLowerCase().includes("invalid api key")) return "Authentication service is misconfigured. Please contact support.";
+  if (msg.toLowerCase().includes("email not confirmed")) return "Please verify your email address before signing in.";
+  if (msg.toLowerCase().includes("user already registered")) return "An account with this email already exists. Try signing in instead.";
+  if (msg.toLowerCase().includes("password should be")) return "Password must be at least 6 characters.";
+  if (msg.toLowerCase().includes("too many requests") || msg.toLowerCase().includes("rate limit")) return "Too many attempts. Please wait a moment and try again.";
+  if (msg.toLowerCase().includes("network") || msg.toLowerCase().includes("fetch")) return "Network error. Please check your connection and try again.";
+  return msg;
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
@@ -45,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    return { error: error ? friendlyAuthError(error.message) : null };
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
@@ -54,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: { data: { full_name: fullName } },
     });
-    return { error: error?.message ?? null };
+    return { error: error ? friendlyAuthError(error.message) : null };
   };
 
   const signOut = async () => {
