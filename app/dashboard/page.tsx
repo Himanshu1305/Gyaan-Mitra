@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
@@ -56,7 +56,6 @@ const TYPE_ICONS: Record<string, string> = {
 
 function groupItems(items: SavedItem[]): ItemGroup[] {
   // answer-keys that are linked to a question paper
-  const linkedIds = new Set(items.filter(i => i.content_type === "answer-key" && i.linked_id).map(i => i.linked_id!));
   const answerKeysByLinkedId = new Map<string, SavedItem>();
   items.filter(i => i.content_type === "answer-key" && i.linked_id).forEach(i => {
     answerKeysByLinkedId.set(i.linked_id!, i);
@@ -91,7 +90,7 @@ function groupItems(items: SavedItem[]): ItemGroup[] {
   return groups;
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
   const params = useSearchParams();
   const { user, loading } = useAuth();
@@ -378,5 +377,20 @@ export default function DashboardPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <svg className="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+        </svg>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
