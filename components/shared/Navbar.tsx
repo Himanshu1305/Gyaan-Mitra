@@ -16,19 +16,25 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [adminUser, setAdminUser] = useState(false);
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
   const { user, signOut, loading } = useAuth();
 
   useEffect(() => {
-    if (!user) { setAdminUser(false); return; }
-    supabase.from("profiles").select("is_admin").eq("id", user.id).single()
-      .then(({ data }) => setAdminUser(data?.is_admin === true));
+    if (!user) { setIsUserAdmin(false); return; }
+    supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data?.is_admin === true) setIsUserAdmin(true);
+      });
   }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
     setMenuOpen(false);
-    setAdminUser(false);
+    setIsUserAdmin(false);
   };
 
   const displayName = user?.user_metadata?.full_name
@@ -78,7 +84,7 @@ export default function Navbar() {
                     >
                       Settings
                     </Link>
-                    {adminUser && (
+                    {isUserAdmin && (
                       <Link
                         href="/admin"
                         className="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors"
@@ -153,7 +159,7 @@ export default function Navbar() {
               <Link href="/settings" className="block text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}>
                 Settings
               </Link>
-              {adminUser && (
+              {isUserAdmin && (
                 <Link href="/admin" className="block text-sm font-semibold text-red-600" onClick={() => setMenuOpen(false)}>
                   Admin
                 </Link>

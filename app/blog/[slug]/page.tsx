@@ -36,6 +36,131 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/* ── Markdown renderer ─────────────────────────────────────────── */
+
+function renderInline(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+          return (
+            <strong key={i} className="font-semibold text-secondary">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        if (part.startsWith("*") && part.endsWith("*") && part.length > 2 && !part.startsWith("**")) {
+          return (
+            <em key={i} className="italic text-gray-600">
+              {part.slice(1, -1)}
+            </em>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
+function renderContent(content: string) {
+  const blocks = content
+    .split(/\n\n+/)
+    .map((b) => b.trim())
+    .filter((b) => b && b !== "---");
+
+  return (
+    <>
+      {blocks.map((block, blockIdx) => {
+        /* H2 */
+        if (block.startsWith("## ")) {
+          return (
+            <h2
+              key={blockIdx}
+              className="text-2xl font-bold text-secondary mt-10 mb-4 leading-snug"
+            >
+              {renderInline(block.slice(3))}
+            </h2>
+          );
+        }
+
+        /* H3 */
+        if (block.startsWith("### ")) {
+          return (
+            <h3
+              key={blockIdx}
+              className="text-lg font-semibold text-secondary mt-7 mb-3"
+            >
+              {renderInline(block.slice(4))}
+            </h3>
+          );
+        }
+
+        const lines = block.split("\n");
+        const hasBullets = lines.some((l) => /^[-*]\s/.test(l.trim()));
+
+        /* Block containing bullet lines (possibly mixed with text) */
+        if (hasBullets) {
+          const elements: JSX.Element[] = [];
+          let bullets: string[] = [];
+          let bulletKey = 0;
+
+          const flushBullets = () => {
+            if (bullets.length === 0) return;
+            elements.push(
+              <ul key={`${blockIdx}-ul-${bulletKey++}`} className="my-5 space-y-2.5">
+                {bullets.map((item, j) => (
+                  <li key={j} className="flex items-start gap-3">
+                    <span className="mt-[0.6rem] w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                    <span className="text-gray-700 leading-[1.8] text-base">
+                      {renderInline(item)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            );
+            bullets = [];
+          };
+
+          lines.forEach((line, li) => {
+            const t = line.trim();
+            if (!t) { flushBullets(); return; }
+            if (/^[-*]\s/.test(t)) {
+              bullets.push(t.replace(/^[-*]\s+/, ""));
+            } else {
+              flushBullets();
+              elements.push(
+                <p
+                  key={`${blockIdx}-p-${li}`}
+                  className="text-gray-700 leading-[1.8] text-base mb-3"
+                >
+                  {renderInline(t)}
+                </p>
+              );
+            }
+          });
+          flushBullets();
+
+          return <div key={blockIdx}>{elements}</div>;
+        }
+
+        /* Regular paragraph — join lines with a space */
+        const joined = lines.map((l) => l.trim()).filter(Boolean).join(" ");
+        return (
+          <p
+            key={blockIdx}
+            className="text-gray-700 leading-[1.8] text-base mb-5"
+          >
+            {renderInline(joined)}
+          </p>
+        );
+      })}
+    </>
+  );
+}
+
+/* ── Page ──────────────────────────────────────────────────────── */
+
 export default function BlogPostPage({ params }: PageProps) {
   const post = blogPosts.find((p) => p.slug === params.slug);
   if (!post) notFound();
@@ -81,7 +206,11 @@ export default function BlogPostPage({ params }: PageProps) {
             All Articles
           </Link>
 
-          <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-block mb-4 ${CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"}`}>
+          <span
+            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-block mb-4 ${
+              CATEGORY_COLORS[post.category] ?? "bg-gray-100 text-gray-600"
+            }`}
+          >
             {post.category}
           </span>
 
@@ -110,17 +239,7 @@ export default function BlogPostPage({ params }: PageProps) {
 
           {/* Article body */}
           <article className="bg-white rounded-2xl border border-gray-100 shadow-sm px-7 sm:px-10 py-10">
-            <div
-              className="prose prose-gray max-w-none
-                prose-headings:text-secondary prose-headings:font-bold
-                prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-                prose-h3:text-lg prose-h3:mt-7 prose-h3:mb-3
-                prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-5
-                prose-li:text-gray-600 prose-li:leading-relaxed
-                prose-strong:text-secondary prose-strong:font-semibold
-                prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+            {renderContent(post.content)}
           </article>
 
           {/* Share again at bottom */}
@@ -139,7 +258,11 @@ export default function BlogPostPage({ params }: PageProps) {
                     href={`/blog/${related.slug}`}
                     className="group bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:border-primary-200 transition-all duration-200 flex flex-col"
                   >
-                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-block mb-3 ${CATEGORY_COLORS[related.category] ?? "bg-gray-100 text-gray-600"}`}>
+                    <span
+                      className={`text-xs font-semibold px-2.5 py-0.5 rounded-full inline-block mb-3 ${
+                        CATEGORY_COLORS[related.category] ?? "bg-gray-100 text-gray-600"
+                      }`}
+                    >
                       {related.category}
                     </span>
                     <h3 className="text-sm font-bold text-secondary group-hover:text-primary transition-colors leading-snug mb-2">

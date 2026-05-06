@@ -12,19 +12,17 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
   {
     slug: "ai-for-teachers-india-complete-guide",
-    title: "AI for Teachers in India — A Complete, Honest Guide for 2025",
+    title: "AI for Teachers in India — A Complete, Honest Guide for 2026",
     category: "AI Tools",
     readTime: "8 min read",
-    date: "May 2025",
+    date: "May 2026",
     author: "Team Gyaan Mitra",
     excerpt: "Everything Indian teachers need to know about AI — what it can do, what it can't, and how to start without feeling overwhelmed.",
     content: `## It's Sunday Evening. Sound Familiar?
 
-Rajesh sir sits at his desk in Nagpur, marking books. His chai went cold twenty minutes ago and he hasn't noticed. There are three lesson plans to write before Monday morning — and that stack isn't getting smaller. His phone rings. Parent asking about the upcoming test. He picks up, answers patiently, and then stares at the pile again.
+Rajesh sir sits at his desk in Nagpur, marking books. His chai went cold twenty minutes ago and he hasn't noticed. There are three lesson plans to write before Monday morning — and that stack isn't getting smaller. His phone rings. A parent asking about the upcoming test. He picks up, answers patiently, and then stares at the pile again.
 
-This Sunday happens to every teacher across India. Different names, different cities, same pile.
-
-That's what AI for teachers is actually about. Not robots. Not replacing anyone. Just getting that Sunday pile down to something manageable.
+This Sunday happens to every teacher across India. Different names, different cities, same pile. That's what AI for teachers is actually about. Not robots. Not replacing anyone. Just getting that Sunday pile down to something manageable.
 
 ## So What Is AI, Actually?
 
@@ -80,27 +78,21 @@ If you're looking for a place to start, Gyaan Mitra was built specifically for t
 
 Pick one worksheet you need to create this week. Go to Gyaan Mitra, fill in the subject, grade, and topic, and click Generate. Read the output. See how it compares to what you'd have written yourself. That's it. No commitment, no account needed, no complicated setup.
 
-That single worksheet might be the start of something that gives you your Sunday evenings back.
-
----
-
-*Author: Team Gyaan Mitra*`,
+That single worksheet might be the start of something that gives you your Sunday evenings back.`,
   },
   {
     slug: "best-ai-prompts-for-teachers-india",
     title: "The Best AI Prompts for Teachers in India — 10 You Can Use Right Now",
     category: "AI Tools",
     readTime: "6 min read",
-    date: "May 2025",
+    date: "May 2026",
     author: "Team Gyaan Mitra",
     excerpt: "Not all AI prompts are equal. These 10 prompts are tested, refined, and ready to copy — for lesson plans, worksheets, parent notes, and more.",
     content: `## Why Most Teachers Get Disappointing AI Results
 
 When teachers first try AI tools, many come away underwhelmed. "It just gives generic content," a Maths teacher from Bangalore told us. "Nothing specific to my board or my chapter."
 
-The tool wasn't the problem. The prompt was.
-
-Think of an AI prompt like a question in a viva voce exam. A vague question gets a vague answer. A specific, well-structured question gets a specific, useful answer. The same principle applies here.
+The tool wasn't the problem. The prompt was. Think of an AI prompt like a question in a viva voce exam. A vague question gets a vague answer. A specific, well-structured question gets a specific, useful answer.
 
 ## What Makes a Good Prompt — 3 Qualities
 
@@ -108,9 +100,10 @@ Think of an AI prompt like a question in a viva voce exam. A vague question gets
 
 **Contextual:** Give the AI the context it needs. Board, class, chapter name, your school type, what you already covered — the more it knows, the more relevant its output.
 
-**Structured:** Tell it exactly what you want in the output. "Include learning objectives, a warm-up activity, a 20-minute explanation with one India-based example, a 10-minute student activity, and 3 homework questions." That structure instruction makes an enormous difference.
+**Structured:** Tell it exactly what you want in the output. "Include learning objectives, a warm-up activity, a 20-minute explanation with one India-based example, a 10-minute student activity, and 3 homework questions."
 
 A bad prompt: *"Create a lesson plan for Class 8 Science."*
+
 A good prompt: *"Create a 40-minute lesson plan for Class 8 CBSE Science on Cell Structure. Include 3 learning objectives, a 5-minute warm-up using everyday objects students can find in their bag, a main teaching section with one Indian-context analogy, a pair activity, and 3 graded homework questions."*
 
 Same tool. Very different output.
@@ -118,84 +111,84 @@ Same tool. Very different output.
 ## 10 Ready-to-Use Prompts (Copy and Adapt These)
 
 ### 1. Lesson Plan with R-I-S-E Framework
+
 *"Create a 45-minute CBSE lesson plan for Class [X] [Subject] on [Topic] using the R-I-S-E framework — Review prior knowledge, Introduce new concept, Student practice, Exit reflection. Include learning objectives using Bloom's action verbs, one India-specific real-life example, and a 5-minute closing check."*
 
-Why it works: R-I-S-E is NEP 2020-aligned and structures the lesson into natural stages. Naming the framework gives the AI clear scaffolding to follow.
+**Why it works:** R-I-S-E is NEP 2020-aligned and structures the lesson into natural stages. Naming the framework gives the AI clear scaffolding to follow.
 
 ### 2. Three-Level Differentiated Worksheet
+
 *"Create a worksheet for Class [X] [Subject] on [Topic] in three levels. Level 1 (Support): fill-in-the-blank with choices given, picture-based questions. Level 2 (Standard): MCQs, short answers. Level 3 (Challenge): application questions going beyond the textbook. Include answer key for all three levels."*
 
-Why it works: Differentiated learning is explicitly encouraged by NEP 2020. Three separate worksheets would take an hour — this prompt gets all three at once.
+**Why it works:** Differentiated learning is explicitly encouraged by NEP 2020. Three separate worksheets would take an hour — this prompt gets all three at once.
 
 ### 3. Parent Communication Note
+
 *"Write a warm, professional 120-word note to the parents of a Class [X] student who has been struggling with [Subject] recently. Acknowledge their child's effort, explain the specific difficulty (without making it sound alarming), give two practical suggestions for home support, and invite them to meet the teacher. Tone: supportive and encouraging."*
 
-Why it works: Parent communication is emotionally tricky. Giving the AI a clear tone instruction and word limit gets you a draft you can personalise in 2 minutes instead of staring at a blank page for 15.
+**Why it works:** Parent communication is emotionally tricky. Giving the AI a clear tone instruction and word limit gets you a draft you can personalise in 2 minutes instead of staring at a blank page for 15.
 
 ### 4. Exam Paper with Answer Key
+
 *"Create a 25-mark Unit Test for Class [X] CBSE [Subject] covering [Chapter]. Include: 5 MCQs (1 mark each), 4 short answer questions (2 marks each), 2 questions of 3 marks each, and 1 long answer of 4 marks. Use proper section headings. Follow CBSE question paper format. Include a complete answer key with model answers and marking scheme immediately after the question paper."*
 
-Why it works: Specifying the exact marks breakdown and format removes ambiguity. The AI has clear numbers to hit.
+**Why it works:** Specifying the exact marks breakdown and format removes ambiguity. The AI has clear numbers to hit.
 
 ### 5. Simple Explanation for a Struggling Student
+
 *"A Class [X] student is struggling to understand [Concept]. Explain it in the simplest possible way — maximum 10 short sentences, no jargon, using only words a [X] student would know. Use one analogy involving something from everyday Indian life (cricket, cooking, festivals, commuting, etc.)."*
 
-Why it works: Simple language instructions are crucial. Without them, AI defaults to textbook language. The Indian analogy instruction grounds the explanation in something the student can picture.
+**Why it works:** Simple language instructions are crucial. Without them, AI defaults to textbook language. The Indian analogy instruction grounds the explanation in something the student can picture.
 
 ### 6. 15-Minute Activity That Needs No Equipment
+
 *"Suggest a 15-minute classroom activity to teach [Topic] to Class [X] students. The activity must work in a regular classroom with no special equipment, 35–45 students, and a single teacher. It should be interactive and connect the concept to something from students' daily life."*
 
-Why it works: The constraint of "no special equipment" and "35–45 students" forces the AI to think practically. Without that, it suggests lab experiments and small groups.
+**Why it works:** The constraint of "no special equipment" and "35–45 students" forces the AI to think practically. Without that, it suggests lab experiments and small groups.
 
 ### 7. One-Page Revision Summary
+
 *"Create a one-page revision summary for Class [X] [Subject] — Chapter: [Name]. Format it as: Key Terms and Definitions (5–7 terms), Core Concepts in bullet points, 5 Important Points to Remember, and 5 Sample Questions with answers. Simple language, exam-ready."*
 
-Why it works: Students need revision material that's compact and exam-focused. Specifying all four sections in the prompt ensures nothing is missed.
+**Why it works:** Students need revision material that's compact and exam-focused. Specifying all four sections in the prompt ensures nothing is missed.
 
 ### 8. Discussion Questions That Spark Thinking
+
 *"Create 5 discussion questions on [Topic] for Class [X] students. These should not have single right answers — they should encourage students to think, argue, and connect the topic to their own experience. At least 2 questions should connect to a contemporary Indian example."*
 
-Why it works: Most AI-generated questions default to recall. This prompt explicitly pushes it toward higher-order thinking — which is what NEP 2020 wants from classrooms.
+**Why it works:** Most AI-generated questions default to recall. This prompt explicitly pushes it toward higher-order thinking — which is what NEP 2020 wants from classrooms.
 
 ### 9. Hindi Grammar Worksheet
+
 *"कक्षा [X] के लिए [Topic — जैसे संज्ञा / क्रिया] पर एक हिंदी व्याकरण कार्यपत्रक बनाएं। 5 रिक्त स्थान भरो, 5 MCQs (4 विकल्प), 3 वाक्य पहचान, और 2 स्वयं वाक्य बनाओ। कठिनाई: मध्यम। उत्तर कुंजी सहित।"*
 
-Why it works: Writing the prompt in Hindi gets the worksheet in proper Hindi. The structured format (specific question types and counts) keeps output consistent.
+**Why it works:** Writing the prompt in Hindi gets the worksheet in proper Hindi. The structured format (specific question types and counts) keeps output consistent.
 
 ### 10. Story Introduction to Hook a Class
+
 *"Write a short story (10–12 sentences) that introduces [Topic] to Class [X] students in India. The story should feature Indian children in a relatable situation — a market, a cricket match, a kitchen, a school trip. The story should end with a question that leads naturally into the lesson."*
 
-Why it works: A hook story takes ages to write well. This prompt gets you a ready-to-use opener that you can read aloud to start the class.
+**Why it works:** A hook story takes ages to write well. This prompt gets you a ready-to-use opener that you can read aloud to start the class.
 
 ## Build Your Own Prompt Library
 
 Start with these 10. Adapt the ones that work best for your subjects. Save your best prompts somewhere — a notes app, a Google Doc, even a notebook. Over a few weeks, you'll build a personal collection of prompts that consistently gives you good results for your specific teaching context.
 
-Gyaan Mitra's Prompt Library has 78 such prompts — tested, organised by category, and available in English, Hinglish, and Hindi. They're free to use and copy. Think of it as a starter kit.
-
-The goal isn't to become an AI expert. It's to spend less time staring at a blank page.
-
----
-
-*Author: Team Gyaan Mitra*`,
+Gyaan Mitra's Prompt Library has 78 such prompts — tested, organised by category, and available in English, Hinglish, and Hindi. They're free to use and copy. The goal isn't to become an AI expert. It's to spend less time staring at a blank page.`,
   },
   {
     slug: "nep-2020-ai-tools-teachers",
     title: "NEP 2020 and AI — How Indian Teachers Can Use Both Together",
     category: "NEP 2020",
     readTime: "7 min read",
-    date: "April 2025",
+    date: "April 2026",
     author: "Team Gyaan Mitra",
     excerpt: "NEP 2020 asks teachers to do more — competency-based learning, activity-based teaching, multi-level assessment. AI makes all of this actually possible.",
     content: `## What NEP 2020 Actually Asks of Teachers
 
 Let's start honestly. The National Education Policy 2020 is a genuinely good document — ambitious, thoughtful, and based on solid research. It asks for competency-based learning instead of rote memorisation. Activity-based classrooms. Multi-level assessment that catches students where they are. Continuous formative assessment. Technology integration. Mother tongue instruction.
 
-It's a lot. And for teachers who are already managing 40-student classrooms, three to four subjects, parent meetings, administrative work, and lesson preparation — hearing "now also do all of this" can feel less like inspiration and more like pressure.
-
-We're not going to pretend otherwise. NEP 2020 genuinely increases the cognitive load on teachers — at least until new habits and new tools become routine. The gap between the vision in the document and the reality of a Monday morning classroom is real.
-
-The question is: what actually closes that gap?
+It's a lot. And for teachers who are already managing 40-student classrooms, three to four subjects, parent meetings, administrative work, and lesson preparation — hearing "now also do all of this" can feel less like inspiration and more like pressure. The gap between the vision in the document and the reality of a Monday morning classroom is real.
 
 ## The Specific Gap Between Vision and Classroom Reality
 
@@ -205,9 +198,7 @@ Writing objectives at that level of specificity, for every lesson, every day, ta
 
 NEP 2020 wants **activity-based learning**. Real activities, not just "answer these questions as a group." An activity has a setup, a student task, a discussion question, and a connection to the concept. Designing good activities requires creativity — and time.
 
-NEP 2020 wants **multi-level assessment** — different worksheets for different learners, not one-size-fits-all tests. Three versions of a worksheet for every topic. For a teacher with five sections and six subjects, that's a staggering amount of additional preparation.
-
-None of this is impossible. But all of it is slow — manually.
+NEP 2020 wants **multi-level assessment** — different worksheets for different learners, not one-size-fits-all tests. Three versions of a worksheet for every topic. For a teacher with five sections and six subjects, that's a staggering amount of additional preparation. None of this is impossible. But all of it is slow — manually.
 
 ## How AI Bridges Specific NEP 2020 Requirements
 
@@ -235,7 +226,7 @@ What used to take 45–60 minutes of separate worksheet creation now takes under
 
 ### Formative Assessment — Quick Checks Built In
 
-NEP 2020 strongly encourages continuous formative assessment — checking understanding during the lesson, not just at the end of the term. AI can generate 5 exit ticket questions (quick check questions for the last 5 minutes of class) in 30 seconds. It can generate warm-up questions that check prior knowledge before a new lesson. These are small things, but cumulatively they build the culture of regular assessment that NEP 2020 envisions.
+NEP 2020 strongly encourages continuous formative assessment — checking understanding during the lesson, not just at the end of the term. AI can generate 5 exit ticket questions in 30 seconds. It can generate warm-up questions that check prior knowledge before a new lesson. These are small things, but cumulatively they build the culture of regular assessment that NEP 2020 envisions.
 
 ## What NEP 2020 Actually Says About Technology
 
@@ -245,9 +236,9 @@ The policy doesn't specify which tools — that's left to schools and teachers. 
 
 ## A NEP-Aligned Lesson Plan Structure (That AI Can Generate)
 
-Here's a complete example — Class 7 Social Studies on The Mughal Empire, 40 minutes, NEP-aligned:
+Here's a complete example — Class 7 Social Studies on The Mughal Empire, 40 minutes, NEP-aligned.
 
-**Learning Objectives** (Competency-based):
+**Learning Objectives (Competency-based):**
 - Students will be able to name the key Mughal emperors in chronological order
 - Students will be able to explain why Akbar's policies made his reign particularly stable
 - Students will evaluate one Mughal cultural contribution that still influences India today
@@ -266,29 +257,21 @@ This structure — objectives, warm-up, teaching, activity, closing — is NEP 2
 
 AI doesn't replace the spirit of NEP 2020. It doesn't think for teachers, and it certainly doesn't build the relationships that make teaching meaningful.
 
-What it does is remove the preparation bottleneck — the hours spent drafting objectives, designing activities, creating different worksheet versions — that prevent teachers from actually living out NEP 2020's vision in their classrooms.
-
-The policy asks for more from teachers. AI gives teachers back some of the time to deliver it.
-
----
-
-*Author: Team Gyaan Mitra*`,
+What it does is remove the preparation bottleneck — the hours spent drafting objectives, designing activities, creating different worksheet versions — that prevent teachers from actually living out NEP 2020's vision in their classrooms. The policy asks for more from teachers. AI gives teachers back some of the time to deliver it.`,
   },
   {
     slug: "save-time-teaching-ai-indian-teachers",
     title: "How I Saved 8 Hours a Week Using AI — A Teacher's Honest Story",
     category: "Classroom Tips",
     readTime: "5 min read",
-    date: "April 2025",
+    date: "April 2026",
     author: "Team Gyaan Mitra",
     excerpt: "This isn't a tech article. It's a story about a Class 7 Science teacher who was drowning in paperwork — and what changed.",
     content: `## Sunday, 8 PM
 
 Meera ma'am teaches Class 7 Science at a government school in Pune. The kind of school where the fans run slow in May and the chalk is always half a stick. She loves her job — that part is easy to say because it's genuinely true.
 
-But on this particular Sunday, love for her job is somewhere underneath the stack of papers on her dining table.
-
-Three lesson plans. Monday's worksheet still unfinished. Her daughter asking if she wants to watch something together. Her husband's dinner going cold. And the quiet, familiar guilt of thinking: "I should be doing this faster."
+But on this particular Sunday, love for her job is somewhere underneath the stack of papers on her dining table. Three lesson plans. Monday's worksheet still unfinished. Her daughter asking if she wants to watch something together. Her husband's dinner going cold. And the quiet, familiar guilt of thinking: "I should be doing this faster."
 
 This is not a dramatic story. It's a very ordinary one. Most teachers in India would recognise it in under five seconds.
 
@@ -296,13 +279,9 @@ This is not a dramatic story. It's a very ordinary one. Most teachers in India w
 
 Meera ma'am didn't go looking for AI tools. A colleague mentioned it in passing in the staffroom — "Have you tried that Gyaan Mitra thing? My worksheets are taking half the time now." She filed it away and forgot about it for two weeks.
 
-Then, one Thursday evening, she had a unit test to write for Friday morning and exactly one hour to do it.
+Then, one Thursday evening, she had a unit test to write for Friday morning and exactly one hour to do it. She tried it. Filled in Class 7, Science, Chapter on Nutrition in Plants, set the question mix — 5 MCQs, 4 short answers, 1 long answer — and clicked Generate.
 
-She tried it. Filled in Class 7, Science, Chapter on Nutrition in Plants, set the question mix — 5 MCQs, 4 short answers, 1 long answer — and clicked Generate.
-
-The paper came out in about 90 seconds.
-
-She read it carefully. It needed small changes — one MCQ option was a bit ambiguous, and she wanted to add a diagram-labelling question. She made those changes. The whole thing, including customisation, took twelve minutes.
+The paper came out in about 90 seconds. She read it carefully. It needed small changes — one MCQ option was a bit ambiguous, and she wanted to add a diagram-labelling question. She made those changes. The whole thing, including customisation, took twelve minutes.
 
 She stared at the screen for a moment. Then she went and watched that show with her daughter.
 
@@ -310,13 +289,13 @@ She stared at the screen for a moment. Then she went and watched that show with 
 
 Over the next month, Meera ma'am tracked her preparation time informally. Not scientifically — just noting when she started and finished.
 
-Lesson plans: down from about an hour to 15–18 minutes. She still rewrites certain sections. She always adds her own examples, usually something from the students' immediate environment — the garden outside the classroom, the kitchen at home, the road they walk on. The AI gives her the structure. She fills it with her knowledge of her students.
+**Lesson plans:** down from about an hour to 15–18 minutes. She still rewrites certain sections. She always adds her own examples, usually something from the students' immediate environment — the garden outside the classroom, the kitchen at home, the road they walk on. The AI gives her the structure. She fills it with her knowledge of her students.
 
-Worksheets: down from 35–40 minutes to 8–10. She generates three levels for each topic now — something she'd never done before because it was too time-consuming. Weaker students get Level 1 with guided choices. Strong students get Level 3 with application questions. "Earlier I used to say I'd differentiate and then not have time to. Now I actually do it."
+**Worksheets:** down from 35–40 minutes to 8–10 minutes. She generates three levels for each topic now — something she'd never done before because it was too time-consuming. Weaker students get Level 1 with guided choices. Strong students get Level 3 with application questions. "Earlier I used to say I'd differentiate and then not have time to. Now I actually do it."
 
-Parent communication notes: she used to put these off because getting the tone right was hard. A note about a struggling student could so easily sound judgmental. Now she generates a draft in two minutes and edits for tone and personalisation. "I know exactly what I want to say — I just used to struggle with starting."
+**Parent communication notes:** she used to put these off because getting the tone right was hard. A note about a struggling student could so easily sound judgmental. Now she generates a draft in two minutes and edits for tone and personalisation. "I know exactly what I want to say — I just used to struggle with starting."
 
-Total saved per week: roughly 6–8 hours.
+**Total saved per week:** roughly 6–8 hours.
 
 ## The Honest Part
 
@@ -328,17 +307,13 @@ She also adds her own touch to everything. The AI doesn't know that her Class 7C
 
 "The AI gives me material. I give it context."
 
-She also pushes back on the idea that AI makes everything mechanical. "If anything, I'm more creative now — because I have more energy. When you're not exhausted from writing the same worksheet format for the fifteenth time, you have space to actually think about your class."
-
 ## What Didn't Change
 
 Her relationship with her students — intact, maybe stronger because she's less frazzled.
 
 Her instinct for the classroom — still entirely hers. AI doesn't know when a lesson is going well or when to stop and go back two steps because the class looks confused.
 
-Her standards — she hasn't lowered them. She's met them faster.
-
-Her belief that teaching matters — that one's never been in question.
+Her standards — she hasn't lowered them. She's met them faster. Her belief that teaching matters — that one's never been in question.
 
 ## What She Wishes She'd Known Earlier
 
@@ -352,29 +327,21 @@ If Meera ma'am were in a staffroom with you right now, here's what she'd say:
 
 "Try it for one worksheet. One. Pick something you have to make anyway this week. See what comes out. You don't have to use it exactly — change whatever you want. But you might find that the hardest part, the starting-with-a-blank-page part, is already done for you."
 
-That's it. Not a revolution. Just a Sunday evening with fewer papers — and more time for everything that actually matters.
-
----
-
-*This story is based on real experiences shared by teachers using Gyaan Mitra.*
-
-*Author: Team Gyaan Mitra*`,
+That's it. Not a revolution. Just a Sunday evening with fewer papers — and more time for everything that actually matters.`,
   },
   {
     slug: "cbse-lesson-plan-guide-teachers",
     title: "How to Write a Perfect CBSE Lesson Plan — With and Without AI",
     category: "Lesson Planning",
     readTime: "9 min read",
-    date: "March 2025",
+    date: "March 2026",
     author: "Team Gyaan Mitra",
     excerpt: "A practical, step-by-step guide to CBSE lesson plans — what they must include, common mistakes, and how AI can make the whole process faster without cutting corners.",
     content: `## Why Lesson Plans Matter Beyond Inspection Day
 
 Most teachers write lesson plans because they're required. During inspections, during training periods, or when a senior teacher needs to review your work. The file gets filled, the file gets checked, the file sits on a shelf.
 
-That's a shame — because a well-written lesson plan is actually one of the most useful things a teacher can make.
-
-Not because it tells you exactly what to do in class (good lessons rarely follow their plans exactly), but because the act of writing it forces you to think through the lesson before it happens. To anticipate where students might get confused. To decide what "success" looks like for this particular 40 minutes. To realise, at 9 PM the night before, that you don't actually have a clear answer to a question students will definitely ask.
+That's a shame — because a well-written lesson plan is actually one of the most useful things a teacher can make. Not because it tells you exactly what to do in class (good lessons rarely follow their plans exactly), but because the act of writing it forces you to think through the lesson before it happens. To anticipate where students might get confused. To decide what "success" looks like for this particular 40 minutes. To realise, at 9 PM the night before, that you don't actually have a clear answer to a question students will definitely ask.
 
 A lesson plan is a rehearsal on paper. And like any rehearsal, its value comes from doing it seriously.
 
@@ -388,18 +355,17 @@ A learning objective is not "students will understand photosynthesis." That's to
 
 Good format: *"By the end of this lesson, students will be able to [action verb] [specific content] [condition/standard]."*
 
-Examples:
-- "Students will be able to list the raw materials required for photosynthesis."
-- "Students will be able to explain the role of chlorophyll using their own words."
-- "Students will be able to draw and label a simple diagram of a leaf cross-section."
+Use Bloom's Taxonomy verbs to keep objectives measurable:
+- identify, recall, describe (knowledge level)
+- explain, summarise, classify (comprehension level)
+- apply, demonstrate, solve (application level)
+- analyse, compare, differentiate (analysis level)
 
-Use Bloom's Taxonomy verbs to keep objectives measurable: *identify, recall, describe, explain, apply, analyse, evaluate, create.* "Understand" is not a Bloom's verb — it's too hard to measure.
+"Understand" is not a Bloom's verb — it's too hard to measure.
 
 ### 2. Prior Knowledge Check
 
-What do students already know about this topic? This section takes two minutes to write and saves enormous amounts of classroom confusion.
-
-Before teaching cell division, do your students know what a cell is? Have they covered mitosis before in a lower class? If they haven't — or if last week's class was interrupted by a cricket match and rain — you need to know that before you start.
+What do students already know about this topic? This section takes two minutes to write and saves enormous amounts of classroom confusion. Before teaching cell division, do your students know what a cell is? Have they covered mitosis before in a lower class? If they haven't — or if last week's class was interrupted by a cricket match and rain — you need to know that before you start.
 
 ### 3. Materials and Resources Needed
 
@@ -407,27 +373,19 @@ Every resource, listed out. Textbook (which page), blackboard diagrams you plan 
 
 ### 4. Warm-Up / Hook (5 minutes)
 
-This is the part most lesson plans either skip or treat as optional. It shouldn't be. The warm-up does two things: it connects to prior learning (activating what students already know), and it creates curiosity about what's coming.
-
-A good warm-up is a question students can attempt before they've been taught. "Look at this picture of a leaf. Why do you think leaves are green and not some other colour?" They'll have guesses. Most will be wrong or incomplete. That's fine — now they're curious.
+This is the part most lesson plans either skip or treat as optional. It shouldn't be. The warm-up does two things: it connects to prior learning (activating what students already know), and it creates curiosity about what's coming. A good warm-up is a question students can attempt before they've been taught.
 
 ### 5. Main Teaching — Introduction to New Content (20 minutes)
 
-This is the core of the lesson. For CBSE, this section typically covers the key concept from the chapter — explained step by step, with vocabulary, at least one diagram or visual, and one example connecting the concept to students' daily life.
-
-The "India-specific example" is worth taking seriously. Photosynthesis is easier to grasp when connected to the mango tree in the school compound or the rice crop in the local field, not just a generic "green plant in a pot."
+This is the core of the lesson. For CBSE, this section typically covers the key concept from the chapter — explained step by step, with vocabulary, at least one diagram or visual, and one example connecting the concept to students' daily life. The "India-specific example" is worth taking seriously. Photosynthesis is easier to grasp when connected to the mango tree in the school compound or the rice crop in the local field.
 
 ### 6. Guided Practice and Student Activity (10 minutes)
 
-This is where students do something — not just listen. It can be a pair discussion, a quick diagram activity, a board exercise, 3 problems to solve, a matching activity on a slip of paper.
-
-This section is what separates a lecture from a lesson. Without it, you're delivering information. With it, you're teaching.
+This is where students do something — not just listen. It can be a pair discussion, a quick diagram activity, a board exercise, 3 problems to solve, a matching activity on a slip of paper. This section is what separates a lecture from a lesson.
 
 ### 7. Closing Summary and Exit Check (5 minutes)
 
-Before students leave, what's the one thing they should take away? A good closing restates the key idea and checks whether it landed.
-
-An exit ticket is the most reliable way to do this — one question on a slip of paper: "Explain photosynthesis in one sentence." Read the answers after class. They'll tell you exactly who understood and who needs a revisit.
+Before students leave, what's the one thing they should take away? A good closing restates the key idea and checks whether it landed. An exit ticket is the most reliable way to do this — one question on a slip of paper. Read the answers after class. They'll tell you exactly who understood and who needs a revisit.
 
 ### 8. Homework or Summative Assessment
 
@@ -441,7 +399,7 @@ Clear, specific, manageable. Not "read Chapter 3" but "answer questions 2, 4, an
 
 **Ignoring prior knowledge.** Jumping straight into new content without checking what students already know leads to confusion that cascades through the lesson.
 
-**Overplanning.** Some teachers plan for 60 minutes of content in a 40-minute class. Ambition is good; realism is better. Build in buffer. Real classrooms have distractions.
+**Overplanning.** Some teachers plan for 60 minutes of content in a 40-minute class. Ambition is good; realism is better. Build in buffer.
 
 ## A Before and After — Class 8 Science, Cell Structure
 
@@ -460,17 +418,11 @@ Clear, specific, manageable. Not "read Chapter 3" but "answer questions 2, 4, an
 
 *Prior Knowledge Check:* Students covered "Cells — The Basic Unit of Life" in Class 6. Quick oral quiz: "What is a cell? Name one part of a cell you remember."
 
-*Materials:* Textbook p. 31–38, chalk for board diagram, printed comparison worksheet
-
 *Warm-Up (5 min):* "Your body has about 37 trillion cells. Your mango tree has them too. But they're different in important ways. Today we'll find out exactly how — and why it matters."
-
-*Main Teaching (20 min):* Introduce cell organelles with function-first approach — "This part does this job" before naming. Use brick-and-mortar analogy for cell wall. Draw comparison diagram on board: plant cell vs animal cell.
 
 *Student Activity (10 min):* Pairs receive a slip with 8 cell parts. Task: sort into "Plant only", "Animal only", "Both". Report back in 2 minutes.
 
 *Closing (5 min):* Exit question — "Name one cell part that plant cells have but animal cells don't, and explain what it does."
-
-*Homework:* Draw and label a plant cell (memory, without looking at textbook). Answer question 3 on page 38.
 
 The difference is dramatic. The second plan is usable, specific, and student-centred.
 
@@ -484,15 +436,11 @@ That generates a solid first draft in about 15 seconds. You then review it, adju
 
 ## 5 Things to Always Customise in AI Output
 
-1. **The examples.** AI doesn't know your city, your school, or what your students find interesting. Replace generic examples with local ones.
-
-2. **The objectives.** AI gets the format right but sometimes aims too high or too low. Adjust for where your class actually is.
-
-3. **The timing.** AI often underestimates how long activities take in a real 40-student classroom. Add 2–3 minutes of buffer per activity.
-
-4. **The homework.** Check it against your actual textbook pages. AI sometimes cites questions that don't match your edition.
-
-5. **The voice.** The best lesson plans sound like the teacher who wrote them. Add your own phrasing, your own questions, your own teaching personality.
+- **The examples.** AI doesn't know your city, your school, or what your students find interesting. Replace generic examples with local ones.
+- **The objectives.** AI gets the format right but sometimes aims too high or too low. Adjust for where your class actually is.
+- **The timing.** AI often underestimates how long activities take in a real 40-student classroom. Add 2–3 minutes of buffer per activity.
+- **The homework.** Check it against your actual textbook pages. AI sometimes cites questions that don't match your edition.
+- **The voice.** The best lesson plans sound like the teacher who wrote them. Add your own phrasing, your own questions, your own teaching personality.
 
 ## A Lesson Plan is a Starting Point, Not a Script
 
@@ -500,11 +448,7 @@ The best teachers we've talked to have all said some version of the same thing: 
 
 A great lesson plan gives you confidence and structure. It means you've thought through the lesson before it happens, which frees your attention during the lesson to be with your students — reading the room, following their curiosity, catching the student in the back who's not keeping up.
 
-The plan is the preparation. The teaching is what happens when you walk in.
-
----
-
-*Author: Team Gyaan Mitra*`,
+The plan is the preparation. The teaching is what happens when you walk in.`,
   },
 ];
 
