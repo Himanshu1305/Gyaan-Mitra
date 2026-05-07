@@ -18,6 +18,7 @@ const EXAM_TYPES = ["Unit Test", "Half-Yearly Exam", "Annual Exam", "Class Test"
 const BOARDS = ["CBSE", "ICSE", "State Board"];
 const DURATIONS = ["1 hour", "1.5 hours", "2 hours", "2.5 hours", "3 hours"];
 const DIFFICULTIES = ["Standard", "Easy", "Challenging", "All Three Levels"];
+const LOADING_MSGS = ["Reading your inputs…", "Crafting your exam paper…", "Almost ready…", "Adding the finishing touches…"];
 
 interface QuestionMix { mcq: number; shortTwo: number; shortThree: number; longFour: number; longFive: number; }
 interface LevelContent { label: string; questionPaper: string; answerKey: string; }
@@ -145,6 +146,8 @@ export default function ExamPapersPage() {
   });
   const [questionMix, setQuestionMix] = useState<QuestionMix>({ mcq: 5, shortTwo: 3, shortThree: 2, longFour: 1, longFive: 0 });
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
+  const [outputLanguage, setOutputLanguage] = useState("auto");
+  const [loadingMsg, setLoadingMsg] = useState(LOADING_MSGS[0]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [questionContent, setQuestionContent] = useState("");
@@ -180,6 +183,14 @@ export default function ExamPapersPage() {
 
   const atLimit = user && usage >= FREE_LIMIT;
 
+  useEffect(() => {
+    if (!loading) return;
+    let i = 0;
+    setLoadingMsg(LOADING_MSGS[0]);
+    const id = setInterval(() => { i = (i + 1) % LOADING_MSGS.length; setLoadingMsg(LOADING_MSGS[i]); }, 3000);
+    return () => clearInterval(id);
+  }, [loading]);
+
   const handleGenerate = async () => {
     if (mode === "form" && !form.chapters.trim()) { setChaptersError("Please enter the chapters covered before generating."); return; }
     if (mode === "custom" && !customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
@@ -191,7 +202,7 @@ export default function ExamPapersPage() {
       const res = await fetch("/api/exam-paper", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ mode, customPrompt, ...form, questionMix, fileData }),
+        body: JSON.stringify({ mode, customPrompt, ...form, questionMix, fileData, outputLanguage }),
       });
       if (res.status === 429) {
         const text = await res.text();
@@ -266,9 +277,10 @@ export default function ExamPapersPage() {
     const gradeNum = form.grade.replace("Class ", "");
     const dateStr = formatDateTitle(new Date());
     const chaptersTrunc = trunc(mode === "form" ? form.chapters : "Custom", 30);
+    const langSuffix = outputLanguage === "hindi" ? " (Hindi)" : outputLanguage === "hinglish" ? " (Hinglish)" : "";
     const baseTitle = mode === "form"
-      ? `${form.subject} · Class ${gradeNum} · ${form.examType} · ${chaptersTrunc} · ${dateStr}`
-      : `Custom Exam Paper · ${dateStr}`;
+      ? `${form.subject} · Class ${gradeNum} · ${form.examType} · ${chaptersTrunc} · ${dateStr}${langSuffix}`
+      : `Custom Exam Paper · ${dateStr}${langSuffix}`;
 
     if (isAllThree && allThreeLevels.length > 0) {
       for (const level of allThreeLevels) {
@@ -377,6 +389,17 @@ export default function ExamPapersPage() {
                   <SelectField label="Difficulty Level" value={form.difficulty}  onChange={set("difficulty")}  options={DIFFICULTIES} />
                   <SelectField label="Duration"        value={form.duration}    onChange={set("duration")}    options={DURATIONS} />
 
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
+                    <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                      <option value="auto">Auto (Hindi subject → Hindi output, others → English)</option>
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi (हिंदी)</option>
+                      <option value="hinglish">Hinglish (Hindi + English mix)</option>
+                    </select>
+                  </div>
+
                   {/* Chapters field */}
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-semibold text-secondary mb-1.5">
@@ -433,6 +456,16 @@ export default function ExamPapersPage() {
                 </div>
                 <p className="text-xs text-gray-400 mb-2">Tap mic to speak your prompt.</p>
                 {promptError && <p className="mb-3 text-xs text-red-500 font-medium">{promptError}</p>}
+                <div className="mt-3">
+                  <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
+                  <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                    <option value="auto">Auto (detect from subject)</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi (हिंदी)</option>
+                    <option value="hinglish">Hinglish (Hindi + English mix)</option>
+                  </select>
+                </div>
               </>
             )}
 
@@ -483,7 +516,7 @@ export default function ExamPapersPage() {
                   <svg className="animate-spin w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
                 </div>
                 <div>
-                  <p className="font-semibold text-secondary text-sm">{isAllThree ? "Generating 3 complete exam papers…" : "Creating your exam paper…"}</p>
+                  <p className="font-semibold text-secondary text-sm">{loadingMsg}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{isAllThree ? "This usually takes 45–90 seconds" : "This usually takes 15–25 seconds"}</p>
                 </div>
               </div>

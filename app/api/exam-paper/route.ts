@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
     questionMix,
     additionalInstructions,
     fileData,
+    outputLanguage,
   }: {
     mode?: "form" | "custom";
     customPrompt?: string;
@@ -56,7 +57,19 @@ export async function POST(req: NextRequest) {
     questionMix?: QuestionMix;
     additionalInstructions?: string;
     fileData?: FileData;
+    outputLanguage?: string;
   } = await req.json();
+
+  const isHindiSubject = subject?.toLowerCase() === "hindi";
+  const lang = outputLanguage || "auto";
+  let languageInstruction = "";
+  if (lang === "hindi" || (lang === "auto" && isHindiSubject)) {
+    languageInstruction = `CRITICAL LANGUAGE REQUIREMENT: Generate ALL content in Hindi using Devanagari script. This includes: all questions, instructions, section headings, answer options, MCQ choices, examples, activities, homework questions, and the complete answer key. The entire output must be in Hindi — not English. Use simple, clear Hindi appropriate for Class ${grade} students. Only keep these in English: 'MCQ', 'Section A/B/C/D', marks in numerals, and internationally used scientific terms. Do not translate proper nouns, scientific formulas, or mathematical symbols.`;
+  } else if (lang === "hinglish") {
+    languageInstruction = `LANGUAGE REQUIREMENT: Generate content in Hinglish — a natural mix of Hindi and English as commonly spoken and written by Indian teachers. Write instructions and explanations in Hindi (Devanagari) but use English for technical terms, subject-specific vocabulary, and where English is more commonly used in Indian classrooms.`;
+  } else {
+    languageInstruction = `Generate all content in clear, simple English appropriate for Indian school students.`;
+  }
 
   if (mode === "custom") {
     if (!customPrompt?.trim()) {
@@ -187,6 +200,8 @@ Structure your output EXACTLY like this — use these delimiters precisely:
   if (difficulty === "All Three Levels") {
     formPrompt = `You are an expert teacher creating exam papers for Indian school students. Generate THREE complete exam papers at different difficulty levels.
 
+${languageInstruction}
+
 **Exam Details (apply to all three papers):**
 - Subject: ${subject}
 - Grade: ${grade}
@@ -211,6 +226,8 @@ ${subjectInstruction}
 ${allThreeOutputStructure}`;
   } else {
     formPrompt = `You are an expert teacher creating an exam paper for Indian school students. Create a complete, print-ready exam paper.
+
+${languageInstruction}
 
 **Exam Details:**
 - Subject: ${subject}

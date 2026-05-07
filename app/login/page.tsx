@@ -106,8 +106,11 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="mt-6 text-center text-xs text-gray-400">
-          By signing in, you agree to use Gyaan Mitra responsibly for educational purposes.
+        <p className="mt-6 text-center text-xs text-gray-400 leading-relaxed">
+          By signing in, you agree to our{" "}
+          <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
+          {" "}and{" "}
+          <Link href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</Link>.
         </p>
       </div>
     </div>

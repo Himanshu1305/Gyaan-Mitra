@@ -220,7 +220,7 @@ function DashboardContent() {
                 <p className="text-xs text-gray-400">
                   {remaining > 0
                     ? `${remaining} free generation${remaining !== 1 ? "s" : ""} remaining this month`
-                    : "You&apos;ve used all free generations this month"}
+                    : "You've used all free generations this month"}
                 </p>
               </>
             )}

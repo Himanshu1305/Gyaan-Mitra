@@ -16,6 +16,7 @@ const SUBJECTS = ["Mathematics", "Science", "Social Studies", "Hindi", "English"
 const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 const BOARDS = ["CBSE", "ICSE", "State Board"];
 const DURATIONS = ["30 minutes", "40 minutes", "45 minutes", "60 minutes"];
+const LOADING_MSGS = ["Reading your inputs…", "Crafting your lesson plan…", "Almost ready…", "Adding the finishing touches…"];
 
 function SelectField({ label, value, onChange, options }: {
   label: string; value: string; onChange: (v: string) => void; options: string[];
@@ -79,6 +80,8 @@ export default function LessonPlansPage() {
     duration: "45 minutes", additionalInstructions: "",
   });
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
+  const [outputLanguage, setOutputLanguage] = useState("auto");
+  const [loadingMsg, setLoadingMsg] = useState(LOADING_MSGS[0]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [copied, setCopied] = useState(false);
@@ -106,6 +109,14 @@ export default function LessonPlansPage() {
 
   const atLimit = user && usage >= FREE_LIMIT;
 
+  useEffect(() => {
+    if (!loading) return;
+    let i = 0;
+    setLoadingMsg(LOADING_MSGS[0]);
+    const id = setInterval(() => { i = (i + 1) % LOADING_MSGS.length; setLoadingMsg(LOADING_MSGS[i]); }, 3000);
+    return () => clearInterval(id);
+  }, [loading]);
+
   const handleGenerate = async () => {
     if (mode === "form" && !form.topic.trim()) { setTopicError("Please enter a topic before generating."); return; }
     if (mode === "custom" && !customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
@@ -117,7 +128,7 @@ export default function LessonPlansPage() {
       const res = await fetch("/api/lesson-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ mode, customPrompt, ...form, fileData }),
+        body: JSON.stringify({ mode, customPrompt, ...form, fileData, outputLanguage }),
       });
       if (res.status === 429) {
         const text = await res.text();
@@ -188,9 +199,10 @@ export default function LessonPlansPage() {
     const gradeNum = form.grade.replace("Class ", "");
     const dateStr = formatDateTitle(new Date());
     const topicTrunc = trunc(mode === "form" ? (form.topic || "Lesson Plan") : "Custom", 30);
+    const langSuffix = outputLanguage === "hindi" ? " (Hindi)" : outputLanguage === "hinglish" ? " (Hinglish)" : "";
     const title = mode === "form"
-      ? `${form.subject} · Class ${gradeNum} · ${topicTrunc} · ${dateStr} — Lesson Plan`
-      : `Custom Lesson Plan · ${dateStr}`;
+      ? `${form.subject} · Class ${gradeNum} · ${topicTrunc} · ${dateStr} — Lesson Plan${langSuffix}`
+      : `Custom Lesson Plan · ${dateStr}${langSuffix}`;
     await supabase.from("saved_content").insert([{
       user_id: user.id,
       content_type: "lesson-plan",
@@ -290,6 +302,17 @@ export default function LessonPlansPage() {
                   <SelectField label="Duration" value={form.duration} onChange={set("duration")} options={DURATIONS} />
 
                   <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
+                    <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                      <option value="auto">Auto (Hindi subject → Hindi output, others → English)</option>
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi (हिंदी)</option>
+                      <option value="hinglish">Hinglish (Hindi + English mix)</option>
+                    </select>
+                  </div>
+
+                  <div className="sm:col-span-2">
                     <label className="block text-sm font-semibold text-secondary mb-1.5">Additional Instructions <span className="text-gray-400 font-normal">(optional)</span></label>
                     <div className="flex gap-2 items-start">
                       <textarea value={form.additionalInstructions} onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
@@ -320,6 +343,16 @@ export default function LessonPlansPage() {
                 </div>
                 <p className="text-xs text-gray-400 mb-2">Tap mic to speak your prompt.</p>
                 {promptError && <p className="mb-3 text-xs text-red-500 font-medium">{promptError}</p>}
+                <div className="mt-3">
+                  <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
+                  <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                    <option value="auto">Auto (detect from subject)</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi (हिंदी)</option>
+                    <option value="hinglish">Hinglish (Hindi + English mix)</option>
+                  </select>
+                </div>
               </>
             )}
 
@@ -377,7 +410,7 @@ export default function LessonPlansPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-semibold text-secondary text-sm">Building your lesson plan…</p>
+                  <p className="font-semibold text-secondary text-sm">{loadingMsg}</p>
                   <p className="text-xs text-gray-400 mt-0.5">This usually takes 10–20 seconds</p>
                 </div>
               </div>

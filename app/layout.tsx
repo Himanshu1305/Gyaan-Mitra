@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import CookieBanner from "@/components/CookieBanner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -51,6 +52,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} font-sans antialiased bg-white text-gray-900`}>
         <AuthProvider>
           {children}
+          <CookieBanner />
         </AuthProvider>
       </body>
     </html>

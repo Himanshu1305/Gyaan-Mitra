@@ -134,6 +134,13 @@ export default function SignupPage() {
               Sign in
             </Link>
           </p>
+
+          <p className="mt-4 text-center text-xs text-gray-400 leading-relaxed">
+            By creating an account, you agree to our{" "}
+            <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
+            {" "}and{" "}
+            <Link href="/privacy-policy" className="text-primary hover:underline">Privacy Policy</Link>.
+          </p>
         </div>
 
         <div className="mt-6 bg-primary-50 border border-primary-100 rounded-xl px-4 py-3 text-center">

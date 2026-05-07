@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
     duration,
     additionalInstructions,
     fileData,
+    outputLanguage,
   }: {
     mode?: "form" | "custom";
     customPrompt?: string;
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
     duration: string;
     additionalInstructions?: string;
     fileData?: FileData;
+    outputLanguage?: string;
   } = await req.json();
 
   if (mode === "custom") {
@@ -83,6 +85,17 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  const isHindiSubject = subject?.toLowerCase() === "hindi";
+  const lang = outputLanguage || "auto";
+  let languageInstruction = "";
+  if (lang === "hindi" || (lang === "auto" && isHindiSubject)) {
+    languageInstruction = `CRITICAL LANGUAGE REQUIREMENT: Generate ALL content in Hindi using Devanagari script. This includes: all questions, instructions, section headings, answer options, MCQ choices, examples, activities, homework questions, and the complete answer key. The entire output must be in Hindi — not English. Use simple, clear Hindi appropriate for Class ${grade} students. Only keep these in English: 'MCQ', 'Section A/B/C/D', marks in numerals, and internationally used scientific terms. Do not translate proper nouns, scientific formulas, or mathematical symbols.`;
+  } else if (lang === "hinglish") {
+    languageInstruction = `LANGUAGE REQUIREMENT: Generate content in Hinglish — a natural mix of Hindi and English as commonly spoken and written by Indian teachers. Write instructions and explanations in Hindi (Devanagari) but use English for technical terms, subject-specific vocabulary, and where English is more commonly used in Indian classrooms.`;
+  } else {
+    languageInstruction = `Generate all content in clear, simple English appropriate for Indian school students.`;
+  }
+
   const chapterNote =
     fileData?.type === "text" && fileData.text
       ? `\n\n**Uploaded Chapter Content (from "${fileData.filename}"):**\n${fileData.text.slice(0, 8000)}`
@@ -91,6 +104,8 @@ export async function POST(req: NextRequest) {
       : "";
 
   const formPrompt = `You are an expert teacher trainer and curriculum designer specialising in Indian school education. Create a detailed, ready-to-use lesson plan for a classroom teacher.
+
+${languageInstruction}
 
 IMPORTANT FORMATTING RULES: Never use HTML entities like &emsp; &nbsp; &amp; or any HTML tags in your response. Use plain text only. For MCQ options use this exact format:
 (a) option one   (b) option two   (c) option three   (d) option four

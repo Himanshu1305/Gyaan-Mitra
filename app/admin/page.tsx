@@ -206,7 +206,22 @@ export default function AdminPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-gray-400">No users found.</td></tr>
+                      <tr>
+                        <td colSpan={7} className="px-4 py-12 text-center">
+                          {users.length === 0 ? (
+                            <div>
+                              <p className="text-2xl mb-2">👥</p>
+                              <p className="text-sm font-semibold text-secondary">No users have signed up yet</p>
+                              <p className="text-xs text-gray-400 mt-1">Users will appear here once they create an account.</p>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-sm text-gray-400">No users match &quot;{search}&quot;</p>
+                              <button onClick={() => setSearch("")} className="mt-2 text-xs text-primary hover:underline font-medium">Clear search</button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
                     ) : filtered.map((u) => (
                       <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-4 py-3 font-medium text-secondary">

@@ -17,6 +17,7 @@ const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 const WORKSHEET_TYPES = ["Practice", "Revision", "Homework", "Activity", "Multi-level — Three Levels"];
 const DIFFICULTIES = ["Easy", "Medium", "Mixed"];
 const BOARDS = ["CBSE", "ICSE", "State Board"];
+const LOADING_MSGS = ["Reading your inputs…", "Crafting your worksheet…", "Almost ready…", "Adding the finishing touches…"];
 
 interface QuestionMix { mcq: number; shortTwo: number; shortThree: number; longFour: number; longFive: number; }
 
@@ -126,6 +127,8 @@ export default function WorksheetsPage() {
   });
   const [questionMix, setQuestionMix] = useState<QuestionMix>({ mcq: 5, shortTwo: 3, shortThree: 2, longFour: 1, longFive: 1 });
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
+  const [outputLanguage, setOutputLanguage] = useState("auto");
+  const [loadingMsg, setLoadingMsg] = useState(LOADING_MSGS[0]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [worksheetContent, setWorksheetContent] = useState("");
@@ -159,6 +162,14 @@ export default function WorksheetsPage() {
 
   const atLimit = user && usage >= FREE_LIMIT;
 
+  useEffect(() => {
+    if (!loading) return;
+    let i = 0;
+    setLoadingMsg(LOADING_MSGS[0]);
+    const id = setInterval(() => { i = (i + 1) % LOADING_MSGS.length; setLoadingMsg(LOADING_MSGS[i]); }, 3000);
+    return () => clearInterval(id);
+  }, [loading]);
+
   const handleGenerate = async () => {
     if (mode === "form" && !form.topic.trim()) { setTopicError("Please enter a topic before generating."); return; }
     if (mode === "custom" && !customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
@@ -170,7 +181,7 @@ export default function WorksheetsPage() {
       const res = await fetch("/api/worksheet", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ mode, customPrompt, ...form, questionMix, fileData }),
+        body: JSON.stringify({ mode, customPrompt, ...form, questionMix, fileData, outputLanguage }),
       });
       if (res.status === 429) {
         const text = await res.text();
@@ -238,9 +249,10 @@ export default function WorksheetsPage() {
     const gradeNum = form.grade.replace("Class ", "");
     const dateStr = formatDateTitle(new Date());
     const topicTrunc = trunc(mode === "form" ? form.topic : "Custom", 30);
+    const langSuffix = outputLanguage === "hindi" ? " (Hindi)" : outputLanguage === "hinglish" ? " (Hinglish)" : "";
     const baseTitle = mode === "form"
-      ? `${form.subject} · Class ${gradeNum} · ${topicTrunc} · ${form.worksheetType} · ${dateStr}`
-      : `Custom Worksheet · ${dateStr}`;
+      ? `${form.subject} · Class ${gradeNum} · ${topicTrunc} · ${form.worksheetType} · ${dateStr}${langSuffix}`
+      : `Custom Worksheet · ${dateStr}${langSuffix}`;
 
     const { data: wsData } = await supabase.from("saved_content").insert([{
       user_id: user.id, content_type: "worksheet",
@@ -340,6 +352,17 @@ export default function WorksheetsPage() {
                   <SelectField label="Difficulty"     value={form.difficulty}    onChange={set("difficulty")}    options={DIFFICULTIES} />
                   <SelectField label="Board"          value={form.board}         onChange={set("board")}         options={BOARDS} />
 
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
+                    <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                      <option value="auto">Auto (Hindi subject → Hindi output, others → English)</option>
+                      <option value="english">English</option>
+                      <option value="hindi">Hindi (हिंदी)</option>
+                      <option value="hinglish">Hinglish (Hindi + English mix)</option>
+                    </select>
+                  </div>
+
                   <QuestionMixInput mix={questionMix} onChange={setQuestionMix} />
 
                   <div className="sm:col-span-2">
@@ -374,6 +397,16 @@ export default function WorksheetsPage() {
                 </div>
                 <p className="text-xs text-gray-400 mb-2">Tap mic to speak your prompt.</p>
                 {promptError && <p className="mb-3 text-xs text-red-500 font-medium">{promptError}</p>}
+                <div className="mt-3">
+                  <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
+                  <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                    <option value="auto">Auto (detect from subject)</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi (हिंदी)</option>
+                    <option value="hinglish">Hinglish (Hindi + English mix)</option>
+                  </select>
+                </div>
               </>
             )}
 
@@ -421,7 +454,7 @@ export default function WorksheetsPage() {
                   <svg className="animate-spin w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
                 </div>
                 <div>
-                  <p className="font-semibold text-secondary text-sm">Creating your worksheet…</p>
+                  <p className="font-semibold text-secondary text-sm">{loadingMsg}</p>
                   <p className="text-xs text-gray-400 mt-0.5">This usually takes 10–20 seconds</p>
                 </div>
               </div>
