@@ -39,15 +39,19 @@ export default function AdminPage() {
   const [actionError, setActionError] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    console.log('Admin useEffect fired — loading:', loading, 'user:', user?.email)
     if (loading) return
     if (!user) {
+      console.log('No user — redirecting to login')
       router.push('/login')
       return
     }
     if (user.email !== 'usdvisionai@gmail.com') {
+      console.log('Not admin — email is:', user.email, '— redirecting to dashboard')
       router.push('/dashboard')
       return
     }
+    console.log('Admin confirmed — loading data')
     loadData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, user])
