@@ -10,4 +10,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Client-side singleton — used in client components and API routes
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    storageKey: 'gyaan-mitra-auth',
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+  }
+});
