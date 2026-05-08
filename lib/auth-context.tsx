@@ -44,21 +44,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState("free");
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("is_admin, subscription_tier")
-      .eq("id", userId)
-      .single();
-    setIsAdmin(data?.is_admin === true);
-    setSubscriptionTier(data?.subscription_tier ?? "free");
+  async function fetchProfile() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) return
+
+      const res = await fetch('/api/auth/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await res.json()
+      setIsAdmin(data.isAdmin === true)
+      setSubscriptionTier(data.subscriptionTier ?? 'free')
+    } catch {
+      setIsAdmin(false)
+      setSubscriptionTier('free')
+    }
   }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
+      if (session?.user) fetchProfile();
       setLoading(false);
     });
 
@@ -66,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        fetchProfile();
       } else {
         setIsAdmin(false);
         setSubscriptionTier("free");
