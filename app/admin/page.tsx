@@ -39,12 +39,18 @@ export default function AdminPage() {
   const [actionError, setActionError] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) { router.push("/login"); return; }
-    if (user.email !== "usdvisionai@gmail.com") { router.push("/dashboard"); return; }
-    loadData();
+    if (loading) return
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    if (user.email !== 'usdvisionai@gmail.com') {
+      router.push('/dashboard')
+      return
+    }
+    loadData()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, user]);
+  }, [loading, user])
 
   async function loadData() {
     setDataLoading(true);
@@ -136,18 +142,8 @@ export default function AdminPage() {
     );
   });
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <svg className="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-        </svg>
-      </div>
-    );
-  }
-
-  if (user?.email !== "usdvisionai@gmail.com") return null;
+  if (loading) return <div>Loading...</div>
+  if (!user || user.email !== 'usdvisionai@gmail.com') return null
 
   const statCards = stats ? [
     { label: "Total Users", value: stats.totalUsers, color: "bg-blue-50 border-blue-200 text-blue-700" },
