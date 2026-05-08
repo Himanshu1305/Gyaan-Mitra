@@ -49,21 +49,15 @@ export async function POST(req: NextRequest) {
     return new Response(`Failed to update profile: ${error.message}`, { status: 500 });
   }
 
-  if (action === "grant") {
-    await serviceSupabase.from("subscriptions").upsert([{
-      user_id: targetUserId,
-      plan: "premium",
-      status: "active",
-      started_at: new Date().toISOString(),
-    }], { onConflict: "user_id" });
-  } else {
-    await serviceSupabase
-      .from("subscriptions")
-      .update({ status: "cancelled" })
-      .eq("user_id", targetUserId);
-  }
+  await serviceSupabase.from("subscriptions").upsert([{
+    user_id: targetUserId,
+    plan: tier,
+    status: "active",
+    granted_by_admin: true,
+    updated_at: new Date().toISOString(),
+  }], { onConflict: "user_id" });
 
-  return new Response(JSON.stringify({ success: true, tier }), {
+  return new Response(JSON.stringify({ success: true, action, targetUserId }), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
