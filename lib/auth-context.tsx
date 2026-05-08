@@ -44,45 +44,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [subscriptionTier, setSubscriptionTier] = useState("free");
 
-  async function fetchProfile() {
+  const fetchProfile = async (userId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const token = session?.access_token
-      if (!token) return
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_admin, subscription_tier')
+        .eq('id', userId)
+        .single()
 
-      const res = await fetch('/api/auth/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      const data = await res.json()
-      setIsAdmin(data.isAdmin === true)
-      setSubscriptionTier(data.subscriptionTier ?? 'free')
-    } catch {
-      setIsAdmin(false)
-      setSubscriptionTier('free')
+      if (error) {
+        console.error('fetchProfile error:', error)
+        setIsAdmin(false)
+        setSubscriptionTier('free')
+      } else {
+        setIsAdmin(data?.is_admin === true)
+        setSubscriptionTier(data?.subscription_tier ?? 'free')
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) await fetchProfile();
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setSession(session)
+      setUser(session?.user ?? null)
       if (session?.user) {
-        await fetchProfile();
+        await fetchProfile(session.user.id)
       } else {
-        setIsAdmin(false);
-        setSubscriptionTier("free");
+        setLoading(false)
       }
-      setLoading(false);
-    });
+    }
+    initAuth()
 
-    return () => subscription.unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session)
+        setUser(session?.user ?? null)
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setIsAdmin(false)
+          setSubscriptionTier('free')
+          setLoading(false)
+        }
+      }
+    )
+
+    return () => subscription.unsubscribe()
   }, []);
 
   const signIn = async (email: string, password: string) => {
