@@ -15,7 +15,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, signOut, loading, isAdmin } = useAuth();
+  const { user, signOut, loading } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -69,7 +69,7 @@ export default function Navbar() {
                     >
                       Settings
                     </Link>
-                    {isAdmin && (
+                    {user?.email === "usdvisionai@gmail.com" && (
                       <Link
                         href="/admin"
                         className="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors"
@@ -144,7 +144,7 @@ export default function Navbar() {
               <Link href="/settings" className="block text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}>
                 Settings
               </Link>
-              {isAdmin && (
+              {user?.email === "usdvisionai@gmail.com" && (
                 <Link href="/admin" className="block text-sm font-semibold text-red-600" onClick={() => setMenuOpen(false)}>
                   Admin
                 </Link>

@@ -30,7 +30,7 @@ function monthYear(): string {
 
 export default function AdminPage() {
   const router = useRouter();
-  const { user, session, loading, isAdmin } = useAuth();
+  const { user, session, loading } = useAuth();
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -41,10 +41,10 @@ export default function AdminPage() {
   useEffect(() => {
     if (loading) return;
     if (!user) { router.push("/login"); return; }
-    if (!isAdmin) { router.push("/dashboard"); return; }
+    if (user.email !== "usdvisionai@gmail.com") { router.push("/dashboard"); return; }
     loadData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, user, isAdmin]);
+  }, [loading, user]);
 
   async function loadData() {
     setDataLoading(true);
@@ -147,7 +147,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!isAdmin) return null;
+  if (user?.email !== "usdvisionai@gmail.com") return null;
 
   const statCards = stats ? [
     { label: "Total Users", value: stats.totalUsers, color: "bg-blue-50 border-blue-200 text-blue-700" },
