@@ -5,6 +5,9 @@ export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('ENV CHECK — URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('ENV CHECK — SERVICE KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+
     // Service role client — bypasses RLS
     const serviceClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -51,6 +54,6 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error('Grant premium error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }
