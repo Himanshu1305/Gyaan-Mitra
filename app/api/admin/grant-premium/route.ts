@@ -1,64 +1,56 @@
-import { NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { createClient } from '@supabase/supabase-js'
+import { NextRequest, NextResponse } from 'next/server'
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
-  const serviceSupabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  try {
+    // Service role client — bypasses RLS
+    const serviceClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
-  const authHeader = req.headers.get("authorization");
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const body = await req.json()
+    const { targetUserId, action } = body
 
-  if (!token) {
-    return new Response("Unauthorized", { status: 401 });
+    if (!targetUserId || !action) {
+      return NextResponse.json({ error: 'Missing targetUserId or action' }, { status: 400 })
+    }
+
+    const tier = action === 'grant' ? 'premium' : 'free'
+
+    // Update profiles table
+    const { error: profileError } = await serviceClient
+      .from('profiles')
+      .update({ subscription_tier: tier })
+      .eq('id', targetUserId)
+
+    if (profileError) {
+      console.error('Profile update error:', profileError)
+      return NextResponse.json({ error: profileError.message }, { status: 500 })
+    }
+
+    // Upsert subscriptions table
+    const { error: subError } = await serviceClient
+      .from('subscriptions')
+      .upsert({
+        user_id: targetUserId,
+        plan: tier,
+        status: 'active',
+        granted_by_admin: true,
+        start_date: new Date().toISOString(),
+      }, { onConflict: 'user_id' })
+
+    if (subError) {
+      console.error('Subscription upsert error:', subError)
+      // Don't fail — profile was already updated
+    }
+
+    return NextResponse.json({ success: true, action, targetUserId })
+
+  } catch (err) {
+    console.error('Grant premium error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-
-  const { data: { user } } = await supabase.auth.getUser(token);
-  if (!user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  const { data: callerProfile } = await serviceSupabase
-    .from("profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
-
-  if (!callerProfile?.is_admin) {
-    return new Response("Forbidden", { status: 403 });
-  }
-
-  const { targetUserId, action }: { targetUserId: string; action: "grant" | "revoke" } = await req.json();
-
-  if (!targetUserId || !["grant", "revoke"].includes(action)) {
-    return new Response("Invalid request", { status: 400 });
-  }
-
-  const tier = action === "grant" ? "premium" : "free";
-
-  const { error } = await serviceSupabase
-    .from("profiles")
-    .update({ subscription_tier: tier })
-    .eq("id", targetUserId);
-
-  if (error) {
-    return new Response(`Failed to update profile: ${error.message}`, { status: 500 });
-  }
-
-  await serviceSupabase.from("subscriptions").upsert([{
-    user_id: targetUserId,
-    plan: tier,
-    status: "active",
-    granted_by_admin: true,
-    updated_at: new Date().toISOString(),
-  }], { onConflict: "user_id" });
-
-  return new Response(JSON.stringify({ success: true, action, targetUserId }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
 }
