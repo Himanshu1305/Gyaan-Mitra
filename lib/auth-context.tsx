@@ -60,19 +60,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAdmin(data?.is_admin === true)
         setSubscriptionTier(data?.subscription_tier ?? 'free')
       }
-    } finally {
-      setLoading(false)
+    } catch (e) {
+      console.error('fetchProfile exception:', e)
+      setIsAdmin(false)
+      setSubscriptionTier('free')
     }
   }
 
   useEffect(() => {
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        await fetchProfile(session.user.id)
-      } else {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setUser(session?.user ?? null)
+        setSession(session)
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        }
+      } catch (e) {
+        console.error('initAuth error:', e)
+      } finally {
         setLoading(false)
       }
     }
@@ -80,8 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session)
         setUser(session?.user ?? null)
+        setSession(session)
         if (session?.user) {
           await fetchProfile(session.user.id)
         } else {
