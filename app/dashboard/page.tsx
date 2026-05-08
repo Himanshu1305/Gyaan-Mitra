@@ -93,7 +93,7 @@ function groupItems(items: SavedItem[]): ItemGroup[] {
 function DashboardContent() {
   const router = useRouter();
   const params = useSearchParams();
-  const { user, loading } = useAuth();
+  const { user, loading, subscriptionTier } = useAuth();
 
   const [usage, setUsage] = useState(0);
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
@@ -163,6 +163,7 @@ function DashboardContent() {
     );
   }
 
+  const isPremium = subscriptionTier === "premium";
   const usagePercent = Math.min((usage / FREE_LIMIT) * 100, 100);
   const remaining = Math.max(FREE_LIMIT - usage, 0);
   const groups = groupItems(savedItems);
@@ -202,10 +203,18 @@ function DashboardContent() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-secondary">Usage this month</h2>
-              <span className="text-xs text-gray-400">Free tier · 5 generations/month</span>
+              {isPremium ? (
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">
+                  Premium Member
+                </span>
+              ) : (
+                <span className="text-xs text-gray-400">Free tier · 5 generations/month</span>
+              )}
             </div>
             {loadingData ? (
               <div className="h-8 bg-gray-100 rounded animate-pulse" />
+            ) : isPremium ? (
+              <p className="text-sm text-green-700 font-medium">Unlimited generations — enjoy unrestricted access.</p>
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-2">
@@ -224,7 +233,7 @@ function DashboardContent() {
                 </p>
               </>
             )}
-            {usage >= FREE_LIMIT - 1 && (
+            {!isPremium && usage >= FREE_LIMIT - 1 && (
               <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-amber-800">

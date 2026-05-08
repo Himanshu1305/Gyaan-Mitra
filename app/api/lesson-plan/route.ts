@@ -71,16 +71,24 @@ export async function POST(req: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         { global: { headers: { Authorization: `Bearer ${token}` } } }
       );
-      const { count } = await userSupa
-        .from("usage_tracking")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", userId)
-        .eq("month_year", monthYear());
-      if ((count ?? 0) >= FREE_LIMIT) {
-        return new Response(
-          "You have used all 5 free generations this month. Upgrade to Premium for unlimited access.",
-          { status: 429 }
-        );
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_tier")
+        .eq("id", userId)
+        .single();
+      const isPremium = profile?.subscription_tier === "premium";
+      if (!isPremium) {
+        const { count } = await userSupa
+          .from("usage_tracking")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .eq("month_year", monthYear());
+        if ((count ?? 0) >= FREE_LIMIT) {
+          return new Response(
+            "You have used all 5 free generations this month. Upgrade to Premium for unlimited access.",
+            { status: 429 }
+          );
+        }
       }
     }
   }

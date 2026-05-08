@@ -34,7 +34,7 @@ function monthYear(): string {
 
 export default function AdminPage() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, session, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -106,6 +106,22 @@ export default function AdminPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "gyaan-mitra-users.csv"; a.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function handlePremiumAction(targetUserId: string, action: "grant" | "revoke") {
+    const label = action === "grant" ? "Grant Premium" : "Revoke Premium";
+    if (!confirm(`${label} for this user?`)) return;
+    const res = await fetch("/api/admin/grant-premium", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+      body: JSON.stringify({ targetUserId, action }),
+    });
+    if (!res.ok) { alert("Action failed. Please try again."); return; }
+    const tier = action === "grant" ? "premium" : "free";
+    setUsers((prev) => prev.map((u) => u.id === targetUserId ? { ...u, subscription_tier: tier } : u));
   }
 
   const filtered = users.filter((u) => {
@@ -239,8 +255,27 @@ export default function AdminPage() {
                         <td className="px-4 py-3 font-bold text-secondary">{u.totalGenerations}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <button className="text-xs text-primary font-semibold hover:underline">View</button>
-                            <button className="text-xs text-red-500 font-semibold hover:underline">Suspend</button>
+                            {u.subscription_tier !== "premium" ? (
+                              <button
+                                onClick={() => handlePremiumAction(u.id, "grant")}
+                                className="text-xs text-amber-600 font-semibold hover:underline"
+                              >
+                                Grant Premium
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handlePremiumAction(u.id, "revoke")}
+                                className="text-xs text-gray-500 font-semibold hover:underline"
+                              >
+                                Revoke Premium
+                              </button>
+                            )}
+                            <button
+                              onClick={() => alert("Suspend feature coming soon")}
+                              className="text-xs text-red-500 font-semibold hover:underline"
+                            >
+                              Suspend
+                            </button>
                           </div>
                         </td>
                       </tr>
