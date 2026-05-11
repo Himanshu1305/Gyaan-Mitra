@@ -7,6 +7,7 @@ import Footer from "@/components/shared/Footer";
 import MarkdownContent from "@/components/ui/MarkdownContent";
 import MicButton from "@/components/ui/MicButton";
 import ChapterUpload, { UploadedFile } from "@/components/ui/ChapterUpload";
+import ChapterSelector, { ChapterSelectorResult } from "@/components/shared/ChapterSelector";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import { getUsageThisMonth, FREE_LIMIT } from "@/lib/usage";
@@ -123,13 +124,14 @@ function QuestionMixInput({ mix, onChange }: { mix: QuestionMix; onChange: (m: Q
   );
 }
 
-function TabToggle({ mode, onChange }: { mode: "form" | "custom"; onChange: (m: "form" | "custom") => void }) {
+function TabToggle({ mode, onChange }: { mode: "form" | "chapter" | "custom"; onChange: (m: "form" | "chapter" | "custom") => void }) {
+  const labels: Record<string, string> = { form: "Fill Form", chapter: "Chapter Selector", custom: "My Own Prompt" };
   return (
     <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-      {(["form", "custom"] as const).map((m) => (
+      {(["form", "chapter", "custom"] as const).map((m) => (
         <button key={m} onClick={() => onChange(m)}
-          className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all ${mode === m ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-secondary"}`}>
-          {m === "form" ? "Fill Form" : "Use My Own Prompt"}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all ${mode === m ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-secondary"}`}>
+          {labels[m]}
         </button>
       ))}
     </div>
@@ -138,7 +140,19 @@ function TabToggle({ mode, onChange }: { mode: "form" | "custom"; onChange: (m: 
 
 export default function ExamPapersPage() {
   const { user, session } = useAuth();
-  const [mode, setMode] = useState<"form" | "custom">("form");
+  const [mode, setMode] = useState<"form" | "chapter" | "custom">("form");
+  // Chapter selector mode state
+  const [chapterResult, setChapterResult] = useState<ChapterSelectorResult | null>(null);
+  const [chapterBoard, setChapterBoard] = useState("CBSE");
+  const [chapterDraft, setChapterDraft] = useState("");
+  const [chapterAnswerKey, setChapterAnswerKey] = useState("");
+  const [chapterTab, setChapterTab] = useState<"paper" | "key">("paper");
+  const [chapterLoadingStep, setChapterLoadingStep] = useState("");
+  const [chapterLoading, setChapterLoading] = useState(false);
+  const [chapterError, setChapterError] = useState("");
+  const [revisionInstructions, setRevisionInstructions] = useState("");
+  const [chapterDraftReady, setChapterDraftReady] = useState(false);
+  const [chapterFinalReady, setChapterFinalReady] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const [form, setForm] = useState({
     subject: "Mathematics", grade: "Class 8", examType: "Unit Test", board: "CBSE",
@@ -325,6 +339,109 @@ export default function ExamPapersPage() {
     setTimeout(() => setSaveToast(""), 6000);
   };
 
+  const handleChaptersSelected = (result: ChapterSelectorResult) => {
+    setChapterResult(result);
+    setChapterDraft("");
+    setChapterAnswerKey("");
+    setChapterDraftReady(false);
+    setChapterFinalReady(false);
+    setChapterError("");
+  };
+
+  const handleChapterGenerate = async () => {
+    if (!chapterResult || chapterResult.chapters.length === 0) return;
+    setChapterError(""); setChapterDraft(""); setChapterAnswerKey("");
+    setChapterDraftReady(false); setChapterFinalReady(false);
+    setChapterLoading(true);
+    try {
+      setChapterLoadingStep("Loading chapter PDFs…");
+      await new Promise((r) => setTimeout(r, 400));
+      setChapterLoadingStep("Analysing with Gemini…");
+      await new Promise((r) => setTimeout(r, 400));
+      setChapterLoadingStep("Generating exam paper…");
+      const res = await fetch("/api/generate-with-chapters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          generationType: "exam-paper",
+          chapterSelections: chapterResult.chapters,
+          additionalInstructions: chapterResult.additionalInstructions,
+          board: chapterBoard,
+          classNumber: chapterResult.classNumber,
+          subject: chapterResult.subject,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Generation failed");
+      setChapterDraft(data.draft);
+      setChapterDraftReady(true);
+    } catch (err) {
+      setChapterError(String(err));
+    } finally { setChapterLoading(false); setChapterLoadingStep(""); }
+  };
+
+  const handleChapterRevise = async () => {
+    if (!revisionInstructions.trim() || !chapterResult) return;
+    setChapterError("");
+    setChapterLoading(true);
+    setChapterLoadingStep("Revising draft…");
+    try {
+      const res = await fetch("/api/generate-with-chapters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          generationType: "exam-paper",
+          chapterSelections: chapterResult.chapters,
+          additionalInstructions: `REVISION REQUEST: ${revisionInstructions}\n\nMake only the requested changes, keep everything else identical.\n\nOriginal draft:\n${chapterDraft}`,
+          board: chapterBoard,
+          classNumber: chapterResult.classNumber,
+          subject: chapterResult.subject,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Revision failed");
+      setChapterDraft(data.draft);
+      setRevisionInstructions("");
+    } catch (err) {
+      setChapterError(String(err));
+    } finally { setChapterLoading(false); setChapterLoadingStep(""); }
+  };
+
+  const handleChapterFinalise = async () => {
+    if (!chapterResult) return;
+    setChapterError("");
+    setChapterLoading(true);
+    setChapterLoadingStep("Generating answer key…");
+    try {
+      const res = await fetch("/api/generate-with-chapters", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          generationType: "exam-paper",
+          chapterSelections: chapterResult.chapters,
+          additionalInstructions: `Generate a COMPLETE ANSWER KEY with model answers and marking scheme for this exam paper:\n\n${chapterDraft}`,
+          board: chapterBoard,
+          classNumber: chapterResult.classNumber,
+          subject: chapterResult.subject,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      setChapterAnswerKey(data.draft);
+      setChapterFinalReady(true);
+      setChapterTab("paper");
+    } catch (err) {
+      setChapterError(String(err));
+    } finally { setChapterLoading(false); setChapterLoadingStep(""); }
+  };
+
+  const chapterCopy = (text: string) => navigator.clipboard.writeText(text);
+  const chapterDownload = (text: string, name: string) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    a.download = name; a.click();
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
       <Navbar />
@@ -368,9 +485,98 @@ export default function ExamPapersPage() {
           )}
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <TabToggle mode={mode} onChange={(m) => { setMode(m); setChaptersError(""); setPromptError(""); setApiError(""); }} />
+            <TabToggle mode={mode} onChange={(m) => { setMode(m); setChaptersError(""); setPromptError(""); setApiError(""); setChapterError(""); }} />
 
-            {mode === "form" ? (
+            {mode === "chapter" ? (
+              <div className="space-y-5">
+                {/* Board selector */}
+                <div className="flex items-center gap-3 flex-wrap">
+                  <span className="text-sm font-semibold text-secondary">Board:</span>
+                  {["CBSE", "ICSE", "State Board"].map((b) => (
+                    <button key={b} onClick={() => setChapterBoard(b)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${chapterBoard === b ? "bg-secondary text-white border-secondary" : "border-secondary text-secondary hover:bg-secondary hover:text-white"}`}>
+                      {b}
+                    </button>
+                  ))}
+                </div>
+
+                <ChapterSelector onChaptersSelected={handleChaptersSelected} showMarks={true} />
+
+                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
+                  <button onClick={handleChapterGenerate} disabled={chapterLoading}
+                    className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 disabled:opacity-60 transition-colors shadow-md">
+                    {chapterLoading ? chapterLoadingStep || "Working…" : "Generate Draft →"}
+                  </button>
+                )}
+
+                {chapterLoading && (
+                  <div className="flex items-center gap-3 py-4">
+                    <svg className="animate-spin w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
+                    <span className="text-sm font-medium text-secondary">{chapterLoadingStep}</span>
+                  </div>
+                )}
+
+                {chapterError && (
+                  <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{chapterError}</div>
+                )}
+
+                {/* Draft */}
+                {chapterDraftReady && !chapterFinalReady && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-secondary">Draft Exam Paper</h3>
+                      <button onClick={() => chapterCopy(chapterDraft)} className="text-xs text-secondary border border-secondary px-3 py-1 rounded-lg hover:bg-secondary hover:text-white transition-colors">Copy</button>
+                    </div>
+                    <textarea value={chapterDraft} onChange={(e) => setChapterDraft(e.target.value)} rows={20}
+                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y" style={{ minHeight: 500 }} />
+                    <div className="space-y-3 pt-3 border-t border-gray-100">
+                      <p className="text-sm font-semibold text-secondary">Revision Instructions</p>
+                      <textarea value={revisionInstructions} onChange={(e) => setRevisionInstructions(e.target.value)} rows={3}
+                        placeholder="e.g. Make Q3 harder, add one more diagram question, remove Q7…"
+                        className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+                      <div className="flex gap-3">
+                        <button onClick={handleChapterRevise} disabled={chapterLoading || !revisionInstructions.trim()}
+                          className="flex-1 py-2.5 rounded-xl border-2 border-secondary text-secondary font-semibold text-sm hover:bg-secondary hover:text-white disabled:opacity-50 transition-colors">
+                          Revise Draft
+                        </button>
+                        <button onClick={handleChapterFinalise} disabled={chapterLoading}
+                          className="flex-1 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary-600 disabled:opacity-50 transition-colors shadow">
+                          Finalise & Get Answer Key →
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Final paper + answer key */}
+                {chapterFinalReady && (
+                  <div className="space-y-4">
+                    <div className="flex border-b border-gray-200">
+                      {(["paper", "key"] as const).map((t) => (
+                        <button key={t} onClick={() => setChapterTab(t)}
+                          className={`px-5 py-2.5 text-sm font-bold border-b-2 -mb-px transition-colors ${chapterTab === t ? "border-primary text-primary" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
+                          {t === "paper" ? "📄 Exam Paper" : "🔑 Answer Key"}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {[
+                        { label: "Copy", action: () => chapterCopy(chapterTab === "paper" ? chapterDraft : chapterAnswerKey) },
+                        { label: "Download", action: () => chapterDownload(chapterTab === "paper" ? chapterDraft : chapterAnswerKey, chapterTab === "paper" ? "exam-paper.txt" : "answer-key.txt") },
+                        { label: "Print", action: () => window.print() },
+                      ].map(({ label, action }) => (
+                        <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
+                      ))}
+                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterAnswerKey(""); setChapterResult(null); }}
+                        className="text-sm bg-secondary text-white rounded-lg px-4 py-1.5 hover:bg-primary transition-colors">New Paper</button>
+                    </div>
+                    <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 rounded-xl border border-gray-200 p-4 max-h-[600px] overflow-y-auto">
+                      {chapterTab === "paper" ? chapterDraft : chapterAnswerKey}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            ) : mode === "form" ? (
               <>
                 <h2 className="text-lg font-bold text-secondary mb-6">Exam Paper Details</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -469,6 +675,7 @@ export default function ExamPapersPage() {
               </>
             )}
 
+            {mode !== "chapter" && (
             <button onClick={handleGenerate} disabled={loading || !!atLimit}
               className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-md shadow-primary/25">
               {loading ? (
@@ -479,8 +686,9 @@ export default function ExamPapersPage() {
                   {isAllThree ? "Generate All Three Papers" : "Generate Exam Paper"}</>
               )}
             </button>
+            )}
 
-            {atLimit && (
+            {mode !== "chapter" && atLimit && (
               <div className="mt-3 text-center">
                 <Link href="/pricing" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary-600 transition-colors">
                   Upgrade Now — ₹499/year
@@ -488,7 +696,7 @@ export default function ExamPapersPage() {
               </div>
             )}
 
-            {apiError && (
+            {mode !== "chapter" && apiError && (
               <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
                 <div className="flex-1">
@@ -498,6 +706,7 @@ export default function ExamPapersPage() {
               </div>
             )}
 
+            {mode !== "chapter" && (
             <div className="mt-5 flex flex-wrap gap-3 justify-center text-xs text-gray-400">
               {["No login required", "CBSE · ICSE · State Board", "Includes answer key & marking scheme"].map((tag) => (
                 <span key={tag} className="flex items-center gap-1">
@@ -506,10 +715,11 @@ export default function ExamPapersPage() {
                 </span>
               ))}
             </div>
+            )}
           </div>
 
           {/* Loading skeleton */}
-          {loading && !result && (
+          {mode !== "chapter" && loading && !result && (
             <div className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
@@ -529,7 +739,7 @@ export default function ExamPapersPage() {
           )}
 
           {/* Result */}
-          {result && (
+          {mode !== "chapter" && result && (
             <div ref={resultRef} className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm overflow-hidden" id="print-content">
               <div className="print-only-header">Generated by Gyaan Mitra — gyaanmitra.com</div>
 
@@ -627,7 +837,7 @@ export default function ExamPapersPage() {
             </div>
           )}
 
-          {result && !loading && (
+          {mode !== "chapter" && result && !loading && (
             <div className="mt-4 text-center">
               <button onClick={() => { setResult(""); setSaved(false); setSaveToast(""); setQuestionContent(""); setKeyContent(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 className="text-sm text-secondary hover:text-primary font-medium transition-colors">
