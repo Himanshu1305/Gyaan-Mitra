@@ -9,7 +9,7 @@ type ChapterSelection = {
   bookDisplayName: string;
   marks: number;
   questionType: string;
-  filePath: string;
+  filePath: string | null;
 };
 
 type RequestBody = {
@@ -47,6 +47,7 @@ async function analyzeWithGemini(chapters: ChapterSelection[]): Promise<string> 
   const loaded: string[] = [];
 
   for (const ch of chapters.slice(0, 20)) {
+    if (!ch.filePath) continue;
     const b64 = await fetchPdfBase64(ch.filePath);
     if (b64) {
       parts.push({ inlineData: { data: b64, mimeType: "application/pdf" } });

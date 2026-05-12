@@ -6,11 +6,11 @@ import { supabase } from "@/lib/supabase";
 export type ChapterSelectionItem = {
   chapterId: number;
   chapterName: string;
-  bookCode: string;
+  bookCode: string | null;
   bookDisplayName: string;
   marks: number;
   questionType: string;
-  filePath: string;
+  filePath: string | null;
 };
 
 export type ChapterSelectorResult = {
@@ -25,16 +25,16 @@ type Props = {
   showMarks?: boolean;
 };
 
-type BookRow = { book_code: string; book_display_name: string };
+type BookRow = { book_code: string | null; book_display_name: string };
 type ChapterRow = {
   id: number;
   class_number: number;
   subject: string;
-  book_code: string;
+  book_code: string | null;
   book_display_name: string;
   chapter_number: number;
   chapter_name: string;
-  file_path: string;
+  file_path: string | null;
 };
 
 const CLASSES = [6, 7, 8, 9, 10, 11, 12];
@@ -46,6 +46,9 @@ const QUESTION_TYPES = [
   "MCQ + Long Answer",
   "All Types",
 ];
+
+// Sentinel used when subject has NULL book_codes — fetch all chapters for that subject
+const ALL_BOOKS_SENTINEL = "__ALL__";
 
 const btnBase = "px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all";
 const btnActive = "bg-[#FF9933] border-[#FF9933] text-white shadow-sm";
@@ -67,7 +70,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
   const [loadingChapters, setLoadingChapters] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch subjects when class changes
+  // Step 1 — fetch subjects when class changes
   useEffect(() => {
     if (!selectedClass) return;
     setError("");
@@ -78,6 +81,9 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     setChapters([]);
     setChecked({});
     setLoadingSubjects(true);
+
+    console.log("[ChapterSelector] Fetching subjects for class:", selectedClass);
+
     supabase
       .from("ncert_chapters")
       .select("subject")
@@ -85,14 +91,22 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
       .order("subject")
       .then(({ data, error: err }) => {
         setLoadingSubjects(false);
-        if (err) { setError("Could not load subjects: " + err.message); return; }
-        if (!data || data.length === 0) { setError(`No subjects found for Class ${selectedClass}. Check that the ncert_chapters table has data.`); return; }
+        if (err) {
+          console.error("[ChapterSelector] Subject fetch error:", err);
+          setError("Could not load subjects: " + err.message);
+          return;
+        }
+        if (!data || data.length === 0) {
+          setError(`No subjects found for Class ${selectedClass}. Check that the ncert_chapters table has data.`);
+          return;
+        }
         const unique = Array.from(new Set((data as { subject: string }[]).map((r) => r.subject)));
+        console.log("[ChapterSelector] Subjects loaded:", unique);
         setSubjects(unique);
       });
   }, [selectedClass]);
 
-  // Fetch books when subject changes
+  // Step 2 — fetch books when subject changes
   useEffect(() => {
     if (!selectedClass || !selectedSubject) return;
     setError("");
@@ -101,6 +115,9 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     setChapters([]);
     setChecked({});
     setLoadingBooks(true);
+
+    console.log("[ChapterSelector] Fetching books for class:", selectedClass, "subject:", selectedSubject);
+
     supabase
       .from("ncert_chapters")
       .select("book_code, book_display_name")
@@ -109,25 +126,56 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
       .order("book_display_name")
       .then(({ data, error: err }) => {
         setLoadingBooks(false);
-        if (err) { setError("Could not load books: " + err.message); return; }
-        if (!data) return;
-        const seen = new Set<string>();
-        const unique: BookRow[] = [];
-        for (const row of data as BookRow[]) {
-          if (!seen.has(row.book_code)) {
-            seen.add(row.book_code);
-            unique.push(row);
-          }
+        if (err) {
+          console.error("[ChapterSelector] Book fetch error:", err);
+          setError("Could not load books: " + err.message);
+          return;
         }
-        setBooks(unique);
-        // Auto-select single book immediately so chapters load without extra click
-        if (unique.length === 1) {
-          setSelectedBookCodes([unique[0].book_code]);
+        if (!data || data.length === 0) {
+          console.warn("[ChapterSelector] No books found");
+          return;
+        }
+
+        const rows = data as BookRow[];
+
+        // Check if this subject has null book_codes (single-book subject like Maths, Science)
+        const hasNullBookCodes = rows.some((r) => r.book_code === null);
+
+        if (hasNullBookCodes) {
+          // Deduplicate by book_display_name
+          const seen = new Set<string>();
+          const unique: BookRow[] = [];
+          for (const row of rows) {
+            if (!seen.has(row.book_display_name)) {
+              seen.add(row.book_display_name);
+              unique.push(row);
+            }
+          }
+          console.log("[ChapterSelector] Books loaded (null book_code subject):", unique.map(b => b.book_display_name));
+          setBooks(unique);
+          // Use sentinel so chapter query skips the .in("book_code") filter
+          setSelectedBookCodes([ALL_BOOKS_SENTINEL]);
+        } else {
+          // Deduplicate by book_code
+          const seen = new Set<string>();
+          const unique: BookRow[] = [];
+          for (const row of rows) {
+            if (row.book_code && !seen.has(row.book_code)) {
+              seen.add(row.book_code);
+              unique.push(row);
+            }
+          }
+          console.log("[ChapterSelector] Books loaded:", unique.map(b => b.book_display_name));
+          setBooks(unique);
+          // Auto-select if only one real book
+          if (unique.length === 1) {
+            setSelectedBookCodes([unique[0].book_code!]);
+          }
         }
       });
   }, [selectedClass, selectedSubject]);
 
-  // Fetch chapters when book selection changes
+  // Step 3 — fetch chapters when book selection changes
   useEffect(() => {
     if (!selectedClass || !selectedSubject || selectedBookCodes.length === 0) {
       if (selectedBookCodes.length === 0 && books.length > 0) setChapters([]);
@@ -137,19 +185,41 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     setChapters([]);
     setChecked({});
     setLoadingChapters(true);
-    supabase
+
+    const isAllBooks = selectedBookCodes.includes(ALL_BOOKS_SENTINEL);
+    console.log(
+      "[ChapterSelector] Fetching chapters — class:", selectedClass,
+      "subject:", selectedSubject,
+      isAllBooks ? "(all books / null book_code)" : "books:" + selectedBookCodes.join(",")
+    );
+
+    let query = supabase
       .from("ncert_chapters")
       .select("*")
       .eq("class_number", selectedClass)
       .eq("subject", selectedSubject)
-      .in("book_code", selectedBookCodes)
-      .order("chapter_number")
-      .then(({ data, error: err }) => {
-        setLoadingChapters(false);
-        if (err) { setError("Could not load chapters: " + err.message); return; }
-        if (!data || data.length === 0) { setError("No chapters found for the selected book(s). Check your Supabase data."); return; }
-        setChapters(data as ChapterRow[]);
-      });
+      .order("chapter_number");
+
+    // Only filter by book_code when we have real (non-null) book codes selected
+    if (!isAllBooks) {
+      query = query.in("book_code", selectedBookCodes);
+    }
+
+    query.then(({ data, error: err }) => {
+      setLoadingChapters(false);
+      if (err) {
+        console.error("[ChapterSelector] Chapter fetch error:", err);
+        setError("Could not load chapters: " + err.message);
+        return;
+      }
+      if (!data || data.length === 0) {
+        console.warn("[ChapterSelector] No chapters found");
+        setError("No chapters found for the selected book(s). Check your Supabase data.");
+        return;
+      }
+      console.log("[ChapterSelector] Chapters loaded:", data.length, "chapters");
+      setChapters(data as ChapterRow[]);
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass, selectedSubject, selectedBookCodes.join(",")]);
 
@@ -197,11 +267,16 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     notifyParent();
   }, [notifyParent]);
 
+  // Group chapters by book_display_name for rendering
   const byBook = chapters.reduce<Record<string, ChapterRow[]>>((acc, ch) => {
-    if (!acc[ch.book_display_name]) acc[ch.book_display_name] = [];
-    acc[ch.book_display_name].push(ch);
+    const key = ch.book_display_name ?? "Chapters";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(ch);
     return acc;
   }, {});
+
+  // Books with real book_codes (for the toggle UI) — excludes null-book-code subjects
+  const booksWithCodes = books.filter((b) => b.book_code !== null);
 
   return (
     <div className="space-y-6">
@@ -230,7 +305,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
         </div>
       </div>
 
-      {/* Step 2 — Subject */}
+      {/* Loading subjects */}
       {loadingSubjects && (
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <svg className="animate-spin w-4 h-4 text-[#FF9933]" fill="none" viewBox="0 0 24 24">
@@ -240,6 +315,8 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
           Loading subjects…
         </div>
       )}
+
+      {/* Step 2 — Subject */}
       {subjects.length > 0 && (
         <div>
           <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
@@ -259,7 +336,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
         </div>
       )}
 
-      {/* Step 3 — Books (only if multiple) */}
+      {/* Loading books */}
       {loadingBooks && (
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <svg className="animate-spin w-4 h-4 text-[#FF9933]" fill="none" viewBox="0 0 24 24">
@@ -269,18 +346,20 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
           Loading books…
         </div>
       )}
-      {books.length > 1 && (
+
+      {/* Step 3 — Books (only show when there are multiple real book_codes) */}
+      {booksWithCodes.length > 1 && (
         <div>
           <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
             Step 3 — Select Books
           </p>
           <div className="flex flex-wrap gap-3">
-            {books.map((book) => (
+            {booksWithCodes.map((book) => (
               <label key={book.book_code} className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={selectedBookCodes.includes(book.book_code)}
-                  onChange={() => toggleBook(book.book_code)}
+                  checked={selectedBookCodes.includes(book.book_code!)}
+                  onChange={() => toggleBook(book.book_code!)}
                   className="w-4 h-4 accent-[#FF9933]"
                 />
                 <span className="text-sm text-[#1B3A6B] font-medium">{book.book_display_name}</span>
@@ -290,7 +369,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
         </div>
       )}
 
-      {/* Step 4 — Chapters */}
+      {/* Loading chapters */}
       {loadingChapters && (
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <svg className="animate-spin w-4 h-4 text-[#FF9933]" fill="none" viewBox="0 0 24 24">
@@ -300,10 +379,12 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
           Loading chapters…
         </div>
       )}
+
+      {/* Step 4 — Chapters */}
       {Object.keys(byBook).length > 0 && (
         <div>
           <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-3">
-            {books.length > 1 ? "Step 4 — " : "Step 3 — "}Select Chapters{" "}
+            {booksWithCodes.length > 1 ? "Step 4 — " : "Step 3 — "}Select Chapters{" "}
             <span className="text-gray-400 normal-case font-normal">(check to include)</span>
           </p>
           <div className="space-y-4">
@@ -375,7 +456,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
             ))}
           </div>
 
-          {/* Additional instructions + total marks — shown once chapters are available */}
+          {/* Additional instructions + status */}
           <div className="mt-5 space-y-3">
             <div>
               <label className="block text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
