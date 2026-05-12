@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 
 const navLinks = [
@@ -16,10 +17,17 @@ const navLinks = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, signOut, loading } = useAuth();
+  const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut();
     setMenuOpen(false);
+    try {
+      await signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      window.location.href = "/";
+    }
   };
 
   const displayName = user?.user_metadata?.full_name

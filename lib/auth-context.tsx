@@ -133,7 +133,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("supabase.auth.signOut error:", error);
+    } finally {
+      // Clear state immediately — don't wait for onAuthStateChange
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      setSubscriptionTier("free");
+    }
   };
 
   return (
