@@ -74,7 +74,8 @@ function trunc(s: string, max = 30): string {
 }
 
 export default function LessonPlansPage() {
-  const { user, session } = useAuth();
+  const { user, session, subscriptionTier } = useAuth();
+  const isPremium = subscriptionTier === "premium";
   const [mode, setMode] = useState<"form" | "chapter" | "custom">("form");
   // Chapter selector state
   const [chapterResult, setChapterResult] = useState<ChapterSelectorResult | null>(null);
@@ -120,7 +121,7 @@ export default function LessonPlansPage() {
     setForm((f) => ({ ...f, [field]: f[field] ? f[field] + " " + text : text }));
   const appendToCustom = (text: string) => setCustomPrompt((p) => p ? p + " " + text : text);
 
-  const atLimit = user && usage >= FREE_LIMIT;
+  const atLimit = user && !isPremium && usage >= FREE_LIMIT;
 
   useEffect(() => {
     if (!loading) return;
@@ -346,8 +347,8 @@ export default function LessonPlansPage() {
             </p>
           </div>
 
-          {/* Usage warning */}
-          {user && !usageLoading && usage >= FREE_LIMIT - 1 && (
+          {/* Usage warning — free tier only */}
+          {user && !isPremium && !usageLoading && usage >= FREE_LIMIT - 1 && (
             <div className={`mb-6 rounded-xl px-4 py-3.5 flex items-start justify-between gap-3 ${usage >= FREE_LIMIT ? "bg-red-50 border border-red-200" : "bg-amber-50 border border-amber-200"}`}>
               <p className={`text-sm font-medium ${usage >= FREE_LIMIT ? "text-red-700" : "text-amber-800"}`}>
                 {usage >= FREE_LIMIT
@@ -356,6 +357,13 @@ export default function LessonPlansPage() {
                 {" "}
                 <Link href="/pricing" className="underline font-semibold">Upgrade to Premium</Link> for unlimited access.
               </p>
+            </div>
+          )}
+          {/* Premium badge */}
+          {user && isPremium && (
+            <div className="mb-6 rounded-xl px-4 py-3 bg-green-50 border border-green-200 flex items-center gap-2">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">Premium Member</span>
+              <p className="text-sm text-green-700 font-medium">Unlimited generations — enjoy unrestricted access.</p>
             </div>
           )}
 

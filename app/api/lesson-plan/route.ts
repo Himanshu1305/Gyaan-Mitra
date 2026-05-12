@@ -71,11 +71,15 @@ export async function POST(req: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         { global: { headers: { Authorization: `Bearer ${token}` } } }
       );
-      const { data: profile } = await supabase
+      const profileClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+        ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+        : userSupa;
+      const { data: profile, error: profileError } = await profileClient
         .from("profiles")
         .select("subscription_tier")
         .eq("id", userId)
         .single();
+      if (profileError) console.error("[lesson-plan] Profile fetch error:", profileError);
       const isPremium = profile?.subscription_tier === "premium";
       if (!isPremium) {
         const { count } = await userSupa

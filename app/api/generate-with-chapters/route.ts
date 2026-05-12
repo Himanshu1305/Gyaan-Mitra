@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Anthropic from "@anthropic-ai/sdk";
+import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 type ChapterSelection = {
   chapterName: string;
@@ -118,6 +120,13 @@ Create a comprehensive lesson plan covering:
 Format clearly and professionally.`;
 }
 
+const FREE_LIMIT = 5;
+
+function monthYear(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body: RequestBody = await req.json();
@@ -125,6 +134,46 @@ export async function POST(req: NextRequest) {
 
     if (!generationType || !chapterSelections || chapterSelections.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Auth & premium check
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    let userId: string | null = null;
+
+    if (token) {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+        const userSupa = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          { global: { headers: { Authorization: `Bearer ${token}` } } }
+        );
+        const profileClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+          ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
+          : userSupa;
+        const { data: profile, error: profileError } = await profileClient
+          .from("profiles")
+          .select("subscription_tier")
+          .eq("id", userId)
+          .single();
+        if (profileError) console.error("[generate-with-chapters] Profile fetch error:", profileError);
+        const isPremium = profile?.subscription_tier === "premium";
+        if (!isPremium) {
+          const { count } = await userSupa
+            .from("usage_tracking")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", userId)
+            .eq("month_year", monthYear());
+          if ((count ?? 0) >= FREE_LIMIT) {
+            return NextResponse.json(
+              { error: "You have used all 5 free generations this month. Upgrade to Premium for unlimited access." },
+              { status: 429 }
+            );
+          }
+        }
+      }
     }
 
     // Step A — Gemini reads PDFs
