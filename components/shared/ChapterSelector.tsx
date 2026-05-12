@@ -16,9 +16,8 @@ export type ChapterSelectionItem = {
   chapterName: string;
   bookCode: string | null;
   bookDisplayName: string;
-  marks: number;
-  questionType: string;
   filePath: string | null;
+  questionMix: QuestionMix;
 };
 
 export type ChapterSelectorResult = {
@@ -27,12 +26,13 @@ export type ChapterSelectorResult = {
   classNumber: number;
   subject: string;
   board: string;
-  questionMix: QuestionMix;
+  questionMix: QuestionMix; // aggregated total
 };
 
 type Props = {
   onChaptersSelected: (result: ChapterSelectorResult) => void;
   showMarks?: boolean;
+  locked?: boolean;
 };
 
 type BookRow = { book_code: string | null; book_display_name: string };
@@ -49,13 +49,13 @@ type ChapterRow = {
 
 const BOARDS = ["CBSE", "ICSE", "State Board"];
 const CLASSES = [6, 7, 8, 9, 10, 11, 12];
-const QUESTION_TYPES = ["MCQ", "Short Answer", "Long Answer", "MCQ + Short Answer", "MCQ + Long Answer", "All Types"];
-const DEFAULT_MIX: QuestionMix = { mcq: 10, shortTwo: 3, shortThree: 2, longFour: 1, longFive: 0 };
 const ALL_BOOKS_SENTINEL = "__ALL__";
+const EMPTY_MIX: QuestionMix = { mcq: 0, shortTwo: 0, shortThree: 0, longFour: 0, longFive: 0 };
 
 const pill = "px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all";
 const pillOn = "bg-[#FF9933] border-[#FF9933] text-white shadow-sm";
 const pillOff = "bg-white border-[#1B3A6B] text-[#1B3A6B] hover:bg-[#FF9933] hover:border-[#FF9933] hover:text-white";
+const pillDisabled = "bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed";
 
 function Spinner() {
   return (
@@ -66,7 +66,15 @@ function Spinner() {
   );
 }
 
-export default function ChapterSelector({ onChaptersSelected, showMarks = true }: Props) {
+const MIX_COLS: { label: string; sub: string; key: keyof QuestionMix; max: number; multiplier: number; color: string }[] = [
+  { label: "MCQ", sub: "1m", key: "mcq", max: 30, multiplier: 1, color: "bg-blue-100 text-blue-700" },
+  { label: "Short", sub: "2m", key: "shortTwo", max: 20, multiplier: 2, color: "bg-green-100 text-green-700" },
+  { label: "Short", sub: "3m", key: "shortThree", max: 20, multiplier: 3, color: "bg-yellow-100 text-yellow-700" },
+  { label: "Long", sub: "4m", key: "longFour", max: 10, multiplier: 4, color: "bg-orange-100 text-orange-700" },
+  { label: "Long", sub: "5m", key: "longFive", max: 10, multiplier: 5, color: "bg-red-100 text-red-700" },
+];
+
+export default function ChapterSelector({ onChaptersSelected, showMarks = true, locked = false }: Props) {
   const [board, setBoard] = useState("CBSE");
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [subjects, setSubjects] = useState<string[]>([]);
@@ -75,11 +83,8 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
   const [selectedBookCodes, setSelectedBookCodes] = useState<string[]>([]);
   const [chapters, setChapters] = useState<ChapterRow[]>([]);
   const [checked, setChecked] = useState<Record<number, boolean>>({});
-  const [marks, setMarks] = useState<Record<number, number>>({});
-  const [questionTypes, setQuestionTypes] = useState<Record<number, string>>({});
+  const [chapterMix, setChapterMix] = useState<Record<number, QuestionMix>>({});
   const [additionalInstructions, setAdditionalInstructions] = useState("");
-  const [questionMix, setQuestionMix] = useState<QuestionMix>(DEFAULT_MIX);
-  const [perChapterMarks, setPerChapterMarks] = useState(false);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [loadingChapters, setLoadingChapters] = useState(false);
@@ -95,8 +100,8 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     setSelectedBookCodes([]);
     setChapters([]);
     setChecked({});
+    setChapterMix({});
     setLoadingSubjects(true);
-    console.log("[ChapterSelector] Fetching subjects for class:", selectedClass);
     supabase
       .from("ncert_chapters")
       .select("subject")
@@ -104,18 +109,9 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
       .order("subject")
       .then(({ data, error: err }) => {
         setLoadingSubjects(false);
-        if (err) {
-          console.error("[ChapterSelector] Subject fetch error:", err);
-          setError("Could not load subjects: " + err.message);
-          return;
-        }
-        if (!data || data.length === 0) {
-          setError(`No subjects found for Class ${selectedClass}. Check that the ncert_chapters table has data.`);
-          return;
-        }
-        const unique = Array.from(new Set((data as { subject: string }[]).map((r) => r.subject)));
-        console.log("[ChapterSelector] Subjects loaded:", unique);
-        setSubjects(unique);
+        if (err) { setError("Could not load subjects: " + err.message); return; }
+        if (!data || data.length === 0) { setError(`No subjects found for Class ${selectedClass}.`); return; }
+        setSubjects(Array.from(new Set((data as { subject: string }[]).map((r) => r.subject))));
       });
   }, [selectedClass]);
 
@@ -127,8 +123,8 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     setSelectedBookCodes([]);
     setChapters([]);
     setChecked({});
+    setChapterMix({});
     setLoadingBooks(true);
-    console.log("[ChapterSelector] Fetching books for class:", selectedClass, "subject:", selectedSubject);
     supabase
       .from("ncert_chapters")
       .select("book_code, book_display_name")
@@ -137,40 +133,24 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
       .order("book_display_name")
       .then(({ data, error: err }) => {
         setLoadingBooks(false);
-        if (err) {
-          console.error("[ChapterSelector] Book fetch error:", err);
-          setError("Could not load books: " + err.message);
-          return;
-        }
-        if (!data || data.length === 0) {
-          console.warn("[ChapterSelector] No books found");
-          return;
-        }
+        if (err) { setError("Could not load books: " + err.message); return; }
+        if (!data || data.length === 0) return;
         const rows = data as BookRow[];
         const hasNullBookCodes = rows.some((r) => r.book_code === null);
-
         if (hasNullBookCodes) {
           const seen = new Set<string>();
           const unique: BookRow[] = [];
           for (const row of rows) {
-            if (!seen.has(row.book_display_name)) {
-              seen.add(row.book_display_name);
-              unique.push(row);
-            }
+            if (!seen.has(row.book_display_name)) { seen.add(row.book_display_name); unique.push(row); }
           }
-          console.log("[ChapterSelector] Books (null book_code subject):", unique.map((b) => b.book_display_name));
           setBooks(unique);
           setSelectedBookCodes([ALL_BOOKS_SENTINEL]);
         } else {
           const seen = new Set<string>();
           const unique: BookRow[] = [];
           for (const row of rows) {
-            if (row.book_code && !seen.has(row.book_code)) {
-              seen.add(row.book_code);
-              unique.push(row);
-            }
+            if (row.book_code && !seen.has(row.book_code)) { seen.add(row.book_code); unique.push(row); }
           }
-          console.log("[ChapterSelector] Books loaded:", unique.map((b) => b.book_display_name));
           setBooks(unique);
           if (unique.length === 1) setSelectedBookCodes([unique[0].book_code!]);
         }
@@ -186,9 +166,9 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     setError("");
     setChapters([]);
     setChecked({});
+    setChapterMix({});
     setLoadingChapters(true);
     const isAll = selectedBookCodes.includes(ALL_BOOKS_SENTINEL);
-    console.log("[ChapterSelector] Fetching chapters — isAll:", isAll, "books:", selectedBookCodes.join(","));
 
     let query = supabase
       .from("ncert_chapters")
@@ -201,16 +181,8 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
 
     query.then(({ data, error: err }) => {
       setLoadingChapters(false);
-      if (err) {
-        console.error("[ChapterSelector] Chapter fetch error:", err);
-        setError("Could not load chapters: " + err.message);
-        return;
-      }
-      if (!data || data.length === 0) {
-        setError("No chapters found for the selected book(s). Check your Supabase data.");
-        return;
-      }
-      console.log("[ChapterSelector] Chapters loaded:", data.length, "chapters");
+      if (err) { setError("Could not load chapters: " + err.message); return; }
+      if (!data || data.length === 0) { setError("No chapters found for the selected book(s)."); return; }
       setChapters(data as ChapterRow[]);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -222,59 +194,88 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
     );
 
   const toggleChapter = (id: number) => {
+    if (locked) return;
     setChecked((prev) => {
       const isNowChecked = !prev[id];
       if (isNowChecked) {
-        setMarks((m) => ({ ...m, [id]: 10 }));
-        setQuestionTypes((q) => ({ ...q, [id]: "All Types" }));
+        setChapterMix((m) => ({ ...m, [id]: m[id] ?? { ...EMPTY_MIX } }));
       }
       return { ...prev, [id]: isNowChecked };
     });
   };
 
   const toggleAll = (ids: number[], allChecked: boolean) => {
+    if (locked) return;
     setChecked((prev) => {
       const next = { ...prev };
       ids.forEach((id) => {
         next[id] = !allChecked;
         if (!allChecked) {
-          setMarks((m) => ({ ...m, [id]: 10 }));
-          setQuestionTypes((q) => ({ ...q, [id]: "All Types" }));
+          setChapterMix((m) => ({ ...m, [id]: m[id] ?? { ...EMPTY_MIX } }));
         }
       });
       return next;
     });
   };
 
+  const updateChapterMix = (id: number, key: keyof QuestionMix, val: number) => {
+    if (locked) return;
+    setChapterMix((m) => ({
+      ...m,
+      [id]: { ...(m[id] ?? EMPTY_MIX), [key]: Math.max(0, val) },
+    }));
+  };
+
   const checkedChapters = chapters.filter((c) => checked[c.id]);
-  const totalMixMarks =
-    questionMix.mcq * 1 + questionMix.shortTwo * 2 + questionMix.shortThree * 3 +
-    questionMix.longFour * 4 + questionMix.longFive * 5;
+
+  const totalMix: QuestionMix = checkedChapters.reduce(
+    (acc, c) => {
+      const m = chapterMix[c.id] ?? EMPTY_MIX;
+      return {
+        mcq: acc.mcq + m.mcq,
+        shortTwo: acc.shortTwo + m.shortTwo,
+        shortThree: acc.shortThree + m.shortThree,
+        longFour: acc.longFour + m.longFour,
+        longFive: acc.longFive + m.longFive,
+      };
+    },
+    { ...EMPTY_MIX }
+  );
+
+  const totalMarks =
+    totalMix.mcq + totalMix.shortTwo * 2 + totalMix.shortThree * 3 +
+    totalMix.longFour * 4 + totalMix.longFive * 5;
+
+  const chapterMixKey = checkedChapters
+    .map((c) => `${c.id}:${JSON.stringify(chapterMix[c.id] ?? {})}`)
+    .join("|");
 
   const notifyParent = useCallback(() => {
     if (!selectedClass || !selectedSubject || checkedChapters.length === 0) return;
+    const agg: QuestionMix = checkedChapters.reduce(
+      (acc, c) => {
+        const m = chapterMix[c.id] ?? EMPTY_MIX;
+        return { mcq: acc.mcq + m.mcq, shortTwo: acc.shortTwo + m.shortTwo, shortThree: acc.shortThree + m.shortThree, longFour: acc.longFour + m.longFour, longFive: acc.longFive + m.longFive };
+      },
+      { ...EMPTY_MIX }
+    );
     onChaptersSelected({
       chapters: checkedChapters.map((c) => ({
         chapterId: c.id,
         chapterName: c.chapter_name,
         bookCode: c.book_code,
         bookDisplayName: c.book_display_name,
-        marks: marks[c.id] ?? 10,
-        questionType: questionTypes[c.id] ?? "All Types",
         filePath: c.file_path,
+        questionMix: chapterMix[c.id] ?? { ...EMPTY_MIX },
       })),
       additionalInstructions,
       classNumber: selectedClass,
       subject: selectedSubject,
       board,
-      questionMix,
+      questionMix: agg,
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    checkedChapters.length, marks, questionTypes, additionalInstructions,
-    selectedClass, selectedSubject, board,
-    questionMix.mcq, questionMix.shortTwo, questionMix.shortThree, questionMix.longFour, questionMix.longFive,
-  ]);
+  }, [checkedChapters.length, chapterMixKey, additionalInstructions, selectedClass, selectedSubject, board]);
 
   useEffect(() => { notifyParent(); }, [notifyParent]);
 
@@ -289,36 +290,48 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
   const hasChapters = Object.keys(byBook).length > 0;
   const stepOffset = booksWithCodes.length > 1 ? 1 : 0;
 
-  const mixRows: { label: string; sub: string; key: keyof QuestionMix; max: number; color: string }[] = [
-    { label: "MCQ", sub: "1 mark each", key: "mcq", max: 50, color: "bg-blue-100 text-blue-700" },
-    { label: "Short Answer", sub: "2 marks each", key: "shortTwo", max: 20, color: "bg-green-100 text-green-700" },
-    { label: "Short Answer", sub: "3 marks each", key: "shortThree", max: 20, color: "bg-yellow-100 text-yellow-700" },
-    { label: "Long Answer", sub: "4 marks each", key: "longFour", max: 10, color: "bg-orange-100 text-orange-700" },
-    { label: "Long Answer", sub: "5 marks each", key: "longFive", max: 10, color: "bg-red-100 text-red-700" },
-  ];
+  const inputCls = (extra = "") =>
+    `w-full rounded-lg border border-gray-200 bg-white px-1 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#FF9933] transition ${locked ? "opacity-50 cursor-not-allowed" : ""} ${extra}`;
 
   return (
     <div className="space-y-6">
+      {locked && (
+        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5">
+          <svg className="w-4 h-4 text-amber-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+          </svg>
+          <p className="text-xs text-amber-700 font-medium">Settings locked after generation — click <strong>Start Fresh</strong> above to make changes.</p>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">⚠️ {error}</div>
       )}
 
       {/* Board */}
       <div>
-        <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">Board</p>
+        <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
+          Board {locked && <span className="ml-1 normal-case text-amber-600 font-normal">🔒 locked</span>}
+        </p>
         <div className="flex flex-wrap gap-2">
           {BOARDS.map((b) => (
-            <button key={b} onClick={() => setBoard(b)} className={`${pill} ${board === b ? pillOn : pillOff}`}>{b}</button>
+            <button key={b} onClick={() => !locked && setBoard(b)} disabled={locked}
+              className={`${pill} ${locked ? pillDisabled : board === b ? pillOn : pillOff}`}>
+              {b}
+            </button>
           ))}
         </div>
       </div>
 
       {/* Class */}
       <div>
-        <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">Step 1 — Select Class</p>
+        <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
+          Step 1 — Select Class {locked && <span className="ml-1 normal-case text-amber-600 font-normal">🔒 locked</span>}
+        </p>
         <div className="flex flex-wrap gap-2">
           {CLASSES.map((cls) => (
-            <button key={cls} onClick={() => setSelectedClass(cls)} className={`${pill} ${selectedClass === cls ? pillOn : pillOff}`}>
+            <button key={cls} onClick={() => !locked && setSelectedClass(cls)} disabled={locked}
+              className={`${pill} ${locked ? (selectedClass === cls ? pillOn + " opacity-60 cursor-not-allowed" : pillDisabled) : selectedClass === cls ? pillOn : pillOff}`}>
               Class {cls}
             </button>
           ))}
@@ -330,10 +343,15 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
       {/* Subject */}
       {subjects.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">Step 2 — Select Subject</p>
+          <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
+            Step 2 — Select Subject {locked && <span className="ml-1 normal-case text-amber-600 font-normal">🔒 locked</span>}
+          </p>
           <div className="flex flex-wrap gap-2">
             {subjects.map((sub) => (
-              <button key={sub} onClick={() => setSelectedSubject(sub)} className={`${pill} ${selectedSubject === sub ? pillOn : pillOff}`}>{sub}</button>
+              <button key={sub} onClick={() => !locked && setSelectedSubject(sub)} disabled={locked}
+                className={`${pill} ${locked ? (selectedSubject === sub ? pillOn + " opacity-60 cursor-not-allowed" : pillDisabled) : selectedSubject === sub ? pillOn : pillOff}`}>
+                {sub}
+              </button>
             ))}
           </div>
         </div>
@@ -347,9 +365,10 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
           <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">Step 3 — Select Books</p>
           <div className="flex flex-wrap gap-3">
             {booksWithCodes.map((book) => (
-              <label key={book.book_code} className="flex items-center gap-2 cursor-pointer select-none">
+              <label key={book.book_code} className={`flex items-center gap-2 cursor-pointer select-none ${locked ? "opacity-50 pointer-events-none" : ""}`}>
                 <input type="checkbox" checked={selectedBookCodes.includes(book.book_code!)}
-                  onChange={() => toggleBook(book.book_code!)} className="w-4 h-4 accent-[#FF9933]" />
+                  onChange={() => toggleBook(book.book_code!)} disabled={locked}
+                  className="w-4 h-4 accent-[#FF9933]" />
                 <span className="text-sm text-[#1B3A6B] font-medium">{book.book_display_name}</span>
               </label>
             ))}
@@ -365,6 +384,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
           <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-3">
             Step {2 + stepOffset} — Select Chapters{" "}
             <span className="text-gray-400 normal-case font-normal">(check to include)</span>
+            {locked && <span className="ml-1 normal-case text-amber-600 font-normal">🔒 locked</span>}
           </p>
           <div className="space-y-4">
             {Object.entries(byBook).map(([bookName, bookChapters]) => {
@@ -375,13 +395,15 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
                   {Object.keys(byBook).length > 1 && (
                     <div className="flex items-center gap-2 mb-2">
                       <p className="text-xs font-bold text-[#FF9933] uppercase tracking-wide">{bookName}</p>
-                      <button onClick={() => toggleAll(ids, allChecked)}
-                        className="text-xs text-[#1B3A6B] underline hover:text-[#FF9933]">
-                        {allChecked ? "Deselect all" : "Select all"}
-                      </button>
+                      {!locked && (
+                        <button onClick={() => toggleAll(ids, allChecked)}
+                          className="text-xs text-[#1B3A6B] underline hover:text-[#FF9933]">
+                          {allChecked ? "Deselect all" : "Select all"}
+                        </button>
+                      )}
                     </div>
                   )}
-                  {Object.keys(byBook).length === 1 && (
+                  {Object.keys(byBook).length === 1 && !locked && (
                     <div className="flex justify-end mb-2">
                       <button onClick={() => toggleAll(ids, allChecked)}
                         className="text-xs text-[#1B3A6B] underline hover:text-[#FF9933]">
@@ -392,31 +414,42 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
                   <div className="space-y-2">
                     {bookChapters.map((ch) => {
                       const isChecked = !!checked[ch.id];
+                      const mix = chapterMix[ch.id] ?? EMPTY_MIX;
                       return (
                         <div key={ch.id}
-                          className={`rounded-xl border p-3 transition-all ${isChecked ? "border-[#FF9933] bg-orange-50" : "border-gray-200 bg-white hover:border-[#1B3A6B]"}`}>
-                          <div className="flex flex-wrap items-start gap-3">
+                          className={`rounded-xl border p-3 transition-all ${isChecked ? "border-[#FF9933] bg-orange-50" : "border-gray-200 bg-white hover:border-[#1B3A6B]"} ${locked ? "opacity-70" : ""}`}>
+                          <div className="flex items-start gap-3">
                             <input type="checkbox" checked={isChecked} onChange={() => toggleChapter(ch.id)}
+                              disabled={locked}
                               className="mt-0.5 w-4 h-4 accent-[#FF9933] flex-shrink-0 cursor-pointer" />
-                            <span className="flex-1 text-sm font-medium text-[#1B3A6B] cursor-pointer" onClick={() => toggleChapter(ch.id)}>
+                            <span className={`flex-1 text-sm font-medium text-[#1B3A6B] ${locked ? "" : "cursor-pointer"}`}
+                              onClick={() => toggleChapter(ch.id)}>
                               Ch {ch.chapter_number}: {ch.chapter_name}
                             </span>
-                            {isChecked && showMarks && perChapterMarks && (
-                              <>
-                                <div className="flex items-center gap-1.5">
-                                  <label className="text-xs text-gray-500 whitespace-nowrap">Marks:</label>
-                                  <input type="number" min={1} max={50} value={marks[ch.id] ?? 10}
-                                    onChange={(e) => setMarks((m) => ({ ...m, [ch.id]: Math.min(50, Math.max(1, Number(e.target.value))) }))}
-                                    className="w-14 text-sm text-center border border-[#1B3A6B] rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF9933]" />
-                                </div>
-                                <select value={questionTypes[ch.id] ?? "All Types"}
-                                  onChange={(e) => setQuestionTypes((q) => ({ ...q, [ch.id]: e.target.value }))}
-                                  className="text-xs border border-[#1B3A6B] rounded-lg px-2 py-1.5 text-[#1B3A6B] focus:outline-none focus:ring-2 focus:ring-[#FF9933]">
-                                  {QUESTION_TYPES.map((qt) => <option key={qt} value={qt}>{qt}</option>)}
-                                </select>
-                              </>
-                            )}
                           </div>
+
+                          {/* Per-chapter question mix */}
+                          {isChecked && showMarks && (
+                            <div className="mt-2.5 ml-7">
+                              <div className="grid grid-cols-5 gap-1.5">
+                                {MIX_COLS.map(({ label, sub, key, max }) => (
+                                  <div key={key} className="text-center">
+                                    <div className="text-xs text-gray-500 mb-0.5 leading-tight">
+                                      {label}<br />
+                                      <span className="font-bold text-[#FF9933]">{sub}</span>
+                                    </div>
+                                    <input
+                                      type="number" min={0} max={max}
+                                      value={mix[key]}
+                                      disabled={locked}
+                                      onChange={(e) => updateChapterMix(ch.id, key, parseInt(e.target.value) || 0)}
+                                      className={inputCls()}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -426,66 +459,56 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true }
             })}
           </div>
 
-          {/* Question Mix section */}
-          {showMarks && (
-            <div className="mt-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider">Question Mix</p>
-                <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer select-none">
-                  <input type="checkbox" checked={perChapterMarks} onChange={(e) => setPerChapterMarks(e.target.checked)}
-                    className="w-3.5 h-3.5 accent-[#FF9933]" />
-                  Set marks per chapter (advanced)
-                </label>
-              </div>
-
-              {!perChapterMarks && (
-                <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
-                  {mixRows.map(({ label, sub, key, max, color }) => (
-                    <div key={key} className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-700">{label}</p>
-                        <p className="text-xs text-gray-400">{sub}</p>
+          {/* Auto-aggregated totals */}
+          {showMarks && checkedChapters.length > 0 && (
+            <div className="mt-5 bg-gray-50 rounded-xl border border-gray-200 p-4">
+              <p className="text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-3">Total Question Mix</p>
+              <div className="space-y-2">
+                {MIX_COLS.map(({ label, key, multiplier, color }) => {
+                  const count = totalMix[key];
+                  if (count === 0) return null;
+                  return (
+                    <div key={key} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-700">{label} ({multiplier}m each)</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500 text-xs">{count} q</span>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${color}`}>{count * multiplier} marks</span>
                       </div>
-                      <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${color}`}>
-                        {questionMix[key] * parseInt(sub)} marks
-                      </div>
-                      <input type="number" min={0} max={max} value={questionMix[key]}
-                        onChange={(e) => setQuestionMix((m) => ({ ...m, [key]: Math.max(0, Math.min(max, parseInt(e.target.value) || 0)) }))}
-                        className="w-16 rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#FF9933] transition" />
                     </div>
-                  ))}
-                  <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-600">Total Marks</p>
-                    <p className="text-xl font-extrabold text-[#FF9933]">{totalMixMarks}</p>
-                  </div>
+                  );
+                })}
+                {totalMarks === 0 && (
+                  <p className="text-xs text-gray-400 text-center">Enter question counts above to see total marks</p>
+                )}
+              </div>
+              {totalMarks > 0 && (
+                <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+                  <p className="text-sm font-bold text-[#1B3A6B]">Total Marks</p>
+                  <p className="text-2xl font-extrabold text-[#FF9933]">{totalMarks}</p>
                 </div>
               )}
             </div>
           )}
 
           {/* Additional instructions */}
-          <div className="mt-4">
-            <label className="block text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
-              Additional Instructions <span className="text-gray-400 normal-case font-normal">(optional)</span>
-            </label>
-            <textarea value={additionalInstructions} onChange={(e) => setAdditionalInstructions(e.target.value)} rows={2}
-              placeholder="e.g. Focus on application questions, include a diagram question…"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF9933] resize-none" />
-          </div>
+          {!locked && (
+            <div className="mt-4">
+              <label className="block text-xs font-bold text-[#1B3A6B] uppercase tracking-wider mb-2">
+                Additional Instructions <span className="text-gray-400 normal-case font-normal">(optional)</span>
+              </label>
+              <textarea value={additionalInstructions} onChange={(e) => setAdditionalInstructions(e.target.value)} rows={2}
+                placeholder="e.g. Focus on application questions, include a diagram question…"
+                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF9933] resize-none" />
+            </div>
+          )}
 
           {/* Status */}
           {checkedChapters.length > 0 ? (
             <div className="mt-3 flex items-center justify-between pt-2 border-t border-gray-100">
-              {showMarks && !perChapterMarks ? (
-                <p className="text-sm font-semibold text-[#1B3A6B]">
-                  Total Marks: <span className="text-[#FF9933] text-lg font-bold">{totalMixMarks}</span>
-                </p>
-              ) : (
-                <p className="text-sm text-[#1B3A6B] font-semibold">
-                  {checkedChapters.length} chapter{checkedChapters.length !== 1 ? "s" : ""} selected ✓
-                </p>
-              )}
-              <p className="text-xs text-green-600 font-semibold">✓ Ready — click Generate Draft below</p>
+              <p className="text-sm text-[#1B3A6B] font-semibold">
+                {checkedChapters.length} chapter{checkedChapters.length !== 1 ? "s" : ""} selected ✓
+              </p>
+              {!locked && <p className="text-xs text-green-600 font-semibold">✓ Ready — click Generate Draft below</p>}
             </div>
           ) : (
             <p className="mt-3 text-xs text-gray-400 text-center pt-1">☝️ Check at least one chapter above to enable generation</p>

@@ -18,7 +18,6 @@ const DURATIONS = ["1 hour", "1.5 hours", "2 hours", "2.5 hours", "3 hours"];
 const DIFFICULTIES = ["Standard", "Easy", "Challenging"];
 const LOADING_MSGS = ["Reading your inputs…", "Crafting your exam paper…", "Almost ready…", "Adding the finishing touches…"];
 
-
 function cleanOutput(text: string): string {
   return text
     .replace(/&emsp;/g, "   ")
@@ -51,17 +50,18 @@ function parseExamContent(raw: string): { question: string; key: string } {
   return { question, key };
 }
 
-
 function stripDelimiters(text: string): string {
   return text.replace(/===[A-Z][A-Z\s]*===\n?/g, "");
 }
 
-function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: string[]; }) {
+function SelectField({ label, value, onChange, options, disabled }: {
+  label: string; value: string; onChange: (v: string) => void; options: string[]; disabled?: boolean;
+}) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-secondary mb-1.5">{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+      <label className={`block text-sm font-semibold mb-1.5 ${disabled ? "text-gray-400" : "text-secondary"}`}>{label}</label>
+      <select value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled}
+        className={`w-full rounded-xl border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${disabled ? "border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed" : "border-gray-200 bg-white text-gray-800"}`}>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
     </div>
@@ -87,6 +87,8 @@ export default function ExamPapersPage() {
   const [mode, setMode] = useState<"chapter" | "custom">("chapter");
 
   // Chapter selector mode state
+  const [selectorKey, setSelectorKey] = useState(0);
+  const [chapterPreviewMode, setChapterPreviewMode] = useState<"preview" | "raw">("preview");
   const [chapterResult, setChapterResult] = useState<ChapterSelectorResult | null>(null);
   const [chapterExamType, setChapterExamType] = useState("Unit Test");
   const [chapterDifficulty, setChapterDifficulty] = useState("Standard");
@@ -141,6 +143,18 @@ export default function ExamPapersPage() {
     const id = setInterval(() => { i = (i + 1) % LOADING_MSGS.length; setLoadingMsg(LOADING_MSGS[i]); }, 3000);
     return () => clearInterval(id);
   }, [loading]);
+
+  const handleStartFresh = () => {
+    setSelectorKey(k => k + 1);
+    setChapterResult(null);
+    setChapterDraft("");
+    setChapterAnswerKey("");
+    setChapterDraftReady(false);
+    setChapterFinalReady(false);
+    setChapterError("");
+    setRevisionInstructions("");
+    setChapterPreviewMode("preview");
+  };
 
   // Custom prompt generation (uses streaming exam-paper route)
   const handleGenerate = async () => {
@@ -280,6 +294,7 @@ export default function ExamPapersPage() {
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setChapterDraft(data.draft);
       setChapterDraftReady(true);
+      setChapterPreviewMode("preview");
       if (user) getUsageThisMonth(user.id).then(setUsage);
     } catch (err) {
       setChapterError(String(err));
@@ -347,7 +362,6 @@ export default function ExamPapersPage() {
     } finally { setChapterLoading(false); setChapterLoadingStep(""); }
   };
 
-  const chapterCopy = (text: string) => navigator.clipboard.writeText(text);
   const chapterDownload = (text: string, name: string) => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
@@ -356,6 +370,13 @@ export default function ExamPapersPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          .paper-output, .paper-output * { visibility: visible; }
+          .paper-output { position: absolute; left: 0; top: 0; width: 100%; padding: 2cm; font-family: 'Times New Roman', serif; }
+        }
+      `}</style>
       <Navbar />
 
       <section className="bg-secondary py-12 px-4">
@@ -405,21 +426,33 @@ export default function ExamPapersPage() {
 
             {mode === "chapter" ? (
               <div className="space-y-5">
-                <ChapterSelector onChaptersSelected={handleChaptersSelected} showMarks={true} />
+                <ChapterSelector
+                  key={selectorKey}
+                  onChaptersSelected={handleChaptersSelected}
+                  showMarks={true}
+                  locked={chapterDraftReady || chapterFinalReady}
+                />
 
                 {/* Paper settings — shown once chapters are selected */}
                 {chapterResult && chapterResult.chapters.length > 0 && (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 rounded-xl border border-gray-200 p-4">
-                    <SelectField label="Exam Type"   value={chapterExamType}    onChange={setChapterExamType}    options={EXAM_TYPES} />
-                    <SelectField label="Duration"    value={chapterDuration}    onChange={setChapterDuration}    options={DURATIONS} />
-                    <SelectField label="Difficulty"  value={chapterDifficulty}  onChange={setChapterDifficulty}  options={DIFFICULTIES} />
+                    <SelectField label="Exam Type"   value={chapterExamType}    onChange={setChapterExamType}    options={EXAM_TYPES}    disabled={chapterDraftReady} />
+                    <SelectField label="Duration"    value={chapterDuration}    onChange={setChapterDuration}    options={DURATIONS}     disabled={chapterDraftReady} />
+                    <SelectField label="Difficulty"  value={chapterDifficulty}  onChange={setChapterDifficulty}  options={DIFFICULTIES}  disabled={chapterDraftReady} />
                   </div>
                 )}
 
-                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
-                  <button onClick={handleChapterGenerate} disabled={chapterLoading || !!atLimit}
+                {chapterResult && chapterResult.chapters.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (chapterDraftReady) {
+                        if (!window.confirm("This will replace your current draft. Continue?")) return;
+                      }
+                      handleChapterGenerate();
+                    }}
+                    disabled={chapterLoading || !!atLimit}
                     className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 disabled:opacity-60 transition-colors shadow-md">
-                    {chapterLoading ? chapterLoadingStep || "Working…" : "Generate Draft →"}
+                    {chapterLoading ? chapterLoadingStep || "Working…" : chapterDraftReady ? "Regenerate Draft" : "Generate Draft →"}
                   </button>
                 )}
 
@@ -437,12 +470,38 @@ export default function ExamPapersPage() {
                 {/* Draft */}
                 {chapterDraftReady && !chapterFinalReady && (
                   <div className="space-y-4">
+                    <button onClick={handleStartFresh}
+                      className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Start Fresh
+                    </button>
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-secondary">Draft Exam Paper</h3>
-                      <button onClick={() => chapterCopy(chapterDraft)} className="text-xs text-secondary border border-secondary px-3 py-1 rounded-lg hover:bg-secondary hover:text-white transition-colors">Copy</button>
+                      <div className="flex items-center gap-2">
+                        <div className="flex bg-gray-100 rounded-lg p-0.5">
+                          <button onClick={() => setChapterPreviewMode("preview")}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${chapterPreviewMode === "preview" ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+                            Preview
+                          </button>
+                          <button onClick={() => setChapterPreviewMode("raw")}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${chapterPreviewMode === "raw" ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+                            Edit Raw
+                          </button>
+                        </div>
+                        <button onClick={() => navigator.clipboard.writeText(chapterDraft)}
+                          className="text-xs text-secondary border border-secondary px-3 py-1 rounded-lg hover:bg-secondary hover:text-white transition-colors">
+                          Copy
+                        </button>
+                      </div>
                     </div>
-                    <textarea value={chapterDraft} onChange={(e) => setChapterDraft(e.target.value)} rows={20}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y" style={{ minHeight: 500 }} />
+                    {chapterPreviewMode === "preview" ? (
+                      <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
+                        <MarkdownContent text={chapterDraft} />
+                      </div>
+                    ) : (
+                      <textarea value={chapterDraft} onChange={(e) => setChapterDraft(e.target.value)} rows={20}
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y" style={{ minHeight: 500 }} />
+                    )}
                     <div className="space-y-3 pt-3 border-t border-gray-100">
                       <p className="text-sm font-semibold text-secondary">Revision Instructions</p>
                       <textarea value={revisionInstructions} onChange={(e) => setRevisionInstructions(e.target.value)} rows={3}
@@ -465,6 +524,11 @@ export default function ExamPapersPage() {
                 {/* Final paper + answer key */}
                 {chapterFinalReady && (
                   <div className="space-y-4">
+                    <button onClick={handleStartFresh}
+                      className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Start Fresh
+                    </button>
                     <div className="flex border-b border-gray-200">
                       {(["paper", "key"] as const).map((t) => (
                         <button key={t} onClick={() => setChapterTab(t)}
@@ -475,18 +539,16 @@ export default function ExamPapersPage() {
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {[
-                        { label: "Copy", action: () => chapterCopy(chapterTab === "paper" ? chapterDraft : chapterAnswerKey) },
+                        { label: "Copy", action: () => navigator.clipboard.writeText(chapterTab === "paper" ? chapterDraft : chapterAnswerKey) },
                         { label: "Download", action: () => chapterDownload(chapterTab === "paper" ? chapterDraft : chapterAnswerKey, chapterTab === "paper" ? "exam-paper.txt" : "answer-key.txt") },
-                        { label: "Print", action: () => window.print() },
+                        { label: "Print / PDF", action: () => window.print() },
                       ].map(({ label, action }) => (
                         <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
                       ))}
-                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterAnswerKey(""); }}
-                        className="text-sm bg-secondary text-white rounded-lg px-4 py-1.5 hover:bg-primary transition-colors">New Paper</button>
                     </div>
-                    <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 rounded-xl border border-gray-200 p-4 max-h-[600px] overflow-y-auto">
-                      {chapterTab === "paper" ? chapterDraft : chapterAnswerKey}
-                    </pre>
+                    <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
+                      <MarkdownContent text={chapterTab === "paper" ? chapterDraft : chapterAnswerKey} />
+                    </div>
                   </div>
                 )}
               </div>

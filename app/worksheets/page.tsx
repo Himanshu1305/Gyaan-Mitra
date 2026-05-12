@@ -68,6 +68,8 @@ export default function WorksheetsPage() {
   const [mode, setMode] = useState<"chapter" | "custom">("chapter");
 
   // Chapter selector state
+  const [selectorKey, setSelectorKey] = useState(0);
+  const [chapterPreviewMode, setChapterPreviewMode] = useState<"preview" | "raw">("preview");
   const [chapterResult, setChapterResult] = useState<ChapterSelectorResult | null>(null);
   const [chapterDraft, setChapterDraft] = useState("");
   const [chapterFinal, setChapterFinal] = useState("");
@@ -117,6 +119,18 @@ export default function WorksheetsPage() {
     const id = setInterval(() => { i = (i + 1) % LOADING_MSGS.length; setLoadingMsg(LOADING_MSGS[i]); }, 3000);
     return () => clearInterval(id);
   }, [loading]);
+
+  const handleStartFresh = () => {
+    setSelectorKey(k => k + 1);
+    setChapterResult(null);
+    setChapterDraft("");
+    setChapterFinal("");
+    setChapterDraftReady(false);
+    setChapterFinalReady(false);
+    setChapterError("");
+    setRevisionInstructions("");
+    setChapterPreviewMode("preview");
+  };
 
   const handleGenerate = async () => {
     if (!customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
@@ -252,6 +266,7 @@ export default function WorksheetsPage() {
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setChapterDraft(data.draft);
       setChapterDraftReady(true);
+      setChapterPreviewMode("preview");
       if (user) getUsageThisMonth(user.id).then(setUsage);
     } catch (err) { setChapterError(String(err)); }
     finally { setChapterLoading(false); setChapterLoadingStep(""); }
@@ -302,7 +317,6 @@ export default function WorksheetsPage() {
     finally { setChapterLoading(false); setChapterLoadingStep(""); }
   };
 
-  const chapterCopy = (t: string) => navigator.clipboard.writeText(t);
   const chapterDownload = (t: string, n: string) => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([t], { type: "text/plain" }));
@@ -311,6 +325,13 @@ export default function WorksheetsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
+      <style>{`
+        @media print {
+          body * { visibility: hidden; }
+          .paper-output, .paper-output * { visibility: visible; }
+          .paper-output { position: absolute; left: 0; top: 0; width: 100%; padding: 2cm; font-family: 'Times New Roman', serif; }
+        }
+      `}</style>
       <Navbar />
 
       <section className="bg-secondary py-12 px-4">
@@ -358,12 +379,24 @@ export default function WorksheetsPage() {
 
             {mode === "chapter" ? (
               <div className="space-y-5">
-                <ChapterSelector onChaptersSelected={handleChaptersSelected} showMarks={true} />
+                <ChapterSelector
+                  key={selectorKey}
+                  onChaptersSelected={handleChaptersSelected}
+                  showMarks={true}
+                  locked={chapterDraftReady || chapterFinalReady}
+                />
 
-                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
-                  <button onClick={handleChapterGenerate} disabled={chapterLoading || !!atLimit}
+                {chapterResult && chapterResult.chapters.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (chapterDraftReady) {
+                        if (!window.confirm("This will replace your current draft. Continue?")) return;
+                      }
+                      handleChapterGenerate();
+                    }}
+                    disabled={chapterLoading || !!atLimit}
                     className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 disabled:opacity-60 transition-colors shadow-md">
-                    {chapterLoading ? chapterLoadingStep || "Working…" : "Generate Draft →"}
+                    {chapterLoading ? chapterLoadingStep || "Working…" : chapterDraftReady ? "Regenerate Draft" : "Generate Draft →"}
                   </button>
                 )}
                 {chapterLoading && (
@@ -373,14 +406,41 @@ export default function WorksheetsPage() {
                   </div>
                 )}
                 {chapterError && <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{chapterError}</div>}
+
                 {chapterDraftReady && !chapterFinalReady && (
                   <div className="space-y-4">
+                    <button onClick={handleStartFresh}
+                      className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Start Fresh
+                    </button>
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-secondary">Draft Worksheet</h3>
-                      <button onClick={() => chapterCopy(chapterDraft)} className="text-xs text-secondary border border-secondary px-3 py-1 rounded-lg hover:bg-secondary hover:text-white transition-colors">Copy</button>
+                      <div className="flex items-center gap-2">
+                        <div className="flex bg-gray-100 rounded-lg p-0.5">
+                          <button onClick={() => setChapterPreviewMode("preview")}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${chapterPreviewMode === "preview" ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+                            Preview
+                          </button>
+                          <button onClick={() => setChapterPreviewMode("raw")}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${chapterPreviewMode === "raw" ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-gray-700"}`}>
+                            Edit Raw
+                          </button>
+                        </div>
+                        <button onClick={() => navigator.clipboard.writeText(chapterDraft)}
+                          className="text-xs text-secondary border border-secondary px-3 py-1 rounded-lg hover:bg-secondary hover:text-white transition-colors">
+                          Copy
+                        </button>
+                      </div>
                     </div>
-                    <textarea value={chapterDraft} onChange={(e) => setChapterDraft(e.target.value)} rows={20}
-                      className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y" style={{ minHeight: 500 }} />
+                    {chapterPreviewMode === "preview" ? (
+                      <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
+                        <MarkdownContent text={chapterDraft} />
+                      </div>
+                    ) : (
+                      <textarea value={chapterDraft} onChange={(e) => setChapterDraft(e.target.value)} rows={20}
+                        className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y" style={{ minHeight: 500 }} />
+                    )}
                     <div className="space-y-3 pt-3 border-t border-gray-100">
                       <p className="text-sm font-semibold text-secondary">Revision Instructions</p>
                       <textarea value={revisionInstructions} onChange={(e) => setRevisionInstructions(e.target.value)} rows={3}
@@ -399,17 +459,27 @@ export default function WorksheetsPage() {
                     </div>
                   </div>
                 )}
+
                 {chapterFinalReady && (
                   <div className="space-y-4">
+                    <button onClick={handleStartFresh}
+                      className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Start Fresh
+                    </button>
                     <h3 className="font-bold text-secondary">Final Worksheet</h3>
                     <div className="flex gap-2 flex-wrap">
-                      {[{ label: "Copy", action: () => chapterCopy(chapterFinal) }, { label: "Download", action: () => chapterDownload(chapterFinal, "worksheet.txt") }, { label: "Print", action: () => window.print() }].map(({ label, action }) => (
+                      {[
+                        { label: "Copy", action: () => navigator.clipboard.writeText(chapterFinal) },
+                        { label: "Download", action: () => chapterDownload(chapterFinal, "worksheet.txt") },
+                        { label: "Print / PDF", action: () => window.print() },
+                      ].map(({ label, action }) => (
                         <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
                       ))}
-                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterFinal(""); }}
-                        className="text-sm bg-secondary text-white rounded-lg px-4 py-1.5 hover:bg-primary transition-colors">New Worksheet</button>
                     </div>
-                    <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 rounded-xl border border-gray-200 p-4 max-h-[600px] overflow-y-auto">{chapterFinal}</pre>
+                    <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
+                      <MarkdownContent text={chapterFinal} />
+                    </div>
                   </div>
                 )}
               </div>

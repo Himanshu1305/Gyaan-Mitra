@@ -15,8 +15,7 @@ type QuestionMix = {
 type ChapterSelection = {
   chapterName: string;
   bookDisplayName: string;
-  marks: number;
-  questionType: string;
+  questionMix?: QuestionMix;
   filePath: string | null;
 };
 
@@ -87,6 +86,17 @@ Return structured JSON with chapter name as key.`;
   return result.response.text();
 }
 
+const FORMATTING_RULES = `
+IMPORTANT FORMATTING RULES:
+- Use clean Markdown only: ## headings, **bold**, - bullet points, 1. numbered lists
+- No HTML tags whatsoever (no <br>, <p>, <div>, <span>, etc.)
+- No &nbsp; or other HTML entities — use plain spaces only
+- For MCQ options use: (a) ... (b) ... (c) ... (d) ...
+- Number questions as Q1, Q2, Q3 etc.
+- For answer key entries use: Ans. 1: ...
+- No decorative separators or excessive blank lines
+`;
+
 function questionMixDescription(qm: QuestionMix): string {
   const parts: string[] = [];
   if (qm.mcq > 0) parts.push(`${qm.mcq} MCQ (1 mark each = ${qm.mcq} marks)`);
@@ -96,6 +106,21 @@ function questionMixDescription(qm: QuestionMix): string {
   if (qm.longFive > 0) parts.push(`${qm.longFive} Long Answer (5 marks each = ${qm.longFive * 5} marks)`);
   const total = qm.mcq + qm.shortTwo * 2 + qm.shortThree * 3 + qm.longFour * 4 + qm.longFive * 5;
   return parts.join(", ") + `. Total: ${total} marks.`;
+}
+
+function buildChapterDistribution(chapters: ChapterSelection[]): string {
+  return chapters.map(c => {
+    const qm = c.questionMix;
+    if (!qm) return `- ${c.chapterName}: balanced mix`;
+    const parts: string[] = [];
+    if (qm.mcq > 0) parts.push(`${qm.mcq} MCQ (1m each)`);
+    if (qm.shortTwo > 0) parts.push(`${qm.shortTwo} Short Answer (2m each)`);
+    if (qm.shortThree > 0) parts.push(`${qm.shortThree} Short Answer (3m each)`);
+    if (qm.longFour > 0) parts.push(`${qm.longFour} Long Answer (4m each)`);
+    if (qm.longFive > 0) parts.push(`${qm.longFive} Long Answer (5m each)`);
+    const marks = (qm.mcq) + (qm.shortTwo * 2) + (qm.shortThree * 3) + (qm.longFour * 4) + (qm.longFive * 5);
+    return `- ${c.chapterName}: ${parts.join(", ") || "balanced mix"} [${marks} marks]`;
+  }).join("\n");
 }
 
 function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: boolean): string {
@@ -109,17 +134,24 @@ function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: 
     ? `Chapters to cover:\n${chapterList}`
     : `NCERT Chapter Content (extracted from actual textbooks):\n${geminiOutput}\n\nChapters:\n${chapterList}`;
 
+  const hasPerChapterMix = chapterSelections.some(c => c.questionMix);
+
   if (generationType === "exam-paper") {
-    const mixDesc = questionMix ? questionMixDescription(questionMix) : "Balanced mix of MCQ, short and long answer questions";
+    const mixSection = hasPerChapterMix
+      ? `Chapter-wise question distribution (generate EXACTLY these questions per chapter):\n${buildChapterDistribution(chapterSelections)}`
+      : questionMix
+      ? `Question Mix: ${questionMixDescription(questionMix)}`
+      : "Balanced mix of MCQ, short and long answer questions";
+
     const paperType = examType || "Exam Paper";
     const paperDuration = duration || "3 hours";
     const paperDifficulty = difficulty || "Standard";
 
     return `You are an expert Indian school teacher. Create a ${board} ${paperType} for Class ${classNumber} ${subject}.
-
+${FORMATTING_RULES}
 ${contentSection}
 
-Question Mix: ${mixDesc}
+${mixSection}
 Duration: ${paperDuration}
 Difficulty: ${paperDifficulty}
 Teacher instructions: ${additionalInstructions || "None"}
@@ -131,17 +163,21 @@ Format as a proper exam paper:
 - Space for student name and roll number
 - Instructions at the top
 
-Do NOT include the answer key in the question paper — keep it separate.`;
+Do NOT include the answer key in the question paper.`;
   }
 
   if (generationType === "worksheet") {
-    const mixDesc = questionMix ? questionMixDescription(questionMix) : "Varied question types";
+    const mixSection = hasPerChapterMix
+      ? `Chapter-wise question distribution:\n${buildChapterDistribution(chapterSelections)}`
+      : questionMix
+      ? `Question Mix: ${questionMixDescription(questionMix)}`
+      : "Varied question types";
 
     return `You are an expert Indian school teacher. Create a practice worksheet for Class ${classNumber} ${subject} (${board} curriculum).
-
+${FORMATTING_RULES}
 ${contentSection}
 
-Question Mix: ${mixDesc}
+${mixSection}
 Teacher instructions: ${additionalInstructions || "None"}
 
 Create a well-structured worksheet with:
@@ -155,7 +191,7 @@ Format clearly with question numbers and marks in brackets.`;
 
   // lesson-plan
   return `You are an expert Indian school teacher. Create a detailed lesson plan for Class ${classNumber} ${subject} (${board} curriculum).
-
+${FORMATTING_RULES}
 Chapters:
 ${chapterList}
 
