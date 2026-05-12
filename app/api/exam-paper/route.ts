@@ -75,10 +75,6 @@ export async function POST(req: NextRequest) {
     if (!customPrompt?.trim()) {
       return new Response("Prompt is required", { status: 400 });
     }
-  } else {
-    if (!chapters?.trim()) {
-      return new Response("Chapters covered is required", { status: 400 });
-    }
   }
 
   // Auth & usage-limit check
@@ -129,7 +125,9 @@ export async function POST(req: NextRequest) {
       : "";
 
   const noChapterNote = !fileData
-    ? `\n\nNo specific textbook content was provided. The teacher mentioned: "${chapters}". Generate questions based on standard NCERT curriculum for ${grade} ${subject}. If chapters are vague (e.g. "all chapters"), distribute questions evenly across all major topics of the standard NCERT syllabus for this class and subject. After each question, add in brackets which chapter/topic it is from.`
+    ? chapters?.trim()
+      ? `\n\nNo specific textbook content was provided. The teacher mentioned: "${chapters}". Generate questions based on standard NCERT curriculum for ${grade} ${subject}. If chapters are vague (e.g. "all chapters"), distribute questions evenly across all major topics of the standard NCERT syllabus for this class and subject. After each question, add in brackets which chapter/topic it is from.`
+      : `\n\nNo specific chapters were provided. Generate questions based on standard NCERT curriculum for ${grade} ${subject}, distributing questions evenly across all major topics of the syllabus. After each question, add in brackets which chapter/topic it is from.`
     : "";
 
   const mixLines = [
@@ -313,6 +311,7 @@ ${outputStructure}`;
         }
         streamSucceeded = true;
       } catch (err: unknown) {
+        console.error("[exam-paper] Stream error:", err);
         const message = err instanceof Error ? err.message : "Generation failed. Please try again.";
         controller.enqueue(encoder.encode(`__STREAM_ERROR__${message}`));
       } finally {

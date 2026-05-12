@@ -206,7 +206,6 @@ export default function ExamPapersPage() {
   }, [loading]);
 
   const handleGenerate = async () => {
-    if (mode === "form" && !form.chapters.trim()) { setChaptersError("Please enter the chapters covered before generating."); return; }
     if (mode === "custom" && !customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
     setChaptersError(""); setPromptError(""); setApiError(""); setResult(""); setSaved(false); setSaveToast("");
     setQuestionContent(""); setKeyContent(""); setAllThreeLevels([]);
@@ -609,7 +608,7 @@ export default function ExamPapersPage() {
                   {/* Chapters field */}
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-semibold text-secondary mb-1.5">
-                      Chapters / Topics Covered <span className="text-primary">*</span>
+                      Chapters / Topics Covered <span className="text-gray-400 font-normal">(optional)</span>
                     </label>
                     <div className="flex gap-2 items-start">
                       <textarea value={form.chapters}
