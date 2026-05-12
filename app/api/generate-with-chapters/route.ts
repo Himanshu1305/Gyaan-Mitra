@@ -4,6 +4,14 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+type QuestionMix = {
+  mcq: number;
+  shortTwo: number;
+  shortThree: number;
+  longFour: number;
+  longFive: number;
+};
+
 type ChapterSelection = {
   chapterName: string;
   bookDisplayName: string;
@@ -19,6 +27,10 @@ type RequestBody = {
   board: string;
   classNumber: number;
   subject: string;
+  questionMix?: QuestionMix;
+  examType?: string;
+  duration?: string;
+  difficulty?: string;
 };
 
 const STORAGE_BASE =
@@ -27,17 +39,23 @@ const STORAGE_BASE =
 async function fetchPdfBase64(filePath: string): Promise<string | null> {
   try {
     const url = `${STORAGE_BASE}/${filePath}`;
+    console.log("[generate-with-chapters] Fetching PDF:", url);
     const res = await fetch(url, { next: { revalidate: 3600 } });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn("[generate-with-chapters] PDF fetch failed:", url, res.status);
+      return null;
+    }
     const buf = await res.arrayBuffer();
     return Buffer.from(buf).toString("base64");
-  } catch {
+  } catch (e) {
+    console.warn("[generate-with-chapters] PDF fetch exception:", e);
     return null;
   }
 }
 
 async function analyzeWithGemini(chapters: ChapterSelection[]): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
+  console.log("[generate-with-chapters] GEMINI_API_KEY exists:", !!apiKey);
   if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -47,7 +65,10 @@ async function analyzeWithGemini(chapters: ChapterSelection[]): Promise<string> 
   const loaded: string[] = [];
 
   for (const ch of chapters.slice(0, 20)) {
-    if (!ch.filePath) continue;
+    if (!ch.filePath) {
+      console.log("[generate-with-chapters] Skipping chapter (no filePath):", ch.chapterName);
+      continue;
+    }
     const b64 = await fetchPdfBase64(ch.filePath);
     if (b64) {
       parts.push({ inlineData: { data: b64, mimeType: "application/pdf" } });
@@ -57,6 +78,7 @@ async function analyzeWithGemini(chapters: ChapterSelection[]): Promise<string> 
 
   if (parts.length === 0) throw new Error("No PDFs could be fetched");
 
+  console.log("[generate-with-chapters] Gemini analyzing", loaded.length, "chapters:", loaded);
   const prompt = `Analyze these NCERT textbook chapters: ${loaded.join(", ")}.
 For each chapter extract: main topics, key concepts, important diagrams/figures mentioned, and sample questions from exercises.
 Return structured JSON with chapter name as key.`;
@@ -65,48 +87,79 @@ Return structured JSON with chapter name as key.`;
   return result.response.text();
 }
 
+function questionMixDescription(qm: QuestionMix): string {
+  const parts: string[] = [];
+  if (qm.mcq > 0) parts.push(`${qm.mcq} MCQ (1 mark each = ${qm.mcq} marks)`);
+  if (qm.shortTwo > 0) parts.push(`${qm.shortTwo} Short Answer (2 marks each = ${qm.shortTwo * 2} marks)`);
+  if (qm.shortThree > 0) parts.push(`${qm.shortThree} Short Answer (3 marks each = ${qm.shortThree * 3} marks)`);
+  if (qm.longFour > 0) parts.push(`${qm.longFour} Long Answer (4 marks each = ${qm.longFour * 4} marks)`);
+  if (qm.longFive > 0) parts.push(`${qm.longFive} Long Answer (5 marks each = ${qm.longFive * 5} marks)`);
+  const total = qm.mcq + qm.shortTwo * 2 + qm.shortThree * 3 + qm.longFour * 4 + qm.longFive * 5;
+  return parts.join(", ") + `. Total: ${total} marks.`;
+}
+
 function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: boolean): string {
-  const { generationType, chapterSelections, additionalInstructions, board, classNumber, subject } = body;
+  const { generationType, chapterSelections, additionalInstructions, board, classNumber, subject, questionMix, examType, duration, difficulty } = body;
 
   const chapterList = chapterSelections
-    .map(
-      (c) =>
-        `${c.bookDisplayName} - ${c.chapterName}: ${c.marks} marks (${c.questionType})`
-    )
+    .map((c) => `- ${c.bookDisplayName}: ${c.chapterName}`)
     .join("\n");
 
   const contentSection = isFallback
     ? `Chapters to cover:\n${chapterList}`
-    : `NCERT Chapter Content (extracted from actual textbooks):\n${geminiOutput}\n\nMarks distribution by chapter:\n${chapterList}`;
+    : `NCERT Chapter Content (extracted from actual textbooks):\n${geminiOutput}\n\nChapters:\n${chapterList}`;
 
   if (generationType === "exam-paper") {
-    return `You are an expert Indian school teacher. Create a ${board} exam paper for Class ${classNumber} ${subject}.
+    const mixDesc = questionMix ? questionMixDescription(questionMix) : "Balanced mix of MCQ, short and long answer questions";
+    const paperType = examType || "Exam Paper";
+    const paperDuration = duration || "3 hours";
+    const paperDifficulty = difficulty || "Standard";
+
+    return `You are an expert Indian school teacher. Create a ${board} ${paperType} for Class ${classNumber} ${subject}.
 
 ${contentSection}
 
+Question Mix: ${mixDesc}
+Duration: ${paperDuration}
+Difficulty: ${paperDifficulty}
 Teacher instructions: ${additionalInstructions || "None"}
 
-Format as a proper exam paper with clear sections (Section A, B, C etc.) and question numbers. Questions must come from the chapter content above. Do not include answer key — that is generated separately. Include marks for each question in brackets.`;
+Format as a proper exam paper:
+- School/date header section
+- Clear sections (Section A: MCQ, Section B: Short Answer, Section C: Long Answer)
+- Question numbers and marks in brackets
+- Space for student name and roll number
+- Instructions at the top
+
+Do NOT include the answer key in the question paper — keep it separate.`;
   }
 
   if (generationType === "worksheet") {
+    const mixDesc = questionMix ? questionMixDescription(questionMix) : "Varied question types";
+
     return `You are an expert Indian school teacher. Create a practice worksheet for Class ${classNumber} ${subject} (${board} curriculum).
 
 ${contentSection}
 
+Question Mix: ${mixDesc}
 Teacher instructions: ${additionalInstructions || "None"}
 
-Create a well-structured worksheet with varied question types as specified per chapter. Include clear instructions for each section. Questions must be based on the chapter content above. Format clearly with question numbers and marks.`;
+Create a well-structured worksheet with:
+- Clear sections for each question type
+- Instructions for each section
+- Questions based strictly on the chapter content above
+- An ANSWER KEY section at the end (clearly separated)
+
+Format clearly with question numbers and marks in brackets.`;
   }
 
   // lesson-plan
   return `You are an expert Indian school teacher. Create a detailed lesson plan for Class ${classNumber} ${subject} (${board} curriculum).
 
 Chapters:
-${chapterSelections.map((c) => `- ${c.bookDisplayName}: ${c.chapterName}`).join("\n")}
+${chapterList}
 
-${isFallback ? "" : `Chapter content overview:\n${geminiOutput}\n`}
-Teacher instructions: ${additionalInstructions || "None"}
+${isFallback ? "" : `Chapter content overview:\n${geminiOutput}\n`}Teacher instructions: ${additionalInstructions || "None"}
 
 Create a comprehensive lesson plan covering:
 1. Learning Objectives
@@ -132,6 +185,8 @@ export async function POST(req: NextRequest) {
   try {
     const body: RequestBody = await req.json();
     const { generationType, chapterSelections } = body;
+
+    console.log("[generate-with-chapters] Request:", { generationType, chapterCount: chapterSelections?.length, board: body.board, subject: body.subject });
 
     if (!generationType || !chapterSelections || chapterSelections.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -161,6 +216,7 @@ export async function POST(req: NextRequest) {
           .single();
         if (profileError) console.error("[generate-with-chapters] Profile fetch error:", profileError);
         const isPremium = profile?.subscription_tier === "premium";
+        console.log("[generate-with-chapters] User:", userId, "isPremium:", isPremium);
         if (!isPremium) {
           const { count } = await userSupa
             .from("usage_tracking")
@@ -175,6 +231,8 @@ export async function POST(req: NextRequest) {
           }
         }
       }
+    } else {
+      console.log("[generate-with-chapters] No auth token — guest request");
     }
 
     // Step A — Gemini reads PDFs
@@ -183,7 +241,7 @@ export async function POST(req: NextRequest) {
     try {
       console.log(`[generate-with-chapters] Gemini analyzing ${chapterSelections.length} chapters…`);
       geminiOutput = await analyzeWithGemini(chapterSelections);
-      console.log("[generate-with-chapters] Gemini done");
+      console.log("[generate-with-chapters] Gemini done, output length:", geminiOutput.length);
     } catch (err) {
       console.warn("[generate-with-chapters] Gemini failed, falling back to chapter names:", err);
       isFallback = true;
@@ -191,6 +249,7 @@ export async function POST(req: NextRequest) {
 
     // Step B — Claude generates content
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    console.log("[generate-with-chapters] ANTHROPIC_API_KEY exists:", !!anthropicKey);
     if (!anthropicKey) {
       return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
     }
@@ -198,9 +257,12 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey: anthropicKey });
     const prompt = buildClaudePrompt(body, geminiOutput, isFallback);
 
+    console.log("[generate-with-chapters] Claude prompt length:", prompt.length);
+    console.log("[generate-with-chapters] Claude prompt preview:", prompt.slice(0, 300));
     console.log(`[generate-with-chapters] Claude generating ${generationType}…`);
+
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 4000,
       messages: [{ role: "user", content: prompt }],
     });
@@ -210,7 +272,17 @@ export async function POST(req: NextRequest) {
       .map((b) => (b as { type: "text"; text: string }).text)
       .join("\n");
 
-    console.log("[generate-with-chapters] Done");
+    console.log("[generate-with-chapters] Done, draft length:", draft.length);
+
+    // Track usage
+    if (userId) {
+      const userSupa = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { global: { headers: { Authorization: `Bearer ${token}` } } }
+      );
+      await userSupa.from("usage_tracking").insert([{ user_id: userId, month_year: monthYear(), content_type: generationType }]);
+    }
 
     return NextResponse.json({
       success: true,

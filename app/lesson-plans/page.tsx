@@ -13,42 +13,8 @@ import { supabase } from "@/lib/supabase";
 import { getUsageThisMonth, FREE_LIMIT } from "@/lib/usage";
 import { getFriendlyError } from "@/lib/api-errors";
 
-const SUBJECTS = ["Mathematics", "Science", "Social Studies", "Hindi", "English", "EVS", "Other"];
-const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
-const BOARDS = ["CBSE", "ICSE", "State Board"];
 const DURATIONS = ["30 minutes", "40 minutes", "45 minutes", "60 minutes"];
 const LOADING_MSGS = ["Reading your inputs…", "Crafting your lesson plan…", "Almost ready…", "Adding the finishing touches…"];
-
-function SelectField({ label, value, onChange, options }: {
-  label: string; value: string; onChange: (v: string) => void; options: string[];
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-semibold text-secondary mb-1.5">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
-      >
-        {options.map((o) => <option key={o} value={o}>{o}</option>)}
-      </select>
-    </div>
-  );
-}
-
-function TabToggle({ mode, onChange }: { mode: "form" | "chapter" | "custom"; onChange: (m: "form" | "chapter" | "custom") => void }) {
-  const labels: Record<string, string> = { form: "Fill Form", chapter: "Chapter Selector", custom: "My Own Prompt" };
-  return (
-    <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-      {(["form", "chapter", "custom"] as const).map((m) => (
-        <button key={m} onClick={() => onChange(m)}
-          className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all ${mode === m ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-secondary"}`}>
-          {labels[m]}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 function cleanOutput(text: string): string {
   return text
@@ -69,17 +35,27 @@ function formatDateTitle(d: Date): string {
   return `${day} ${months[d.getMonth()]} ${d.getFullYear()} ${hh}:${mm}`;
 }
 
-function trunc(s: string, max = 30): string {
-  return s.length > max ? s.slice(0, max).trim() + "..." : s;
+function TabToggle({ mode, onChange }: { mode: "chapter" | "custom"; onChange: (m: "chapter" | "custom") => void }) {
+  return (
+    <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+      {(["chapter", "custom"] as const).map((m) => (
+        <button key={m} onClick={() => onChange(m)}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all ${mode === m ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-secondary"}`}>
+          {m === "chapter" ? "Chapter Selector" : "My Own Prompt"}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 export default function LessonPlansPage() {
   const { user, session, subscriptionTier } = useAuth();
   const isPremium = subscriptionTier === "premium";
-  const [mode, setMode] = useState<"form" | "chapter" | "custom">("form");
+  const [mode, setMode] = useState<"chapter" | "custom">("chapter");
+
   // Chapter selector state
   const [chapterResult, setChapterResult] = useState<ChapterSelectorResult | null>(null);
-  const [chapterBoard, setChapterBoard] = useState("CBSE");
+  const [chapterDuration, setChapterDuration] = useState("45 minutes");
   const [chapterDraft, setChapterDraft] = useState("");
   const [chapterFinal, setChapterFinal] = useState("");
   const [chapterLoadingStep, setChapterLoadingStep] = useState("");
@@ -88,11 +64,9 @@ export default function LessonPlansPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
+
+  // Custom prompt state
   const [customPrompt, setCustomPrompt] = useState("");
-  const [form, setForm] = useState({
-    subject: "Mathematics", grade: "Class 6", topic: "", board: "CBSE",
-    duration: "45 minutes", additionalInstructions: "",
-  });
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
   const [outputLanguage, setOutputLanguage] = useState("auto");
   const [loadingMsg, setLoadingMsg] = useState(LOADING_MSGS[0]);
@@ -102,7 +76,6 @@ export default function LessonPlansPage() {
   const [pdfHint, setPdfHint] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveToast, setSaveToast] = useState("");
-  const [topicError, setTopicError] = useState("");
   const [promptError, setPromptError] = useState("");
   const [apiError, setApiError] = useState("");
   const [usage, setUsage] = useState(0);
@@ -116,11 +89,7 @@ export default function LessonPlansPage() {
     }
   }, [user]);
 
-  const set = (key: string) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
-  const appendToField = (field: "topic" | "additionalInstructions") => (text: string) =>
-    setForm((f) => ({ ...f, [field]: f[field] ? f[field] + " " + text : text }));
   const appendToCustom = (text: string) => setCustomPrompt((p) => p ? p + " " + text : text);
-
   const atLimit = user && !isPremium && usage >= FREE_LIMIT;
 
   useEffect(() => {
@@ -132,24 +101,21 @@ export default function LessonPlansPage() {
   }, [loading]);
 
   const handleGenerate = async () => {
-    if (mode === "form" && !form.topic.trim()) { setTopicError("Please enter a topic before generating."); return; }
-    if (mode === "custom" && !customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
-    setTopicError(""); setPromptError(""); setApiError(""); setResult(""); setSaved(false);
+    if (!customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
+    setPromptError(""); setApiError(""); setResult(""); setSaved(false);
     setLoading(true);
-
     const token = session?.access_token;
     try {
       const res = await fetch("/api/lesson-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ mode, customPrompt, ...form, fileData, outputLanguage }),
+        body: JSON.stringify({ mode: "custom", customPrompt, fileData, outputLanguage }),
       });
       if (res.status === 429) {
         const text = await res.text();
         throw new Error(text || "Usage limit reached. Upgrade to Premium for unlimited access.");
       }
       if (!res.ok) throw new Error("Server error. Please try again.");
-
       const reader = res.body!.getReader();
       const decoder = new TextDecoder();
       let firstChunk = true;
@@ -157,24 +123,14 @@ export default function LessonPlansPage() {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        if (chunk.startsWith("__STREAM_ERROR__")) {
-          setApiError(getFriendlyError({ message: chunk.replace("__STREAM_ERROR__", "").trim() }) );
-          setResult(""); break;
-        }
+        if (chunk.startsWith("__STREAM_ERROR__")) { setApiError(getFriendlyError({ message: chunk.replace("__STREAM_ERROR__", "").trim() })); setResult(""); break; }
         setResult((prev) => prev + cleanOutput(chunk));
-        if (firstChunk && resultRef.current) {
-          firstChunk = false;
-          resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        if (firstChunk && resultRef.current) { firstChunk = false; resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" }); }
       }
-      if (user) {
-        getUsageThisMonth(user.id).then(setUsage);
-      }
+      if (user) getUsageThisMonth(user.id).then(setUsage);
     } catch (err: unknown) {
       setApiError(getFriendlyError(err));
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const handleCopy = async () => {
@@ -183,21 +139,18 @@ export default function LessonPlansPage() {
   };
 
   const handlePrint = (showPdfHint = false) => {
-    const title = mode === "form" ? `Lesson Plan — ${form.subject} ${form.grade} — ${form.topic}` : "Lesson Plan";
     const win = window.open("", "_blank", "width=900,height=700");
     if (!win) return;
     const content = document.getElementById("result-content")?.innerHTML ?? result;
-    win.document.write(`<!DOCTYPE html><html><head><title>${title}</title><style>
+    win.document.write(`<!DOCTYPE html><html><head><title>Lesson Plan</title><style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.7;color:#000;padding:2cm}
       h1,h2{color:#1B3A6B;page-break-after:avoid}
       h2{font-size:14pt;margin-top:16pt;margin-bottom:6pt;border-bottom:1px solid #ccc;padding-bottom:3pt}
       h3{font-size:13pt;margin-top:12pt;margin-bottom:5pt;color:#333;page-break-after:avoid}
-      h4{font-size:12pt;margin-top:8pt;color:#555;page-break-after:avoid}
       p{margin-bottom:7pt}ul,ol{margin-left:20pt;margin-bottom:7pt}li{margin-bottom:3pt}
       strong{font-weight:bold}em{font-style:italic}hr{border:none;border-top:1px solid #ccc;margin:10pt 0}
       .gm-header{text-align:center;border-bottom:2px solid #FF9933;padding-bottom:10pt;margin-bottom:20pt}
-      .gm-header p{font-size:11pt;color:#666}
       .gm-footer{text-align:center;border-top:1px solid #ccc;padding-top:10pt;margin-top:20pt;font-size:10pt;color:#888}
     </style></head><body>
       <div class="gm-header"><p>Generated by Gyaan Mitra — gyaanmitra.com</p></div>
@@ -210,19 +163,11 @@ export default function LessonPlansPage() {
 
   const handleSave = async () => {
     if (!user || !result) return;
-    const gradeNum = form.grade.replace("Class ", "");
     const dateStr = formatDateTitle(new Date());
-    const topicTrunc = trunc(mode === "form" ? (form.topic || "Lesson Plan") : "Custom", 30);
-    const langSuffix = outputLanguage === "hindi" ? " (Hindi)" : outputLanguage === "hinglish" ? " (Hinglish)" : "";
-    const title = mode === "form"
-      ? `${form.subject} · Class ${gradeNum} · ${topicTrunc} · ${dateStr} — Lesson Plan${langSuffix}`
-      : `Custom Lesson Plan · ${dateStr}${langSuffix}`;
     await supabase.from("saved_content").insert([{
-      user_id: user.id,
-      content_type: "lesson-plan",
-      title,
-      input_data: mode === "form" ? form : { customPrompt },
-      output_content: result,
+      user_id: user.id, content_type: "lesson-plan",
+      title: `Custom Lesson Plan · ${dateStr}`,
+      input_data: { customPrompt }, output_content: result,
     }]);
     setSaved(true);
     setSaveToast("Lesson plan saved to your dashboard");
@@ -230,9 +175,14 @@ export default function LessonPlansPage() {
   };
 
   const handleChaptersSelected = (result: ChapterSelectorResult) => {
+    const newIds = result.chapters.map(c => c.chapterId).sort().join(",");
+    const prevIds = (chapterResult?.chapters || []).map(c => c.chapterId).sort().join(",");
     setChapterResult(result);
-    setChapterDraft(""); setChapterFinal("");
-    setChapterDraftReady(false); setChapterFinalReady(false); setChapterError("");
+    if (newIds !== prevIds) {
+      setChapterDraft(""); setChapterFinal("");
+      setChapterDraftReady(false); setChapterFinalReady(false);
+    }
+    setChapterError("");
   };
 
   const handleChapterGenerate = async () => {
@@ -240,20 +190,21 @@ export default function LessonPlansPage() {
     setChapterError(""); setChapterDraft(""); setChapterFinal("");
     setChapterDraftReady(false); setChapterFinalReady(false);
     setChapterLoading(true);
+    const token = session?.access_token;
     try {
       setChapterLoadingStep("Loading chapter PDFs…");
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 300));
       setChapterLoadingStep("Analysing with Gemini…");
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 300));
       setChapterLoadingStep("Generating lesson plan…");
       const res = await fetch("/api/generate-with-chapters", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           generationType: "lesson-plan",
           chapterSelections: chapterResult.chapters,
-          additionalInstructions: chapterResult.additionalInstructions,
-          board: chapterBoard,
+          additionalInstructions: chapterResult.additionalInstructions + (chapterDuration ? `\nPeriod duration: ${chapterDuration}` : ""),
+          board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
         }),
@@ -262,6 +213,7 @@ export default function LessonPlansPage() {
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setChapterDraft(data.draft);
       setChapterDraftReady(true);
+      if (user) getUsageThisMonth(user.id).then(setUsage);
     } catch (err) {
       setChapterError(String(err));
     } finally { setChapterLoading(false); setChapterLoadingStep(""); }
@@ -270,15 +222,16 @@ export default function LessonPlansPage() {
   const handleChapterRevise = async () => {
     if (!revisionInstructions.trim() || !chapterResult) return;
     setChapterError(""); setChapterLoading(true); setChapterLoadingStep("Revising…");
+    const token = session?.access_token;
     try {
       const res = await fetch("/api/generate-with-chapters", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           generationType: "lesson-plan",
           chapterSelections: chapterResult.chapters,
           additionalInstructions: `REVISION: ${revisionInstructions}\nMake only the requested changes.\n\nOriginal:\n${chapterDraft}`,
-          board: chapterBoard, classNumber: chapterResult.classNumber, subject: chapterResult.subject,
+          board: chapterResult.board, classNumber: chapterResult.classNumber, subject: chapterResult.subject,
         }),
       });
       const data = await res.json();
@@ -291,15 +244,16 @@ export default function LessonPlansPage() {
   const handleChapterFinalise = async () => {
     if (!chapterResult) return;
     setChapterError(""); setChapterLoading(true); setChapterLoadingStep("Finalising…");
+    const token = session?.access_token;
     try {
       const res = await fetch("/api/generate-with-chapters", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           generationType: "lesson-plan",
           chapterSelections: chapterResult.chapters,
           additionalInstructions: `Create the FINAL professionally formatted version of this lesson plan:\n\n${chapterDraft}`,
-          board: chapterBoard, classNumber: chapterResult.classNumber, subject: chapterResult.subject,
+          board: chapterResult.board, classNumber: chapterResult.classNumber, subject: chapterResult.subject,
         }),
       });
       const data = await res.json();
@@ -320,7 +274,6 @@ export default function LessonPlansPage() {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
       <Navbar />
 
-      {/* Hero */}
       <section className="bg-secondary py-12 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-primary text-xs font-semibold px-4 py-1.5 rounded-full mb-5">
@@ -332,42 +285,27 @@ export default function LessonPlansPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
             Build a complete lesson plan <span className="text-primary">in seconds</span>
           </h1>
-          <p className="mt-3 text-secondary-200 text-base">Fill the form or paste your own prompt — let Gyaan Mitra do the planning.</p>
+          <p className="mt-3 text-secondary-200 text-base">Select chapters or write your own prompt — let Gyaan Mitra do the planning.</p>
         </div>
       </section>
 
       <section className="flex-1 py-10 px-4">
         <div className="max-w-3xl mx-auto">
 
-          {/* Amber banner */}
-          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5 flex items-start gap-3">
-            <span className="text-amber-500 text-lg flex-shrink-0">📚</span>
-            <p className="text-sm text-amber-800">
-              <strong>For best results —</strong> upload your textbook chapter before generating. This ensures all content is based on your exact syllabus and board.
-            </p>
-          </div>
-
-          {/* Usage warning — free tier only */}
           {user && !isPremium && !usageLoading && usage >= FREE_LIMIT - 1 && (
             <div className={`mb-6 rounded-xl px-4 py-3.5 flex items-start justify-between gap-3 ${usage >= FREE_LIMIT ? "bg-red-50 border border-red-200" : "bg-amber-50 border border-amber-200"}`}>
               <p className={`text-sm font-medium ${usage >= FREE_LIMIT ? "text-red-700" : "text-amber-800"}`}>
-                {usage >= FREE_LIMIT
-                  ? "You have used all 5 free generations this month."
-                  : `You have ${FREE_LIMIT - usage} free generation remaining this month.`}
-                {" "}
-                <Link href="/pricing" className="underline font-semibold">Upgrade to Premium</Link> for unlimited access.
+                {usage >= FREE_LIMIT ? "You have used all 5 free generations this month." : `You have ${FREE_LIMIT - usage} free generation remaining this month.`}
+                {" "}<Link href="/pricing" className="underline font-semibold">Upgrade to Premium</Link> for unlimited access.
               </p>
             </div>
           )}
-          {/* Premium badge */}
           {user && isPremium && (
             <div className="mb-6 rounded-xl px-4 py-3 bg-green-50 border border-green-200 flex items-center gap-2">
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">Premium Member</span>
               <p className="text-sm text-green-700 font-medium">Unlimited generations — enjoy unrestricted access.</p>
             </div>
           )}
-
-          {/* Sign-in nudge for guests */}
           {!user && (
             <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
               <p className="text-sm text-blue-700">
@@ -377,22 +315,25 @@ export default function LessonPlansPage() {
           )}
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <TabToggle mode={mode} onChange={(m) => { setMode(m); setTopicError(""); setPromptError(""); setApiError(""); setChapterError(""); }} />
+            <TabToggle mode={mode} onChange={(m) => { setMode(m); setPromptError(""); setApiError(""); setChapterError(""); }} />
 
             {mode === "chapter" ? (
               <div className="space-y-5">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-sm font-semibold text-secondary">Board:</span>
-                  {["CBSE", "ICSE", "State Board"].map((b) => (
-                    <button key={b} onClick={() => setChapterBoard(b)}
-                      className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${chapterBoard === b ? "bg-secondary text-white border-secondary" : "border-secondary text-secondary hover:bg-secondary hover:text-white"}`}>
-                      {b}
-                    </button>
-                  ))}
-                </div>
                 <ChapterSelector onChaptersSelected={handleChaptersSelected} showMarks={false} />
+
+                {/* Period duration — shown once chapters are selected */}
+                {chapterResult && chapterResult.chapters.length > 0 && (
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <label className="block text-sm font-semibold text-secondary mb-1.5">Period Duration</label>
+                    <select value={chapterDuration} onChange={(e) => setChapterDuration(e.target.value)}
+                      className="w-full sm:w-48 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
+                      {DURATIONS.map((d) => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                  </div>
+                )}
+
                 {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
-                  <button onClick={handleChapterGenerate} disabled={chapterLoading}
+                  <button onClick={handleChapterGenerate} disabled={chapterLoading || !!atLimit}
                     className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 disabled:opacity-60 transition-colors shadow-md">
                     {chapterLoading ? chapterLoadingStep || "Working…" : "Generate Draft →"}
                   </button>
@@ -437,71 +378,17 @@ export default function LessonPlansPage() {
                       {[{ label: "Copy", action: () => chapterCopy(chapterFinal) }, { label: "Download", action: () => chapterDownload(chapterFinal, "lesson-plan.txt") }, { label: "Print", action: () => window.print() }].map(({ label, action }) => (
                         <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
                       ))}
-                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterFinal(""); setChapterResult(null); }}
+                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterFinal(""); }}
                         className="text-sm bg-secondary text-white rounded-lg px-4 py-1.5 hover:bg-primary transition-colors">New Plan</button>
                     </div>
                     <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 rounded-xl border border-gray-200 p-4 max-h-[600px] overflow-y-auto">{chapterFinal}</pre>
                   </div>
                 )}
               </div>
-            ) : mode === "form" ? (
-              <>
-                <h2 className="text-lg font-bold text-secondary mb-6">Lesson Details</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {/* Chapter upload FIRST */}
-                  <div className="sm:col-span-2">
-                    <ChapterUpload value={fileData} onChange={setFileData} />
-                    <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 leading-relaxed">
-                      💡 For best results — upload your textbook chapter. AI will base all content strictly on your uploaded material, giving you syllabus-accurate output.
-                    </p>
-                  </div>
-
-                  <SelectField label="Subject" value={form.subject} onChange={set("subject")} options={SUBJECTS} />
-                  <SelectField label="Grade"   value={form.grade}   onChange={set("grade")}   options={GRADES} />
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-secondary mb-1.5">Topic <span className="text-primary">*</span></label>
-                    <div className="flex gap-2">
-                      <input type="text" value={form.topic} onChange={(e) => setForm((f) => ({ ...f, topic: e.target.value }))}
-                        placeholder="e.g. Fractions and Decimals, Photosynthesis, The Mughal Empire"
-                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition" />
-                      <MicButton onResult={appendToField("topic")} />
-                    </div>
-                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
-                    {topicError && <p className="mt-1 text-xs text-red-500 font-medium">{topicError}</p>}
-                  </div>
-
-                  <SelectField label="Board"    value={form.board}    onChange={set("board")}    options={BOARDS} />
-                  <SelectField label="Duration" value={form.duration} onChange={set("duration")} options={DURATIONS} />
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
-                    <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
-                      <option value="auto">Auto (Hindi subject → Hindi output, others → English)</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi (हिंदी)</option>
-                      <option value="hinglish">Hinglish (Hindi + English mix)</option>
-                    </select>
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-secondary mb-1.5">Additional Instructions <span className="text-gray-400 font-normal">(optional)</span></label>
-                    <div className="flex gap-2 items-start">
-                      <textarea value={form.additionalInstructions} onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
-                        rows={3} placeholder="e.g. Include a group activity, focus on real-life examples, class has 40 students…"
-                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none" />
-                      <MicButton onResult={appendToField("additionalInstructions")} />
-                    </div>
-                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
-                  </div>
-                </div>
-              </>
             ) : (
               <>
                 <h2 className="text-lg font-bold text-secondary mb-2">Your Custom Prompt</h2>
                 <p className="text-sm text-gray-500 mb-4">Write your own lesson plan prompt. The AI will follow your instructions exactly.</p>
-                {/* Upload even in custom mode */}
                 <div className="mb-5 space-y-2">
                   <ChapterUpload value={fileData} onChange={setFileData} />
                   <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 leading-relaxed">
@@ -529,16 +416,18 @@ export default function LessonPlansPage() {
               </>
             )}
 
-            {mode !== "chapter" && <button onClick={handleGenerate} disabled={loading || !!atLimit}
-              className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-md shadow-primary/25">
-              {loading ? (
-                <><svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>Generating your lesson plan…</>
-              ) : atLimit ? "Upgrade to continue generating" : (
-                <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Generate Lesson Plan</>
-              )}
-            </button>}
+            {mode === "custom" && (
+              <button onClick={handleGenerate} disabled={loading || !!atLimit}
+                className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-md shadow-primary/25">
+                {loading ? (
+                  <><svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>Generating your lesson plan…</>
+                ) : atLimit ? "Upgrade to continue generating" : (
+                  <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Generate Lesson Plan</>
+                )}
+              </button>
+            )}
 
-            {mode !== "chapter" && atLimit && (
+            {mode === "custom" && atLimit && (
               <div className="mt-3 text-center">
                 <Link href="/pricing" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary-600 transition-colors">
                   Upgrade Now — ₹499/year
@@ -546,16 +435,14 @@ export default function LessonPlansPage() {
               </div>
             )}
 
-            {mode !== "chapter" && apiError && (
+            {mode === "custom" && apiError && (
               <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
                 <div className="flex-1">
                   <p className="text-sm text-red-700">{apiError}</p>
-                  <button onClick={() => { setApiError(""); handleGenerate(); }} className="mt-2 text-xs font-semibold text-red-600 hover:text-red-800 underline">
-                    Try Again
-                  </button>
+                  <button onClick={() => { setApiError(""); handleGenerate(); }} className="mt-2 text-xs font-semibold text-red-600 hover:text-red-800 underline">Try Again</button>
                 </div>
               </div>
             )}
@@ -572,8 +459,7 @@ export default function LessonPlansPage() {
             </div>
           </div>
 
-          {/* Loading skeleton */}
-          {mode !== "chapter" && loading && !result && (
+          {mode === "custom" && loading && !result && (
             <div className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
@@ -598,11 +484,9 @@ export default function LessonPlansPage() {
             </div>
           )}
 
-          {/* Result */}
-          {mode !== "chapter" && result && (
+          {mode === "custom" && result && (
             <div ref={resultRef} className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm overflow-hidden" id="print-content">
               <div className="print-only-header">Generated by Gyaan Mitra — gyaanmitra.com</div>
-
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-blue-50">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -612,9 +496,7 @@ export default function LessonPlansPage() {
                   </div>
                   <div>
                     <p className="font-bold text-secondary text-sm">Lesson Plan Generated</p>
-                    <p className="text-xs text-gray-400">
-                      {mode === "form" ? `${form.subject} · ${form.grade} · ${form.topic} · ${form.board}` : "Custom prompt"}
-                    </p>
+                    <p className="text-xs text-gray-400">Custom prompt</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -664,12 +546,11 @@ export default function LessonPlansPage() {
                 <MarkdownContent text={result} />
                 {loading && <span className="inline-block w-0.5 h-4 bg-primary animate-pulse ml-0.5 -mb-0.5" />}
               </div>
-
               <div className="print-only-footer">Generated by Gyaan Mitra — gyaanmitra.com</div>
             </div>
           )}
 
-          {mode !== "chapter" && result && !loading && (
+          {mode === "custom" && result && !loading && (
             <div className="mt-4 text-center">
               <button onClick={() => { setResult(""); setSaved(false); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 className="text-sm text-secondary hover:text-primary font-medium transition-colors">

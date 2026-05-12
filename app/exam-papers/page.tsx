@@ -13,16 +13,11 @@ import { supabase } from "@/lib/supabase";
 import { getUsageThisMonth, FREE_LIMIT } from "@/lib/usage";
 import { getFriendlyError } from "@/lib/api-errors";
 
-const SUBJECTS = ["Mathematics", "Science", "Social Studies", "Hindi", "English", "EVS", "Other"];
-const GRADES = Array.from({ length: 12 }, (_, i) => `Class ${i + 1}`);
 const EXAM_TYPES = ["Unit Test", "Half-Yearly Exam", "Annual Exam", "Class Test"];
-const BOARDS = ["CBSE", "ICSE", "State Board"];
 const DURATIONS = ["1 hour", "1.5 hours", "2 hours", "2.5 hours", "3 hours"];
-const DIFFICULTIES = ["Standard", "Easy", "Challenging", "All Three Levels"];
+const DIFFICULTIES = ["Standard", "Easy", "Challenging"];
 const LOADING_MSGS = ["Reading your inputs…", "Crafting your exam paper…", "Almost ready…", "Adding the finishing touches…"];
 
-interface QuestionMix { mcq: number; shortTwo: number; shortThree: number; longFour: number; longFive: number; }
-interface LevelContent { label: string; questionPaper: string; answerKey: string; }
 
 function cleanOutput(text: string): string {
   return text
@@ -43,10 +38,6 @@ function formatDateTitle(d: Date): string {
   return `${day} ${months[d.getMonth()]} ${d.getFullYear()} ${hh}:${mm}`;
 }
 
-function trunc(s: string, max = 30): string {
-  return s.length > max ? s.slice(0, max).trim() + "..." : s;
-}
-
 function parseExamContent(raw: string): { question: string; key: string } {
   const QS = "===QUESTION PAPER START===";
   const QE = "===QUESTION PAPER END===";
@@ -60,20 +51,6 @@ function parseExamContent(raw: string): { question: string; key: string } {
   return { question, key };
 }
 
-function parseAllThreeLevels(raw: string): LevelContent[] {
-  return ["EASY", "STANDARD", "CHALLENGING"].map(K => {
-    const label = K.charAt(0) + K.slice(1).toLowerCase();
-    const qpS = `===${K} QUESTION PAPER START===`, qpE = `===${K} QUESTION PAPER END===`;
-    const akS = `===${K} ANSWER KEY START===`, akE = `===${K} ANSWER KEY END===`;
-    const qpSI = raw.indexOf(qpS), qpEI = raw.indexOf(qpE);
-    const akSI = raw.indexOf(akS), akEI = raw.indexOf(akE);
-    return {
-      label,
-      questionPaper: qpSI !== -1 && qpEI > qpSI ? raw.slice(qpSI + qpS.length, qpEI).trim() : "",
-      answerKey: akSI !== -1 && akEI > akSI ? raw.slice(akSI + akS.length, akEI).trim() : "",
-    };
-  });
-}
 
 function stripDelimiters(text: string): string {
   return text.replace(/===[A-Z][A-Z\s]*===\n?/g, "");
@@ -91,47 +68,13 @@ function SelectField({ label, value, onChange, options }: { label: string; value
   );
 }
 
-function QuestionMixInput({ mix, onChange }: { mix: QuestionMix; onChange: (m: QuestionMix) => void }) {
-  const total = mix.mcq * 1 + mix.shortTwo * 2 + mix.shortThree * 3 + mix.longFour * 4 + mix.longFive * 5;
-  const row = (label: string, marks: string, key: keyof QuestionMix, max: number, color: string) => (
-    <div key={key} className="flex items-center gap-3">
-      <div className="flex-1"><p className="text-sm font-medium text-gray-700">{label}</p><p className="text-xs text-gray-400">{marks}</p></div>
-      <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${color}`}>{mix[key] * parseInt(marks)} marks</div>
-      <input type="number" min={0} max={max} value={mix[key]}
-        onChange={(e) => onChange({ ...mix, [key]: Math.max(0, Math.min(max, parseInt(e.target.value) || 0)) })}
-        className="w-16 rounded-lg border border-gray-200 bg-white px-2 py-1.5 text-sm text-center text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary transition" />
-    </div>
-  );
-  return (
-    <div className="sm:col-span-2">
-      <div className="flex items-center justify-between mb-2">
-        <label className="block text-sm font-semibold text-secondary">Question Mix</label>
-        <div className="flex items-center gap-3 flex-wrap justify-end">
-          <span className="text-xs text-gray-400">Set any to 0 to exclude</span>
-          <span className="text-sm font-bold text-secondary whitespace-nowrap">
-            Total Marks: <span className="text-xl font-extrabold text-primary ml-1">{total}</span>
-          </span>
-        </div>
-      </div>
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 space-y-3">
-        {row("MCQ", "1 mark each", "mcq", 50, "bg-blue-100 text-blue-700")}
-        {row("Short Answer", "2 marks each", "shortTwo", 20, "bg-green-100 text-green-700")}
-        {row("Short Answer", "3 marks each", "shortThree", 20, "bg-yellow-100 text-yellow-700")}
-        {row("Long Answer", "4 marks each", "longFour", 10, "bg-orange-100 text-orange-700")}
-        {row("Long Answer", "5 marks each", "longFive", 10, "bg-red-100 text-red-700")}
-      </div>
-    </div>
-  );
-}
-
-function TabToggle({ mode, onChange }: { mode: "form" | "chapter" | "custom"; onChange: (m: "form" | "chapter" | "custom") => void }) {
-  const labels: Record<string, string> = { form: "Fill Form", chapter: "Chapter Selector", custom: "My Own Prompt" };
+function TabToggle({ mode, onChange }: { mode: "chapter" | "custom"; onChange: (m: "chapter" | "custom") => void }) {
   return (
     <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-      {(["form", "chapter", "custom"] as const).map((m) => (
+      {(["chapter", "custom"] as const).map((m) => (
         <button key={m} onClick={() => onChange(m)}
           className={`flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all ${mode === m ? "bg-white text-secondary shadow-sm" : "text-gray-500 hover:text-secondary"}`}>
-          {labels[m]}
+          {m === "chapter" ? "Chapter Selector" : "My Own Prompt"}
         </button>
       ))}
     </div>
@@ -141,10 +84,13 @@ function TabToggle({ mode, onChange }: { mode: "form" | "chapter" | "custom"; on
 export default function ExamPapersPage() {
   const { user, session, subscriptionTier } = useAuth();
   const isPremium = subscriptionTier === "premium";
-  const [mode, setMode] = useState<"form" | "chapter" | "custom">("form");
+  const [mode, setMode] = useState<"chapter" | "custom">("chapter");
+
   // Chapter selector mode state
   const [chapterResult, setChapterResult] = useState<ChapterSelectorResult | null>(null);
-  const [chapterBoard, setChapterBoard] = useState("CBSE");
+  const [chapterExamType, setChapterExamType] = useState("Unit Test");
+  const [chapterDifficulty, setChapterDifficulty] = useState("Standard");
+  const [chapterDuration, setChapterDuration] = useState("2 hours");
   const [chapterDraft, setChapterDraft] = useState("");
   const [chapterAnswerKey, setChapterAnswerKey] = useState("");
   const [chapterTab, setChapterTab] = useState<"paper" | "key">("paper");
@@ -154,12 +100,9 @@ export default function ExamPapersPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
+
+  // Custom prompt mode state
   const [customPrompt, setCustomPrompt] = useState("");
-  const [form, setForm] = useState({
-    subject: "Mathematics", grade: "Class 8", examType: "Unit Test", board: "CBSE",
-    chapters: "", difficulty: "Standard", duration: "1 hour", additionalInstructions: "",
-  });
-  const [questionMix, setQuestionMix] = useState<QuestionMix>({ mcq: 5, shortTwo: 3, shortThree: 2, longFour: 1, longFive: 0 });
   const [fileData, setFileData] = useState<UploadedFile | null>(null);
   const [outputLanguage, setOutputLanguage] = useState("auto");
   const [loadingMsg, setLoadingMsg] = useState(LOADING_MSGS[0]);
@@ -167,21 +110,17 @@ export default function ExamPapersPage() {
   const [result, setResult] = useState("");
   const [questionContent, setQuestionContent] = useState("");
   const [keyContent, setKeyContent] = useState("");
-  const [allThreeLevels, setAllThreeLevels] = useState<LevelContent[]>([]);
   const [activeTab, setActiveTab] = useState<"question" | "key">("question");
   const [copied, setCopied] = useState(false);
   const [pdfHint, setPdfHint] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveToast, setSaveToast] = useState("");
-  const [chaptersError, setChaptersError] = useState("");
   const [promptError, setPromptError] = useState("");
   const [apiError, setApiError] = useState("");
   const [usage, setUsage] = useState(0);
   const [usageLoading, setUsageLoading] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  const calcTotal = questionMix.mcq * 1 + questionMix.shortTwo * 2 + questionMix.shortThree * 3 + questionMix.longFour * 4 + questionMix.longFive * 5;
-  const isAllThree = form.difficulty === "All Three Levels";
   const displayResult = stripDelimiters(result);
 
   useEffect(() => {
@@ -191,9 +130,6 @@ export default function ExamPapersPage() {
     }
   }, [user]);
 
-  const set = (key: string) => (v: string) => setForm((f) => ({ ...f, [key]: v }));
-  const appendToField = (field: "chapters" | "additionalInstructions") => (text: string) =>
-    setForm((f) => ({ ...f, [field]: f[field] ? f[field] + " " + text : text }));
   const appendToCustom = (text: string) => setCustomPrompt((p) => p ? p + " " + text : text);
 
   const atLimit = user && !isPremium && usage >= FREE_LIMIT;
@@ -206,17 +142,18 @@ export default function ExamPapersPage() {
     return () => clearInterval(id);
   }, [loading]);
 
+  // Custom prompt generation (uses streaming exam-paper route)
   const handleGenerate = async () => {
-    if (mode === "custom" && !customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
-    setChaptersError(""); setPromptError(""); setApiError(""); setResult(""); setSaved(false); setSaveToast("");
-    setQuestionContent(""); setKeyContent(""); setAllThreeLevels([]);
+    if (!customPrompt.trim()) { setPromptError("Please enter your prompt before generating."); return; }
+    setPromptError(""); setApiError(""); setResult(""); setSaved(false); setSaveToast("");
+    setQuestionContent(""); setKeyContent("");
     setLoading(true);
     const token = session?.access_token;
     try {
       const res = await fetch("/api/exam-paper", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ mode, customPrompt, ...form, questionMix, fileData, outputLanguage }),
+        body: JSON.stringify({ mode: "custom", customPrompt, fileData, outputLanguage }),
       });
       if (res.status === 429) {
         const text = await res.text();
@@ -237,16 +174,9 @@ export default function ExamPapersPage() {
         if (firstChunk && resultRef.current) { firstChunk = false; resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" }); }
       }
       if (fullText) {
-        if (isAllThree) {
-          const levels = parseAllThreeLevels(fullText);
-          setAllThreeLevels(levels);
-          setQuestionContent(levels.map(l => `## ${l.label} Level — Question Paper\n\n${l.questionPaper}`).join("\n\n---\n\n"));
-          setKeyContent(levels.map(l => `## ${l.label} Level — Answer Key\n\n${l.answerKey}`).join("\n\n---\n\n"));
-        } else {
-          const parsed = parseExamContent(fullText);
-          setQuestionContent(parsed.question || fullText);
-          setKeyContent(parsed.key);
-        }
+        const parsed = parseExamContent(fullText);
+        setQuestionContent(parsed.question || fullText);
+        setKeyContent(parsed.key);
         setActiveTab("question");
       }
       if (user) getUsageThisMonth(user.id).then(setUsage);
@@ -263,14 +193,11 @@ export default function ExamPapersPage() {
   };
 
   const handlePrint = (showPdfHint = false) => {
-    const tabLabel = activeTab === "question" ? (isAllThree ? "All Question Papers" : "Question Paper") : (isAllThree ? "All Answer Keys" : "Answer Key");
-    const title = mode === "form"
-      ? `${form.subject} Class ${form.grade.replace("Class ", "")} ${form.examType} — ${tabLabel}`
-      : `Exam Paper — ${tabLabel}`;
+    const tabLabel = activeTab === "question" ? "Question Paper" : "Answer Key";
     const win = window.open("", "_blank", "width=900,height=700");
     if (!win) return;
     const content = document.getElementById("result-content")?.innerHTML ?? activeContent;
-    win.document.write(`<!DOCTYPE html><html><head><title>${title}</title><style>
+    win.document.write(`<!DOCTYPE html><html><head><title>Exam Paper — ${tabLabel}</title><style>
       *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.7;color:#000;padding:2cm}
       h1,h2{color:#1B3A6B;page-break-after:avoid}h2{font-size:14pt;margin-top:16pt;margin-bottom:6pt;border-bottom:1px solid #ccc;padding-bottom:3pt}
       h3{font-size:13pt;margin-top:12pt;margin-bottom:5pt;color:#333;page-break-after:avoid}p{margin-bottom:7pt}
@@ -288,63 +215,36 @@ export default function ExamPapersPage() {
 
   const handleSave = async () => {
     if (!user || !questionContent) return;
-    const gradeNum = form.grade.replace("Class ", "");
     const dateStr = formatDateTitle(new Date());
-    const chaptersTrunc = trunc(mode === "form" ? form.chapters : "Custom", 30);
-    const langSuffix = outputLanguage === "hindi" ? " (Hindi)" : outputLanguage === "hinglish" ? " (Hinglish)" : "";
-    const baseTitle = mode === "form"
-      ? `${form.subject} · Class ${gradeNum} · ${form.examType} · ${chaptersTrunc} · ${dateStr}${langSuffix}`
-      : `Custom Exam Paper · ${dateStr}${langSuffix}`;
-
-    if (isAllThree && allThreeLevels.length > 0) {
-      for (const level of allThreeLevels) {
-        if (!level.questionPaper) continue;
-        const { data: qpData } = await supabase.from("saved_content").insert([{
-          user_id: user.id, content_type: "question-paper",
-          title: `${baseTitle} — ${level.label} — Question Paper`,
-          input_data: { ...form, questionMix }, output_content: level.questionPaper,
-        }]).select("id").single();
-        if (level.answerKey && qpData?.id) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase as any).from("saved_content").insert([{
-            user_id: user.id, content_type: "answer-key",
-            title: `${baseTitle} — ${level.label} — Answer Key`,
-            input_data: { ...form, questionMix }, output_content: level.answerKey,
-            linked_id: qpData.id,
-          }]);
-        }
-      }
-      setSaveToast("All 6 papers (3 question papers + 3 answer keys) saved to your dashboard");
+    const baseTitle = `Custom Exam Paper · ${dateStr}`;
+    const { data: qpData } = await supabase.from("saved_content").insert([{
+      user_id: user.id, content_type: "question-paper",
+      title: `${baseTitle} — Question Paper`,
+      input_data: { customPrompt }, output_content: questionContent,
+    }]).select("id").single();
+    if (keyContent && qpData?.id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from("saved_content").insert([{
+        user_id: user.id, content_type: "answer-key",
+        title: `${baseTitle} — Answer Key`,
+        input_data: { customPrompt }, output_content: keyContent, linked_id: qpData.id,
+      }]);
+      setSaveToast("Question paper and answer key saved to your dashboard");
     } else {
-      const { data: qpData } = await supabase.from("saved_content").insert([{
-        user_id: user.id, content_type: "question-paper",
-        title: `${baseTitle} — Question Paper`,
-        input_data: mode === "form" ? { ...form, questionMix } : { customPrompt },
-        output_content: questionContent,
-      }]).select("id").single();
-      if (keyContent && qpData?.id) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any).from("saved_content").insert([{
-          user_id: user.id, content_type: "answer-key",
-          title: `${baseTitle} — Answer Key`,
-          input_data: mode === "form" ? { ...form, questionMix } : { customPrompt },
-          output_content: keyContent, linked_id: qpData.id,
-        }]);
-        setSaveToast("Question paper and answer key saved to your dashboard");
-      } else {
-        setSaveToast("Question paper saved to your dashboard");
-      }
+      setSaveToast("Question paper saved to your dashboard");
     }
     setSaved(true);
     setTimeout(() => setSaveToast(""), 6000);
   };
 
   const handleChaptersSelected = (result: ChapterSelectorResult) => {
+    const newIds = result.chapters.map(c => c.chapterId).sort().join(",");
+    const prevIds = (chapterResult?.chapters || []).map(c => c.chapterId).sort().join(",");
     setChapterResult(result);
-    setChapterDraft("");
-    setChapterAnswerKey("");
-    setChapterDraftReady(false);
-    setChapterFinalReady(false);
+    if (newIds !== prevIds) {
+      setChapterDraft(""); setChapterAnswerKey("");
+      setChapterDraftReady(false); setChapterFinalReady(false);
+    }
     setChapterError("");
   };
 
@@ -353,28 +253,34 @@ export default function ExamPapersPage() {
     setChapterError(""); setChapterDraft(""); setChapterAnswerKey("");
     setChapterDraftReady(false); setChapterFinalReady(false);
     setChapterLoading(true);
+    const token = session?.access_token;
     try {
       setChapterLoadingStep("Loading chapter PDFs…");
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 300));
       setChapterLoadingStep("Analysing with Gemini…");
-      await new Promise((r) => setTimeout(r, 400));
+      await new Promise((r) => setTimeout(r, 300));
       setChapterLoadingStep("Generating exam paper…");
       const res = await fetch("/api/generate-with-chapters", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           generationType: "exam-paper",
           chapterSelections: chapterResult.chapters,
           additionalInstructions: chapterResult.additionalInstructions,
-          board: chapterBoard,
+          board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
+          questionMix: chapterResult.questionMix,
+          examType: chapterExamType,
+          duration: chapterDuration,
+          difficulty: chapterDifficulty,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setChapterDraft(data.draft);
       setChapterDraftReady(true);
+      if (user) getUsageThisMonth(user.id).then(setUsage);
     } catch (err) {
       setChapterError(String(err));
     } finally { setChapterLoading(false); setChapterLoadingStep(""); }
@@ -385,17 +291,22 @@ export default function ExamPapersPage() {
     setChapterError("");
     setChapterLoading(true);
     setChapterLoadingStep("Revising draft…");
+    const token = session?.access_token;
     try {
       const res = await fetch("/api/generate-with-chapters", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           generationType: "exam-paper",
           chapterSelections: chapterResult.chapters,
           additionalInstructions: `REVISION REQUEST: ${revisionInstructions}\n\nMake only the requested changes, keep everything else identical.\n\nOriginal draft:\n${chapterDraft}`,
-          board: chapterBoard,
+          board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
+          questionMix: chapterResult.questionMix,
+          examType: chapterExamType,
+          duration: chapterDuration,
+          difficulty: chapterDifficulty,
         }),
       });
       const data = await res.json();
@@ -412,15 +323,16 @@ export default function ExamPapersPage() {
     setChapterError("");
     setChapterLoading(true);
     setChapterLoadingStep("Generating answer key…");
+    const token = session?.access_token;
     try {
       const res = await fetch("/api/generate-with-chapters", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           generationType: "exam-paper",
           chapterSelections: chapterResult.chapters,
           additionalInstructions: `Generate a COMPLETE ANSWER KEY with model answers and marking scheme for this exam paper:\n\n${chapterDraft}`,
-          board: chapterBoard,
+          board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
         }),
@@ -466,7 +378,6 @@ export default function ExamPapersPage() {
       <section className="flex-1 py-10 px-4">
         <div className="max-w-3xl mx-auto">
 
-          {/* Usage warning — free tier only */}
           {user && !isPremium && !usageLoading && usage >= FREE_LIMIT - 1 && (
             <div className={`mb-6 rounded-xl px-4 py-3.5 flex items-start justify-between gap-3 ${usage >= FREE_LIMIT ? "bg-red-50 border border-red-200" : "bg-amber-50 border border-amber-200"}`}>
               <p className={`text-sm font-medium ${usage >= FREE_LIMIT ? "text-red-700" : "text-amber-800"}`}>
@@ -475,14 +386,12 @@ export default function ExamPapersPage() {
               </p>
             </div>
           )}
-          {/* Premium badge */}
           {user && isPremium && (
             <div className="mb-6 rounded-xl px-4 py-3 bg-green-50 border border-green-200 flex items-center gap-2">
               <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">Premium Member</span>
               <p className="text-sm text-green-700 font-medium">Unlimited generations — enjoy unrestricted access.</p>
             </div>
           )}
-
           {!user && (
             <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
               <p className="text-sm text-blue-700">
@@ -492,25 +401,23 @@ export default function ExamPapersPage() {
           )}
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-            <TabToggle mode={mode} onChange={(m) => { setMode(m); setChaptersError(""); setPromptError(""); setApiError(""); setChapterError(""); }} />
+            <TabToggle mode={mode} onChange={(m) => { setMode(m); setPromptError(""); setApiError(""); setChapterError(""); }} />
 
             {mode === "chapter" ? (
               <div className="space-y-5">
-                {/* Board selector */}
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-sm font-semibold text-secondary">Board:</span>
-                  {["CBSE", "ICSE", "State Board"].map((b) => (
-                    <button key={b} onClick={() => setChapterBoard(b)}
-                      className={`px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all ${chapterBoard === b ? "bg-secondary text-white border-secondary" : "border-secondary text-secondary hover:bg-secondary hover:text-white"}`}>
-                      {b}
-                    </button>
-                  ))}
-                </div>
-
                 <ChapterSelector onChaptersSelected={handleChaptersSelected} showMarks={true} />
 
+                {/* Paper settings — shown once chapters are selected */}
+                {chapterResult && chapterResult.chapters.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <SelectField label="Exam Type"   value={chapterExamType}    onChange={setChapterExamType}    options={EXAM_TYPES} />
+                    <SelectField label="Duration"    value={chapterDuration}    onChange={setChapterDuration}    options={DURATIONS} />
+                    <SelectField label="Difficulty"  value={chapterDifficulty}  onChange={setChapterDifficulty}  options={DIFFICULTIES} />
+                  </div>
+                )}
+
                 {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
-                  <button onClick={handleChapterGenerate} disabled={chapterLoading}
+                  <button onClick={handleChapterGenerate} disabled={chapterLoading || !!atLimit}
                     className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-600 disabled:opacity-60 transition-colors shadow-md">
                     {chapterLoading ? chapterLoadingStep || "Working…" : "Generate Draft →"}
                   </button>
@@ -574,7 +481,7 @@ export default function ExamPapersPage() {
                       ].map(({ label, action }) => (
                         <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
                       ))}
-                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterAnswerKey(""); setChapterResult(null); }}
+                      <button onClick={() => { setChapterDraftReady(false); setChapterFinalReady(false); setChapterDraft(""); setChapterAnswerKey(""); }}
                         className="text-sm bg-secondary text-white rounded-lg px-4 py-1.5 hover:bg-primary transition-colors">New Paper</button>
                     </div>
                     <pre className="whitespace-pre-wrap font-mono text-sm bg-gray-50 rounded-xl border border-gray-200 p-4 max-h-[600px] overflow-y-auto">
@@ -583,74 +490,6 @@ export default function ExamPapersPage() {
                   </div>
                 )}
               </div>
-            ) : mode === "form" ? (
-              <>
-                <h2 className="text-lg font-bold text-secondary mb-6">Exam Paper Details</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {/* Chapter upload at top */}
-                  <div className="sm:col-span-2">
-                    <ChapterUpload value={fileData} onChange={setFileData} />
-                    <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 leading-relaxed">
-                      💡 For best results — upload your textbook chapter. AI will base all content strictly on your uploaded material, giving you syllabus-accurate output.
-                    </p>
-                  </div>
-
-                  <SelectField label="Subject"         value={form.subject}     onChange={set("subject")}     options={SUBJECTS} />
-                  <SelectField label="Grade"           value={form.grade}       onChange={set("grade")}       options={GRADES} />
-                  <SelectField label="Exam Type"       value={form.examType}    onChange={set("examType")}    options={EXAM_TYPES} />
-                  <SelectField label="Board"           value={form.board}       onChange={set("board")}       options={BOARDS} />
-                  <SelectField label="Difficulty Level" value={form.difficulty}  onChange={set("difficulty")}  options={DIFFICULTIES} />
-                  <SelectField label="Duration"        value={form.duration}    onChange={set("duration")}    options={DURATIONS} />
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-secondary mb-1.5">Output Language</label>
-                    <select value={outputLanguage} onChange={(e) => setOutputLanguage(e.target.value)}
-                      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition">
-                      <option value="auto">Auto (Hindi subject → Hindi output, others → English)</option>
-                      <option value="english">English</option>
-                      <option value="hindi">Hindi (हिंदी)</option>
-                      <option value="hinglish">Hinglish (Hindi + English mix)</option>
-                    </select>
-                  </div>
-
-                  {/* Chapters field */}
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-secondary mb-1.5">
-                      Chapters / Topics Covered <span className="text-gray-400 font-normal">(optional)</span>
-                    </label>
-                    <div className="flex gap-2 items-start">
-                      <textarea value={form.chapters}
-                        onChange={(e) => setForm((f) => ({ ...f, chapters: e.target.value }))}
-                        rows={3}
-                        placeholder="e.g. Chapter 3: Rational Numbers, Chapter 4: Practical Geometry, Chapter 5: Data Handling"
-                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none" />
-                      <MicButton onResult={appendToField("chapters")} />
-                    </div>
-                    <p className="mt-1.5 text-xs text-gray-400 flex items-start gap-1">
-                      <span>💡</span>
-                      <span>Tip: Be specific — e.g. &quot;Ch 1: Real Numbers, Ch 3: Linear Equations&quot; gives much better results than &quot;all chapters&quot;.</span>
-                    </p>
-                    {chaptersError && <p className="mt-1 text-xs text-red-500 font-medium">{chaptersError}</p>}
-                  </div>
-
-                  <QuestionMixInput mix={questionMix} onChange={setQuestionMix} />
-
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-semibold text-secondary mb-1.5">
-                      Additional Instructions <span className="text-gray-400 font-normal">(optional)</span>
-                    </label>
-                    <div className="flex gap-2 items-start">
-                      <textarea value={form.additionalInstructions}
-                        onChange={(e) => setForm((f) => ({ ...f, additionalInstructions: e.target.value }))}
-                        rows={3}
-                        placeholder="e.g. Include a map-based question, focus on Chapter 4, add internal choice in long answers…"
-                        className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition resize-none" />
-                      <MicButton onResult={appendToField("additionalInstructions")} />
-                    </div>
-                    <p className="mt-1 text-xs text-gray-400">Tap mic to speak instead of type.</p>
-                  </div>
-                </div>
-              </>
             ) : (
               <>
                 <h2 className="text-lg font-bold text-secondary mb-2">Your Custom Prompt</h2>
@@ -682,20 +521,18 @@ export default function ExamPapersPage() {
               </>
             )}
 
-            {mode !== "chapter" && (
-            <button onClick={handleGenerate} disabled={loading || !!atLimit}
-              className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-md shadow-primary/25">
-              {loading ? (
-                <><svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
-                  {isAllThree ? "Generating 3 exam papers…" : "Generating your exam paper…"}</>
-              ) : atLimit ? "Upgrade to continue generating" : (
-                <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  {isAllThree ? "Generate All Three Papers" : "Generate Exam Paper"}</>
-              )}
-            </button>
+            {mode === "custom" && (
+              <button onClick={handleGenerate} disabled={loading || !!atLimit}
+                className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-primary text-white font-bold text-base hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-md shadow-primary/25">
+                {loading ? (
+                  <><svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>Generating your exam paper…</>
+                ) : atLimit ? "Upgrade to continue generating" : (
+                  <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Generate Exam Paper</>
+                )}
+              </button>
             )}
 
-            {mode !== "chapter" && atLimit && (
+            {mode === "custom" && atLimit && (
               <div className="mt-3 text-center">
                 <Link href="/pricing" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary-600 transition-colors">
                   Upgrade Now — ₹499/year
@@ -703,7 +540,7 @@ export default function ExamPapersPage() {
               </div>
             )}
 
-            {mode !== "chapter" && apiError && (
+            {mode === "custom" && apiError && (
               <div className="mt-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 flex items-start gap-2.5">
                 <svg className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
                 <div className="flex-1">
@@ -713,7 +550,6 @@ export default function ExamPapersPage() {
               </div>
             )}
 
-            {mode !== "chapter" && (
             <div className="mt-5 flex flex-wrap gap-3 justify-center text-xs text-gray-400">
               {["No login required", "CBSE · ICSE · State Board", "Includes answer key & marking scheme"].map((tag) => (
                 <span key={tag} className="flex items-center gap-1">
@@ -722,11 +558,10 @@ export default function ExamPapersPage() {
                 </span>
               ))}
             </div>
-            )}
           </div>
 
-          {/* Loading skeleton */}
-          {mode !== "chapter" && loading && !result && (
+          {/* Loading skeleton — custom mode only */}
+          {mode === "custom" && loading && !result && (
             <div className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
@@ -734,7 +569,7 @@ export default function ExamPapersPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-secondary text-sm">{loadingMsg}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{isAllThree ? "This usually takes 45–90 seconds" : "This usually takes 15–25 seconds"}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">This usually takes 15–25 seconds</p>
                 </div>
               </div>
               <div className="space-y-3 animate-pulse">
@@ -745,38 +580,32 @@ export default function ExamPapersPage() {
             </div>
           )}
 
-          {/* Result */}
-          {mode !== "chapter" && result && (
+          {/* Result — custom mode only */}
+          {mode === "custom" && result && (
             <div ref={resultRef} className="mt-8 bg-white rounded-2xl border border-primary-100 shadow-sm overflow-hidden" id="print-content">
               <div className="print-only-header">Generated by Gyaan Mitra — gyaanmitra.com</div>
 
-              {/* Q / A tabs — shown after streaming completes with answer key */}
               {!loading && keyContent && (
                 <div className="flex border-b border-gray-100">
                   <button onClick={() => setActiveTab("question")}
                     className={`px-6 py-3.5 text-sm font-bold border-b-2 transition-colors -mb-px ${activeTab === "question" ? "border-primary text-primary bg-primary-50/30" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
-                    {isAllThree ? "📄 Question Papers" : "📄 Question Paper"}
+                    📄 Question Paper
                   </button>
                   <button onClick={() => setActiveTab("key")}
                     className={`px-6 py-3.5 text-sm font-bold border-b-2 transition-colors -mb-px ${activeTab === "key" ? "border-secondary text-secondary bg-secondary/5" : "border-transparent text-gray-500 hover:text-gray-700"}`}>
-                    {isAllThree ? "🔑 Answer Keys" : "🔑 Answer Key"}
+                    🔑 Answer Key
                   </button>
                 </div>
               )}
 
-              {/* Action bar */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary-50 to-blue-50">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                   </div>
                   <div>
-                    <p className="font-bold text-secondary text-sm">
-                      {loading ? "Generating…" : isAllThree ? "3 Exam Papers Generated" : "Exam Paper Generated"}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {mode === "form" ? `${form.subject} · ${form.grade} · ${form.examType} · ${calcTotal} marks · ${form.difficulty}` : "Custom prompt"}
-                    </p>
+                    <p className="font-bold text-secondary text-sm">{loading ? "Generating…" : "Exam Paper Generated"}</p>
+                    <p className="text-xs text-gray-400">Custom prompt</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -808,15 +637,12 @@ export default function ExamPapersPage() {
                 </div>
               </div>
 
-              {/* PDF hint */}
               {pdfHint && (
                 <div className="mx-6 mt-3 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex items-center gap-2">
                   <svg className="w-4 h-4 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
                   <p className="text-xs text-blue-700">In the print dialog, choose <strong>&quot;Save as PDF&quot;</strong> as the destination to download as PDF.</p>
                 </div>
               )}
-
-              {/* Save toast */}
               {saveToast && (
                 <div className="mx-6 mt-3 bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 flex items-center gap-2">
                   <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
@@ -824,14 +650,9 @@ export default function ExamPapersPage() {
                 </div>
               )}
 
-              {/* Content area */}
               <div className="px-6 sm:px-8 py-6" id="result-content">
                 {!loading && keyContent ? (
-                  activeTab === "question" ? (
-                    <MarkdownContent text={questionContent} />
-                  ) : (
-                    <MarkdownContent text={keyContent} />
-                  )
+                  activeTab === "question" ? <MarkdownContent text={questionContent} /> : <MarkdownContent text={keyContent} />
                 ) : (
                   <>
                     <MarkdownContent text={displayResult} />
@@ -844,7 +665,7 @@ export default function ExamPapersPage() {
             </div>
           )}
 
-          {mode !== "chapter" && result && !loading && (
+          {mode === "custom" && result && !loading && (
             <div className="mt-4 text-center">
               <button onClick={() => { setResult(""); setSaved(false); setSaveToast(""); setQuestionContent(""); setKeyContent(""); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 className="text-sm text-secondary hover:text-primary font-medium transition-colors">
