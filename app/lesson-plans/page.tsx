@@ -66,6 +66,7 @@ export default function LessonPlansPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
+  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("quick");
 
   // Custom prompt state
   const [customPrompt, setCustomPrompt] = useState("");
@@ -112,6 +113,7 @@ export default function LessonPlansPage() {
     setChapterError("");
     setRevisionInstructions("");
     setChapterPreviewMode("preview");
+    setGenerationMode("quick");
   };
 
   const handleGenerate = async () => {
@@ -221,6 +223,7 @@ export default function LessonPlansPage() {
           board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
+          generationMode,
         }),
       });
       const data = await res.json();
@@ -278,19 +281,22 @@ export default function LessonPlansPage() {
     finally { setChapterLoading(false); setChapterLoadingStep(""); }
   };
 
-  const chapterDownload = (t: string, n: string) => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([t], { type: "text/plain" }));
-    a.download = n; a.click();
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
       <style>{`
         @media print {
-          body * { visibility: hidden; }
-          .paper-output, .paper-output * { visibility: visible; }
-          .paper-output { position: absolute; left: 0; top: 0; width: 100%; padding: 2cm; font-family: 'Times New Roman', serif; }
+          body * { visibility: hidden !important; }
+          #print-area, #print-area * { visibility: visible !important; }
+          #print-area {
+            position: fixed; left: 0; top: 0; width: 100%;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt; line-height: 1.6; color: black; background: white;
+            padding: 2cm; max-height: none !important; overflow: visible !important;
+          }
+          .no-print { display: none !important; }
+          h1 { font-size: 16pt; text-align: center; }
+          h2 { font-size: 14pt; }
+          h3 { font-size: 12pt; }
         }
       `}</style>
       <Navbar />
@@ -358,6 +364,25 @@ export default function LessonPlansPage() {
                   </div>
                 )}
 
+                {/* Quick / Accurate toggle */}
+                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
+                  <div>
+                    <div className="flex bg-gray-100 rounded-xl p-1">
+                      <button onClick={() => setGenerationMode("quick")}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${generationMode === "quick" ? "bg-white text-secondary shadow-sm" : "text-gray-500"}`}>
+                        ⚡ Quick (30s)
+                      </button>
+                      <button onClick={() => setGenerationMode("accurate")}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${generationMode === "accurate" ? "bg-white text-secondary shadow-sm" : "text-gray-500"}`}>
+                        🎯 Accurate (60–90s)
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {generationMode === "quick" ? "Uses AI knowledge of NCERT syllabus. Fast but may not match exact book wording." : "Reads actual NCERT PDFs. Slower but strictly based on book content."}
+                    </p>
+                  </div>
+                )}
+
                 {chapterResult && chapterResult.chapters.length > 0 && (
                   <button
                     onClick={() => {
@@ -406,7 +431,7 @@ export default function LessonPlansPage() {
                       </div>
                     </div>
                     {chapterPreviewMode === "preview" ? (
-                      <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
+                      <div id="print-area" className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
                         <MarkdownContent text={chapterDraft} />
                       </div>
                     ) : (
@@ -440,16 +465,15 @@ export default function LessonPlansPage() {
                       Start Fresh
                     </button>
                     <h3 className="font-bold text-secondary">Final Lesson Plan</h3>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap no-print">
                       {[
                         { label: "Copy", action: () => navigator.clipboard.writeText(chapterFinal) },
-                        { label: "Download", action: () => chapterDownload(chapterFinal, "lesson-plan.txt") },
-                        { label: "Print / PDF", action: () => window.print() },
+                        { label: "Save as PDF", action: () => window.print() },
                       ].map(({ label, action }) => (
                         <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
                       ))}
                     </div>
-                    <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
+                    <div id="print-area" className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
                       <MarkdownContent text={chapterFinal} />
                     </div>
                   </div>

@@ -164,6 +164,9 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
       return;
     }
     setError("");
+    // Preserve existing selections before clearing so toggling books doesn't wipe them
+    const prevChecked = { ...checked };
+    const prevChapterMix = { ...chapterMix };
     setChapters([]);
     setChecked({});
     setChapterMix({});
@@ -183,7 +186,17 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
       setLoadingChapters(false);
       if (err) { setError("Could not load chapters: " + err.message); return; }
       if (!data || data.length === 0) { setError("No chapters found for the selected book(s)."); return; }
-      setChapters(data as ChapterRow[]);
+      const newChapters = data as ChapterRow[];
+      setChapters(newChapters);
+      // Restore selections for chapters that exist in the new set
+      const restoredChecked: Record<number, boolean> = {};
+      const restoredMix: Record<number, QuestionMix> = {};
+      for (const ch of newChapters) {
+        if (prevChecked[ch.id]) restoredChecked[ch.id] = true;
+        if (prevChapterMix[ch.id]) restoredMix[ch.id] = prevChapterMix[ch.id];
+      }
+      setChecked(restoredChecked);
+      setChapterMix(restoredMix);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass, selectedSubject, selectedBookCodes.join(",")]);

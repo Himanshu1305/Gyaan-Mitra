@@ -12,6 +12,11 @@ type QuestionMix = {
   longFive: number;
 };
 
+type InternalChoice = {
+  enabled: boolean;
+  sections: string[];
+};
+
 type ChapterSelection = {
   chapterName: string;
   bookDisplayName: string;
@@ -30,6 +35,8 @@ type RequestBody = {
   examType?: string;
   duration?: string;
   difficulty?: string;
+  internalChoice?: InternalChoice;
+  generationMode?: "quick" | "accurate";
 };
 
 const STORAGE_BASE =
@@ -79,15 +86,46 @@ async function analyzeWithGemini(chapters: ChapterSelection[]): Promise<string> 
 
   console.log("[generate-with-chapters] Gemini analyzing", loaded.length, "chapters:", loaded);
   const prompt = `Analyze these NCERT textbook chapters: ${loaded.join(", ")}.
-For each chapter extract: main topics, key concepts, important diagrams/figures mentioned, and sample questions from exercises.
+For each chapter extract: main topics, key concepts, important diagrams/figures mentioned, definitions, and sample questions from exercises.
 Return structured JSON with chapter name as key.`;
 
   const result = await model.generateContent([prompt, ...parts]);
   return result.response.text();
 }
 
-const FORMATTING_RULES = `
-IMPORTANT FORMATTING RULES:
+const EXAM_FORMAT_RULES = `
+STRICT CBSE EXAM PAPER FORMAT RULES:
+1. SECTION HEADERS must include question count and total marks, e.g.:
+   ## Section A — Multiple Choice Questions (10 × 1 = 10 marks)
+   ## Section B — Short Answer Questions (5 × 2 = 10 marks)
+   ## Section C — Short Answer Questions (4 × 3 = 12 marks)
+   ## Section D — Long Answer Questions (3 × 5 = 15 marks)
+2. DO NOT mention chapter names anywhere in the paper
+3. DO NOT add any examiner notes, teacher notes, or parenthetical instructions to the teacher
+4. MARKS PER QUESTION:
+   - Section A (MCQ): no marks shown per question
+   - Section B, C, D: show [X marks] at end of each question
+5. ANSWER SPACES below each question:
+   - MCQ: Answer: _______
+   - 2-mark: ___ ___ ___ ___ (4 lines)
+   - 3-mark: ___ ___ ___ ___ ___ ___ (6 lines)
+   - 4-mark: (8 lines)
+   - 5-mark: (10 lines)
+6. CONTINUOUS QUESTION NUMBERING: Q1, Q2, Q3... never restart numbering per section
+7. Use plain Markdown only — no HTML tags, no &nbsp;
+8. MCQ options: (a) ... (b) ... (c) ... (d) ...
+`;
+
+const HINDI_EXAM_RULES = `
+HINDI-SPECIFIC RULES (apply when subject is Hindi/हिंदी):
+- All questions, options, instructions in Devanagari script only
+- Hindi grammar questions must specify type: संधि/समास/अलंकार/क्रिया etc.
+- Comprehension passages taken from the actual NCERT lesson text
+- Do not switch to English mid-paper
+`;
+
+const GENERAL_FORMAT_RULES = `
+FORMATTING RULES:
 - Use clean Markdown only: ## headings, **bold**, - bullet points, 1. numbered lists
 - No HTML tags whatsoever (no <br>, <p>, <div>, <span>, etc.)
 - No &nbsp; or other HTML entities — use plain spaces only
@@ -96,6 +134,48 @@ IMPORTANT FORMATTING RULES:
 - For answer key entries use: Ans. 1: ...
 - No decorative separators or excessive blank lines
 `;
+
+const NCERT_ACCURACY = `
+NCERT ACCURACY REQUIREMENT:
+- Every fact, concept, definition, and example must come from the NCERT textbook chapter provided
+- Do not invent, modify, or add content not found in the chapter
+- Question wording should reflect the language and style of the NCERT book
+- For diagrams, only label components that appear in the NCERT textbook
+`;
+
+const HINDI_COMPLETENESS = `
+HINDI COMPLETENESS (apply when generating Hindi content):
+- Generate the EXACT number of questions specified — do not stop early
+- Every question, option, instruction, and answer must be written in Devanagari script
+- Do not abbreviate or truncate the output
+`;
+
+const ANSWER_KEY_DIAGRAM_RULES = `
+ANSWER KEY DIAGRAM RULES:
+- For every question that involves a diagram or labelling, include an ASCII art diagram in the answer key
+- Format example:
+  [DIAGRAM: Diagram Name]
+  +---------------------------+
+  |       Component A         |
+  |   +----------+           |
+  |   |  Part B  |           |
+  |   +----------+           |
+  +---------------------------+
+  Labels: (1) Component A  (2) Part B
+- Never skip a diagram-related question in the answer key
+`;
+
+function cleanNotes(text: string): string {
+  return text
+    .split("\n")
+    .filter(
+      (line) =>
+        !/(note\s+to\s+(examiner|teacher)|examiner['']s\s+note|teacher['']s\s+note|this\s+question\s+is\s+clubbed|this\s+question\s+comes?\s+from|questions?\s+are\s+from\s+chapter|\[?note\s*:\s)/i.test(
+          line
+        )
+    )
+    .join("\n");
+}
 
 function questionMixDescription(qm: QuestionMix): string {
   const parts: string[] = [];
@@ -123,8 +203,19 @@ function buildChapterDistribution(chapters: ChapterSelection[]): string {
   }).join("\n");
 }
 
+function buildInternalChoiceInstruction(ic: InternalChoice): string {
+  if (!ic.enabled || ic.sections.length === 0) return "";
+  const sectionNames: Record<string, string> = {
+    B: "Section B (2-mark questions)",
+    C: "Section C (3-mark questions)",
+    D: "Section D (4 & 5-mark questions)",
+  };
+  const named = ic.sections.map(s => sectionNames[s] ?? `Section ${s}`).join(", ");
+  return `\nINTERNAL CHOICE: Provide internal choice (OR questions) in ${named}. Format: write the first question, then on a new line write "OR", then write the alternative question at the same marks.\n`;
+}
+
 function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: boolean): string {
-  const { generationType, chapterSelections, additionalInstructions, board, classNumber, subject, questionMix, examType, duration, difficulty } = body;
+  const { generationType, chapterSelections, additionalInstructions, board, classNumber, subject, questionMix, examType, duration, difficulty, internalChoice } = body;
 
   const chapterList = chapterSelections
     .map((c) => `- ${c.bookDisplayName}: ${c.chapterName}`)
@@ -135,6 +226,33 @@ function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: 
     : `NCERT Chapter Content (extracted from actual textbooks):\n${geminiOutput}\n\nChapters:\n${chapterList}`;
 
   const hasPerChapterMix = chapterSelections.some(c => c.questionMix);
+  const isHindi = /hindi|हिंदी/i.test(subject);
+
+  // Handle FINALISE_AND_KEY: prefix — generate cleaned paper + answer key
+  if (/^FINALISE_AND_KEY:/i.test(additionalInstructions || "")) {
+    const originalDraft = additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
+    return `You are an expert Indian school teacher. You have a draft exam paper below. Your task:
+
+1. Clean the exam paper: remove all chapter references, examiner notes, and teacher notes. Keep questions identical.
+2. Generate a complete answer key with model answers, marking scheme, and ASCII diagrams where needed.
+
+${EXAM_FORMAT_RULES}
+${NCERT_ACCURACY}
+${ANSWER_KEY_DIAGRAM_RULES}
+${isHindi ? HINDI_COMPLETENESS : ""}
+
+DRAFT PAPER:
+${originalDraft}
+
+Output EXACTLY in this format:
+===CLEAN PAPER START===
+[Cleaned exam paper here — no chapter names, no teacher notes]
+===CLEAN PAPER END===
+
+===ANSWER KEY START===
+[Complete answer key with model answers, marks allocation, and ASCII diagrams]
+===ANSWER KEY END===`;
+  }
 
   if (generationType === "exam-paper") {
     const mixSection = hasPerChapterMix
@@ -146,24 +264,33 @@ function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: 
     const paperType = examType || "Exam Paper";
     const paperDuration = duration || "3 hours";
     const paperDifficulty = difficulty || "Standard";
+    const internalChoiceStr = internalChoice ? buildInternalChoiceInstruction(internalChoice) : "";
 
     return `You are an expert Indian school teacher. Create a ${board} ${paperType} for Class ${classNumber} ${subject}.
-${FORMATTING_RULES}
+
+${EXAM_FORMAT_RULES}
+${isHindi ? HINDI_EXAM_RULES : ""}
+${NCERT_ACCURACY}
+${isHindi ? HINDI_COMPLETENESS : ""}
+
 ${contentSection}
 
 ${mixSection}
 Duration: ${paperDuration}
 Difficulty: ${paperDifficulty}
+${internalChoiceStr}
 Teacher instructions: ${additionalInstructions || "None"}
 
 Format as a proper exam paper:
-- School/date header section
-- Clear sections (Section A: MCQ, Section B: Short Answer, Section C: Long Answer)
-- Question numbers and marks in brackets
+- School name / date / subject / class / duration header
+- Clear sections (Section A: MCQ, Section B: 2-mark, Section C: 3-mark, Section D: Long Answer)
+- Question numbers (Q1, Q2… continuous) and marks in brackets
 - Space for student name and roll number
-- Instructions at the top
+- General instructions at the top
 
-Do NOT include the answer key in the question paper.`;
+DO NOT include the answer key in the question paper.
+DO NOT mention chapter names anywhere in the paper.
+DO NOT add any teacher or examiner notes.`;
   }
 
   if (generationType === "worksheet") {
@@ -174,7 +301,11 @@ Do NOT include the answer key in the question paper.`;
       : "Varied question types";
 
     return `You are an expert Indian school teacher. Create a practice worksheet for Class ${classNumber} ${subject} (${board} curriculum).
-${FORMATTING_RULES}
+
+${GENERAL_FORMAT_RULES}
+${NCERT_ACCURACY}
+${isHindi ? HINDI_COMPLETENESS : ""}
+
 ${contentSection}
 
 ${mixSection}
@@ -191,7 +322,10 @@ Format clearly with question numbers and marks in brackets.`;
 
   // lesson-plan
   return `You are an expert Indian school teacher. Create a detailed lesson plan for Class ${classNumber} ${subject} (${board} curriculum).
-${FORMATTING_RULES}
+
+${GENERAL_FORMAT_RULES}
+${NCERT_ACCURACY}
+
 Chapters:
 ${chapterList}
 
@@ -220,9 +354,9 @@ function monthYear(): string {
 export async function POST(req: NextRequest) {
   try {
     const body: RequestBody = await req.json();
-    const { generationType, chapterSelections } = body;
+    const { generationType, chapterSelections, generationMode } = body;
 
-    console.log("[generate-with-chapters] Request:", { generationType, chapterCount: chapterSelections?.length, board: body.board, subject: body.subject });
+    console.log("[generate-with-chapters] Request:", { generationType, chapterCount: chapterSelections?.length, board: body.board, subject: body.subject, generationMode });
 
     if (!generationType || !chapterSelections || chapterSelections.length === 0) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -237,15 +371,11 @@ export async function POST(req: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser(token);
       if (user) {
         userId = user.id;
-        const userSupa = createClient(
+        const serviceClient = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          { global: { headers: { Authorization: `Bearer ${token}` } } }
+          process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
-        const profileClient = process.env.SUPABASE_SERVICE_ROLE_KEY
-          ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY)
-          : userSupa;
-        const { data: profile, error: profileError } = await profileClient
+        const { data: profile, error: profileError } = await serviceClient
           .from("profiles")
           .select("subscription_tier")
           .eq("id", userId)
@@ -254,6 +384,11 @@ export async function POST(req: NextRequest) {
         const isPremium = profile?.subscription_tier === "premium";
         console.log("[generate-with-chapters] User:", userId, "isPremium:", isPremium);
         if (!isPremium) {
+          const userSupa = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            { global: { headers: { Authorization: `Bearer ${token}` } } }
+          );
           const { count } = await userSupa
             .from("usage_tracking")
             .select("*", { count: "exact", head: true })
@@ -271,16 +406,23 @@ export async function POST(req: NextRequest) {
       console.log("[generate-with-chapters] No auth token — guest request");
     }
 
-    // Step A — Gemini reads PDFs
+    // Step A — Gemini reads PDFs (skip if quick mode or FINALISE_AND_KEY)
+    const isQuick = generationMode === "quick";
+    const isFinalise = /^FINALISE_AND_KEY:/i.test(body.additionalInstructions || "");
     let geminiOutput = "";
-    let isFallback = false;
-    try {
-      console.log(`[generate-with-chapters] Gemini analyzing ${chapterSelections.length} chapters…`);
-      geminiOutput = await analyzeWithGemini(chapterSelections);
-      console.log("[generate-with-chapters] Gemini done, output length:", geminiOutput.length);
-    } catch (err) {
-      console.warn("[generate-with-chapters] Gemini failed, falling back to chapter names:", err);
-      isFallback = true;
+    let isFallback = isQuick || isFinalise;
+
+    if (!isFallback) {
+      try {
+        console.log(`[generate-with-chapters] Gemini analyzing ${chapterSelections.length} chapters…`);
+        geminiOutput = await analyzeWithGemini(chapterSelections);
+        console.log("[generate-with-chapters] Gemini done, output length:", geminiOutput.length);
+      } catch (err) {
+        console.warn("[generate-with-chapters] Gemini failed, falling back to chapter names:", err);
+        isFallback = true;
+      }
+    } else {
+      console.log("[generate-with-chapters] Skipping Gemini (quick mode or finalise)");
     }
 
     // Step B — Claude generates content
@@ -297,16 +439,20 @@ export async function POST(req: NextRequest) {
     console.log("[generate-with-chapters] Claude prompt preview:", prompt.slice(0, 300));
     console.log(`[generate-with-chapters] Claude generating ${generationType}…`);
 
+    const maxTokens = generationType === "exam-paper" || isFinalise ? 8000 : 4000;
+
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 4000,
+      max_tokens: maxTokens,
       messages: [{ role: "user", content: prompt }],
     });
 
-    const draft = message.content
+    const rawDraft = message.content
       .filter((b) => b.type === "text")
       .map((b) => (b as { type: "text"; text: string }).text)
       .join("\n");
+
+    const draft = cleanNotes(rawDraft);
 
     console.log("[generate-with-chapters] Done, draft length:", draft.length);
 

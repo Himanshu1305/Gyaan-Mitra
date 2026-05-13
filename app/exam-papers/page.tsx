@@ -102,6 +102,10 @@ export default function ExamPapersPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
+  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("quick");
+  const [internalChoiceEnabled, setInternalChoiceEnabled] = useState(false);
+  const [internalChoiceSections, setInternalChoiceSections] = useState<string[]>(["C", "D"]);
+  const [draftBannerDismissed, setDraftBannerDismissed] = useState(false);
 
   // Custom prompt mode state
   const [customPrompt, setCustomPrompt] = useState("");
@@ -154,6 +158,9 @@ export default function ExamPapersPage() {
     setChapterError("");
     setRevisionInstructions("");
     setChapterPreviewMode("preview");
+    setDraftBannerDismissed(false);
+    setInternalChoiceEnabled(false);
+    setInternalChoiceSections(["C", "D"]);
   };
 
   // Custom prompt generation (uses streaming exam-paper route)
@@ -288,6 +295,8 @@ export default function ExamPapersPage() {
           examType: chapterExamType,
           duration: chapterDuration,
           difficulty: chapterDifficulty,
+          generationMode,
+          internalChoice: { enabled: internalChoiceEnabled, sections: internalChoiceSections },
         }),
       });
       const data = await res.json();
@@ -337,7 +346,7 @@ export default function ExamPapersPage() {
     if (!chapterResult) return;
     setChapterError("");
     setChapterLoading(true);
-    setChapterLoadingStep("Generating answer key…");
+    setChapterLoadingStep("Cleaning paper & generating answer key…");
     const token = session?.access_token;
     try {
       const res = await fetch("/api/generate-with-chapters", {
@@ -346,15 +355,24 @@ export default function ExamPapersPage() {
         body: JSON.stringify({
           generationType: "exam-paper",
           chapterSelections: chapterResult.chapters,
-          additionalInstructions: `Generate a COMPLETE ANSWER KEY with model answers and marking scheme for this exam paper:\n\n${chapterDraft}`,
+          additionalInstructions: `FINALISE_AND_KEY:${chapterDraft}`,
           board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
+          generationMode: "quick",
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      setChapterAnswerKey(data.draft);
+      const raw = data.draft as string;
+      const PAPER_START = "===CLEAN PAPER START===", PAPER_END = "===CLEAN PAPER END===";
+      const KEY_START = "===ANSWER KEY START===", KEY_END = "===ANSWER KEY END===";
+      const psi = raw.indexOf(PAPER_START), pei = raw.indexOf(PAPER_END);
+      const ksi = raw.indexOf(KEY_START), kei = raw.indexOf(KEY_END);
+      const cleanedPaper = psi !== -1 && pei > psi ? raw.slice(psi + PAPER_START.length, pei).trim() : "";
+      const answerKey = ksi !== -1 && kei > ksi ? raw.slice(ksi + KEY_START.length, kei).trim() : "";
+      if (cleanedPaper) setChapterDraft(cleanedPaper);
+      setChapterAnswerKey(answerKey || raw);
       setChapterFinalReady(true);
       setChapterTab("paper");
     } catch (err) {
@@ -362,19 +380,22 @@ export default function ExamPapersPage() {
     } finally { setChapterLoading(false); setChapterLoadingStep(""); }
   };
 
-  const chapterDownload = (text: string, name: string) => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
-    a.download = name; a.click();
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white via-orange-50/40 to-blue-50/40">
       <style>{`
         @media print {
-          body * { visibility: hidden; }
-          .paper-output, .paper-output * { visibility: visible; }
-          .paper-output { position: absolute; left: 0; top: 0; width: 100%; padding: 2cm; font-family: 'Times New Roman', serif; }
+          body * { visibility: hidden !important; }
+          #print-area, #print-area * { visibility: visible !important; }
+          #print-area {
+            position: fixed; left: 0; top: 0; width: 100%;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt; line-height: 1.6; color: black; background: white;
+            padding: 2cm; max-height: none !important; overflow: visible !important;
+          }
+          .no-print { display: none !important; }
+          h1 { font-size: 16pt; text-align: center; }
+          h2 { font-size: 14pt; }
+          h3 { font-size: 12pt; }
         }
       `}</style>
       <Navbar />
@@ -439,6 +460,57 @@ export default function ExamPapersPage() {
                     <SelectField label="Exam Type"   value={chapterExamType}    onChange={setChapterExamType}    options={EXAM_TYPES}    disabled={chapterDraftReady} />
                     <SelectField label="Duration"    value={chapterDuration}    onChange={setChapterDuration}    options={DURATIONS}     disabled={chapterDraftReady} />
                     <SelectField label="Difficulty"  value={chapterDifficulty}  onChange={setChapterDifficulty}  options={DIFFICULTIES}  disabled={chapterDraftReady} />
+                    {/* Internal Choice toggle */}
+                    <div className="col-span-1 sm:col-span-3 border-t border-gray-100 pt-3">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-semibold text-secondary">Include Internal Choice (OR questions)?</label>
+                        <button
+                          onClick={() => setInternalChoiceEnabled(v => !v)}
+                          disabled={chapterDraftReady}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${internalChoiceEnabled ? "bg-primary" : "bg-gray-300"} ${chapterDraftReady ? "opacity-50 cursor-not-allowed" : ""}`}>
+                          <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${internalChoiceEnabled ? "translate-x-4" : "translate-x-1"}`} />
+                        </button>
+                      </div>
+                      {internalChoiceEnabled && (
+                        <div className="mt-2.5">
+                          <p className="text-xs text-gray-500 mb-2">CBSE standard: Internal choice in Section C and D only</p>
+                          <div className="flex gap-3 flex-wrap">
+                            {([["B", "Section B (2m)"], ["C", "Section C (3m)"], ["D", "Section D (4 & 5m)"]] as [string, string][]).map(([code, label]) => (
+                              <label key={code} className="flex items-center gap-1.5 cursor-pointer">
+                                <input type="checkbox"
+                                  checked={internalChoiceSections.includes(code)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) setInternalChoiceSections(prev => [...prev, code].sort());
+                                    else setInternalChoiceSections(prev => prev.filter(s => s !== code));
+                                  }}
+                                  disabled={chapterDraftReady}
+                                  className="w-3.5 h-3.5 accent-primary" />
+                                <span className="text-xs text-gray-700">{label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quick / Accurate toggle */}
+                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
+                  <div>
+                    <div className="flex bg-gray-100 rounded-xl p-1">
+                      <button onClick={() => setGenerationMode("quick")}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${generationMode === "quick" ? "bg-white text-secondary shadow-sm" : "text-gray-500"}`}>
+                        ⚡ Quick (30s)
+                      </button>
+                      <button onClick={() => setGenerationMode("accurate")}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${generationMode === "accurate" ? "bg-white text-secondary shadow-sm" : "text-gray-500"}`}>
+                        🎯 Accurate (60–90s)
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {generationMode === "quick" ? "Uses AI knowledge of NCERT syllabus. Fast but may not match exact book wording." : "Reads actual NCERT PDFs. Slower but strictly based on book content."}
+                    </p>
                   </div>
                 )}
 
@@ -470,6 +542,14 @@ export default function ExamPapersPage() {
                 {/* Draft */}
                 {chapterDraftReady && !chapterFinalReady && (
                   <div className="space-y-4">
+                    {!draftBannerDismissed && (
+                      <div className="flex items-start justify-between gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                        <p className="text-xs text-amber-800">
+                          📝 <strong>DRAFT</strong> — Chapter references shown for your review only. Final paper will not contain chapter names.
+                        </p>
+                        <button onClick={() => setDraftBannerDismissed(true)} className="text-amber-500 hover:text-amber-700 text-xs flex-shrink-0 no-print">✕</button>
+                      </div>
+                    )}
                     <button onClick={handleStartFresh}
                       className="flex items-center gap-1.5 text-sm text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 transition-colors">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -495,7 +575,7 @@ export default function ExamPapersPage() {
                       </div>
                     </div>
                     {chapterPreviewMode === "preview" ? (
-                      <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
+                      <div id="print-area" className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
                         <MarkdownContent text={chapterDraft} />
                       </div>
                     ) : (
@@ -537,16 +617,15 @@ export default function ExamPapersPage() {
                         </button>
                       ))}
                     </div>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap no-print">
                       {[
                         { label: "Copy", action: () => navigator.clipboard.writeText(chapterTab === "paper" ? chapterDraft : chapterAnswerKey) },
-                        { label: "Download", action: () => chapterDownload(chapterTab === "paper" ? chapterDraft : chapterAnswerKey, chapterTab === "paper" ? "exam-paper.txt" : "answer-key.txt") },
-                        { label: "Print / PDF", action: () => window.print() },
+                        { label: "Save as PDF", action: () => window.print() },
                       ].map(({ label, action }) => (
                         <button key={label} onClick={action} className="text-sm border border-gray-200 rounded-lg px-4 py-1.5 hover:bg-gray-50 transition-colors">{label}</button>
                       ))}
                     </div>
-                    <div className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
+                    <div id="print-area" className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
                       <MarkdownContent text={chapterTab === "paper" ? chapterDraft : chapterAnswerKey} />
                     </div>
                   </div>
