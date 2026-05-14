@@ -207,45 +207,21 @@ function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: 
   const isHindi = /hindi|हिंदी/i.test(subject);
   const totalMarks = computeTotalMarks(chapterSelections, questionMix);
 
-  // Handle FINALISE_AND_KEY: prefix — generate cleaned paper + answer key in one call
+  // Handle FINALISE_AND_KEY: prefix — clean paper only (answer key generated in separate calls)
   if (/^FINALISE_AND_KEY:/i.test(additionalInstructions || "")) {
     const originalDraft = additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
-    return `You are generating a complete, finalised exam paper and answer key.
+    return `You are finalising an exam paper draft.
 
 DRAFT PAPER TO FINALISE:
 ${originalDraft}
 
-YOUR TASKS:
-1. Clean the exam paper: remove all chapter references, examiner notes, and teacher notes. Keep every question identical — do not alter wording or marks.
-2. Generate a COMPLETE answer key for every single question.
-
-ANSWER KEY REQUIREMENTS:
-- Provide complete answers for EVERY question — do not skip any
-- MCQ section: First list all answers in format: Q1-(B), Q2-(A), Q3-(C)... then write a brief explanation for each
-- For short and long answers: write complete model answers matching NCERT content
-- For numerical problems: show complete step-by-step working with units
-- For diagram questions:
-  [DIAGRAM: Name of diagram]
-  +---------------------------+
-  |       Component A         |
-  |   +----------+           |
-  |   |  Part B  |           |
-  |   +----------+           |
-  +---------------------------+
-  Labels: (1) Component A  (2) Part B
-- All answers must match NCERT textbook content exactly
-${isHindi ? "- Write everything in Hindi (Devanagari script)" : ""}
-- Do not add any teacher notes or meta-commentary
-- Mark allocation: show marks awarded for each step in long answers
+YOUR TASK:
+Clean the exam paper: remove all chapter references, examiner notes, and teacher notes. Keep every question identical — do not alter wording or marks.
 
 OUTPUT FORMAT — use EXACTLY these delimiters:
 ===CLEAN PAPER START===
 [Cleaned exam paper — no chapter names, no teacher notes, all questions intact]
-===CLEAN PAPER END===
-
-===ANSWER KEY START===
-[Complete answer key with model answers, mark allocations, and ASCII diagrams]
-===ANSWER KEY END===`;
+===CLEAN PAPER END===`;
   }
 
   if (generationType === "exam-paper") {
@@ -522,7 +498,79 @@ export async function POST(req: NextRequest) {
       .join("\n");
 
     // Post-process: remove examiner notes, fix answer space formatting
-    const draft = cleanAnswerSpaces(cleanNotes(rawDraft));
+    let draft: string;
+
+    if (isFinalise) {
+      // Parse cleaned paper from Call 1
+      const PAPER_START = "===CLEAN PAPER START===";
+      const PAPER_END = "===CLEAN PAPER END===";
+      const psi = rawDraft.indexOf(PAPER_START);
+      const pei = rawDraft.indexOf(PAPER_END);
+      const cleanedPaper = psi !== -1 && pei > psi
+        ? rawDraft.slice(psi + PAPER_START.length, pei).trim()
+        : cleanAnswerSpaces(cleanNotes(rawDraft));
+
+      const paperForKey = cleanedPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
+      const isHindi = /hindi|हिंदी/i.test(body.subject);
+
+      // Call 3a: answer key for Section A and Section B
+      const prompt3a = `Generate the answer key ONLY for Section A and Section B of the exam paper below.
+Do not mention marks for individual questions. Marks are already stated at the section heading level.
+${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
+For Section A (MCQ): List all answers as Q1-(B), Q2-(A), Q3-(C)... then a brief explanation for each.
+For Section B (short answers): Write complete model answers matching NCERT content.
+Do not add teacher notes or meta-commentary.
+
+EXAM PAPER:
+${paperForKey}`;
+
+      const msg3a = await client.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 8000,
+        messages: [{ role: "user", content: prompt3a }],
+      });
+
+      const responseA = msg3a.content
+        .filter((b) => b.type === "text")
+        .map((b) => (b as { type: "text"; text: string }).text)
+        .join("\n");
+
+      // Call 3b: answer key for Section C and Section D
+      const prompt3b = `Generate the answer key ONLY for Section C and Section D of the exam paper below.
+Do not mention marks for individual questions. Marks are already stated at the section heading level.
+${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
+For Section C (short answers): Write complete model answers matching NCERT content.
+For Section D (long answers): Show complete step-by-step working with units for numericals. For diagram questions use ASCII art:
+  [DIAGRAM: Name of diagram]
+  +---------------------------+
+  |       Component A         |
+  |   +----------+           |
+  |   |  Part B  |           |
+  |   +----------+           |
+  +---------------------------+
+  Labels: (1) Component A  (2) Part B
+All answers must match NCERT textbook content exactly. Do not add teacher notes or meta-commentary.
+
+EXAM PAPER:
+${paperForKey}`;
+
+      const msg3b = await client.messages.create({
+        model: "claude-sonnet-4-6",
+        max_tokens: 8000,
+        messages: [{ role: "user", content: prompt3b }],
+      });
+
+      const responseB = msg3b.content
+        .filter((b) => b.type === "text")
+        .map((b) => (b as { type: "text"; text: string }).text)
+        .join("\n");
+
+      const combinedAnswerKey = cleanNotes(responseA) + "\n\n---\n\n" + cleanNotes(responseB);
+
+      draft = `===CLEAN PAPER START===\n${cleanedPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${combinedAnswerKey}\n===ANSWER KEY END===`;
+    } else {
+      draft = cleanAnswerSpaces(cleanNotes(rawDraft));
+    }
 
     console.log("[generate-with-chapters] Done, draft length:", draft.length);
 
