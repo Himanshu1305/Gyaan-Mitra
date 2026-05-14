@@ -16,6 +16,14 @@ import { getFriendlyError } from "@/lib/api-errors";
 const DURATIONS = ["30 minutes", "40 minutes", "45 minutes", "60 minutes"];
 const LOADING_MSGS = ["Reading your inputs…", "Crafting your lesson plan…", "Almost ready…", "Adding the finishing touches…"];
 
+const CHAPTER_PROGRESS_STEPS = [
+  "📚 Fetching chapter PDFs from NCERT library...",
+  "🔍 Analysing chapter content with Gemini AI...",
+  "✍️ Generating lesson plan with Claude AI...",
+  "📋 Formatting and structuring the plan...",
+  "⏳ Almost done — finalising your lesson plan...",
+];
+
 function cleanOutput(text: string): string {
   return text
     .replace(/&emsp;/g, "   ")
@@ -67,6 +75,7 @@ export default function LessonPlansPage() {
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
   const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("quick");
+  const [loadingProgressStep, setLoadingProgressStep] = useState(0);
 
   // Custom prompt state
   const [customPrompt, setCustomPrompt] = useState("");
@@ -102,6 +111,17 @@ export default function LessonPlansPage() {
     const id = setInterval(() => { i = (i + 1) % LOADING_MSGS.length; setLoadingMsg(LOADING_MSGS[i]); }, 3000);
     return () => clearInterval(id);
   }, [loading]);
+
+  useEffect(() => {
+    if (!chapterLoading) { setLoadingProgressStep(0); return; }
+    setLoadingProgressStep(0);
+    let step = 0;
+    const id = setInterval(() => {
+      step = Math.min(step + 1, CHAPTER_PROGRESS_STEPS.length - 1);
+      setLoadingProgressStep(step);
+    }, 15000);
+    return () => clearInterval(id);
+  }, [chapterLoading]);
 
   const handleStartFresh = () => {
     setSelectorKey(k => k + 1);
@@ -397,9 +417,21 @@ export default function LessonPlansPage() {
                   </button>
                 )}
                 {chapterLoading && (
-                  <div className="flex items-center gap-3 py-2">
-                    <svg className="animate-spin w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
-                    <span className="text-sm font-medium text-secondary">{chapterLoadingStep}</span>
+                  <div className="space-y-3 py-2 px-1">
+                    <div className="flex items-center gap-3">
+                      <svg className="animate-spin w-5 h-5 text-[#FF9933] flex-shrink-0" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
+                      <span className="text-sm font-medium text-[#1B3A6B]">{CHAPTER_PROGRESS_STEPS[loadingProgressStep]}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-[#FF9933] h-2 rounded-full transition-all duration-1000"
+                        style={{ width: `${Math.min(10 + (loadingProgressStep / (CHAPTER_PROGRESS_STEPS.length - 1)) * 85, 95)}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      {generationMode === "accurate" ? "Estimated time: 60–90 seconds" : "Estimated time: 20–40 seconds"}
+                      {loadingProgressStep >= CHAPTER_PROGRESS_STEPS.length - 1 && " — Taking longer than usual, please wait…"}
+                    </p>
                   </div>
                 )}
                 {chapterError && <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{chapterError}</div>}

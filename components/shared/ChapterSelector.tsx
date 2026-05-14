@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
 export type QuestionMix = {
@@ -89,11 +89,52 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
   const [loadingBooks, setLoadingBooks] = useState(false);
   const [loadingChapters, setLoadingChapters] = useState(false);
   const [error, setError] = useState("");
+  const [failedStep, setFailedStep] = useState<1 | 2 | 3 | null>(null);
+
+  // Per-step retry counters — only re-triggers the affected effect
+  const [retrySubjectCount, setRetrySubjectCount] = useState(0);
+  const [retryBookCount, setRetryBookCount] = useState(0);
+  const [retryChapterCount, setRetryChapterCount] = useState(0);
+
+  // Query result cache — persists for the lifetime of this component instance
+  const subjectCache = useRef<Map<number, string[]>>(new Map());
+  const bookCache = useRef<Map<string, BookRow[]>>(new Map());
+  const chapterCache = useRef<Map<string, ChapterRow[]>>(new Map());
+
+  const handleRetry = useCallback(() => {
+    setError("");
+    if (failedStep === 1 && selectedClass != null) {
+      subjectCache.current.delete(selectedClass);
+      setRetrySubjectCount(c => c + 1);
+    } else if (failedStep === 2 && selectedClass != null && selectedSubject != null) {
+      bookCache.current.delete(`${selectedClass}-${selectedSubject}`);
+      setRetryBookCount(c => c + 1);
+    } else if (failedStep === 3 && selectedClass != null && selectedSubject != null) {
+      chapterCache.current.delete(`${selectedClass}-${selectedSubject}-${selectedBookCodes.join(",")}`);
+      setRetryChapterCount(c => c + 1);
+    }
+    setFailedStep(null);
+  }, [failedStep, selectedClass, selectedSubject, selectedBookCodes]);
 
   // Step 1 — fetch subjects when class changes
   useEffect(() => {
     if (!selectedClass) return;
     setError("");
+    setFailedStep(null);
+
+    // Check cache first — avoids Supabase round-trip on re-visits
+    const cached = subjectCache.current.get(selectedClass);
+    if (cached) {
+      setSubjects(cached);
+      setSelectedSubject(null);
+      setBooks([]);
+      setSelectedBookCodes([]);
+      setChapters([]);
+      setChecked({});
+      setChapterMix({});
+      return;
+    }
+
     setSubjects([]);
     setSelectedSubject(null);
     setBooks([]);
@@ -102,28 +143,48 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
     setChecked({});
     setChapterMix({});
     setLoadingSubjects(true);
+
     supabase
       .from("ncert_chapters")
       .select("subject")
       .eq("class_number", selectedClass)
-      .order("subject")
       .then(({ data, error: err }) => {
         setLoadingSubjects(false);
-        if (err) { setError("Could not load subjects: " + err.message); return; }
-        if (!data || data.length === 0) { setError(`No subjects found for Class ${selectedClass}.`); return; }
-        setSubjects(Array.from(new Set((data as { subject: string }[]).map((r) => r.subject))));
+        if (err) {
+          setError("Could not load subjects. " + err.message);
+          setFailedStep(1);
+          return;
+        }
+        if (!data || data.length === 0) {
+          setError(`No subjects found for Class ${selectedClass}.`);
+          setFailedStep(1);
+          return;
+        }
+        const unique = Array.from(new Set((data as { subject: string }[]).map(r => r.subject))).sort();
+        subjectCache.current.set(selectedClass, unique);
+        setSubjects(unique);
       });
-  }, [selectedClass]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClass, retrySubjectCount]);
 
   // Step 2 — fetch books when subject changes
   useEffect(() => {
     if (!selectedClass || !selectedSubject) return;
     setError("");
-    setBooks([]);
+    setFailedStep(null);
     setSelectedBookCodes([]);
     setChapters([]);
     setChecked({});
     setChapterMix({});
+
+    const cacheKey = `${selectedClass}-${selectedSubject}`;
+    const cached = bookCache.current.get(cacheKey);
+    if (cached) {
+      applyBookData(cached);
+      return;
+    }
+
+    setBooks([]);
     setLoadingBooks(true);
     supabase
       .from("ncert_chapters")
@@ -133,29 +194,39 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
       .order("book_display_name")
       .then(({ data, error: err }) => {
         setLoadingBooks(false);
-        if (err) { setError("Could not load books: " + err.message); return; }
+        if (err) {
+          setError("Could not load books. " + err.message);
+          setFailedStep(2);
+          return;
+        }
         if (!data || data.length === 0) return;
         const rows = data as BookRow[];
-        const hasNullBookCodes = rows.some((r) => r.book_code === null);
-        if (hasNullBookCodes) {
-          const seen = new Set<string>();
-          const unique: BookRow[] = [];
-          for (const row of rows) {
-            if (!seen.has(row.book_display_name)) { seen.add(row.book_display_name); unique.push(row); }
-          }
-          setBooks(unique);
-          setSelectedBookCodes([ALL_BOOKS_SENTINEL]);
-        } else {
-          const seen = new Set<string>();
-          const unique: BookRow[] = [];
-          for (const row of rows) {
-            if (row.book_code && !seen.has(row.book_code)) { seen.add(row.book_code); unique.push(row); }
-          }
-          setBooks(unique);
-          if (unique.length === 1) setSelectedBookCodes([unique[0].book_code!]);
-        }
+        bookCache.current.set(cacheKey, rows);
+        applyBookData(rows);
       });
-  }, [selectedClass, selectedSubject]);
+
+    function applyBookData(rows: BookRow[]) {
+      const hasNullBookCodes = rows.some(r => r.book_code === null);
+      if (hasNullBookCodes) {
+        const seen = new Set<string>();
+        const unique: BookRow[] = [];
+        for (const row of rows) {
+          if (!seen.has(row.book_display_name)) { seen.add(row.book_display_name); unique.push(row); }
+        }
+        setBooks(unique);
+        setSelectedBookCodes([ALL_BOOKS_SENTINEL]);
+      } else {
+        const seen = new Set<string>();
+        const unique: BookRow[] = [];
+        for (const row of rows) {
+          if (row.book_code && !seen.has(row.book_code)) { seen.add(row.book_code); unique.push(row); }
+        }
+        setBooks(unique);
+        if (unique.length === 1) setSelectedBookCodes([unique[0].book_code!]);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClass, selectedSubject, retryBookCount]);
 
   // Step 3 — fetch chapters when book selection changes
   useEffect(() => {
@@ -164,14 +235,35 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
       return;
     }
     setError("");
-    // Preserve existing selections before clearing so toggling books doesn't wipe them
+    setFailedStep(null);
+
+    const isAll = selectedBookCodes.includes(ALL_BOOKS_SENTINEL);
+    const cacheKey = `${selectedClass}-${selectedSubject}-${selectedBookCodes.join(",")}`;
+
+    const cached = chapterCache.current.get(cacheKey);
+    if (cached) {
+      // Restore selections for chapters present in cached set
+      const prevChecked = { ...checked };
+      const prevChapterMix = { ...chapterMix };
+      setChapters(cached);
+      const restoredChecked: Record<number, boolean> = {};
+      const restoredMix: Record<number, QuestionMix> = {};
+      for (const ch of cached) {
+        if (prevChecked[ch.id]) restoredChecked[ch.id] = true;
+        if (prevChapterMix[ch.id]) restoredMix[ch.id] = prevChapterMix[ch.id];
+      }
+      setChecked(restoredChecked);
+      setChapterMix(restoredMix);
+      return;
+    }
+
+    // Preserve selections before clearing
     const prevChecked = { ...checked };
     const prevChapterMix = { ...chapterMix };
     setChapters([]);
     setChecked({});
     setChapterMix({});
     setLoadingChapters(true);
-    const isAll = selectedBookCodes.includes(ALL_BOOKS_SENTINEL);
 
     let query = supabase
       .from("ncert_chapters")
@@ -184,11 +276,19 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
 
     query.then(({ data, error: err }) => {
       setLoadingChapters(false);
-      if (err) { setError("Could not load chapters: " + err.message); return; }
-      if (!data || data.length === 0) { setError("No chapters found for the selected book(s)."); return; }
+      if (err) {
+        setError("Could not load chapters. " + err.message);
+        setFailedStep(3);
+        return;
+      }
+      if (!data || data.length === 0) {
+        setError("No chapters found for the selected book(s).");
+        setFailedStep(3);
+        return;
+      }
       const newChapters = data as ChapterRow[];
+      chapterCache.current.set(cacheKey, newChapters);
       setChapters(newChapters);
-      // Restore selections for chapters that exist in the new set
       const restoredChecked: Record<number, boolean> = {};
       const restoredMix: Record<number, QuestionMix> = {};
       for (const ch of newChapters) {
@@ -199,7 +299,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
       setChapterMix(restoredMix);
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClass, selectedSubject, selectedBookCodes.join(",")]);
+  }, [selectedClass, selectedSubject, selectedBookCodes.join(","), retryChapterCount]);
 
   const toggleBook = (code: string) =>
     setSelectedBookCodes((prev) =>
@@ -318,7 +418,14 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">⚠️ {error}</div>
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700 flex items-center justify-between gap-2">
+          <span>⚠️ {error}</span>
+          <button
+            onClick={handleRetry}
+            className="text-xs font-semibold text-red-600 border border-red-300 rounded px-2 py-0.5 hover:bg-red-100 transition-colors flex-shrink-0">
+            Retry
+          </button>
+        </div>
       )}
 
       {/* Board */}
@@ -351,7 +458,11 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
         </div>
       </div>
 
-      {loadingSubjects && <div className="flex items-center gap-2 text-sm text-gray-500"><Spinner /> Loading subjects…</div>}
+      {loadingSubjects && (
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Spinner /> <span>Loading subjects…</span>
+        </div>
+      )}
 
       {/* Subject */}
       {subjects.length > 0 && (
@@ -370,7 +481,11 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
         </div>
       )}
 
-      {loadingBooks && <div className="flex items-center gap-2 text-sm text-gray-500"><Spinner /> Loading books…</div>}
+      {loadingBooks && (
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Spinner /> <span>Loading books…</span>
+        </div>
+      )}
 
       {/* Books (only when multiple real book_codes) */}
       {booksWithCodes.length > 1 && (
@@ -389,7 +504,11 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
         </div>
       )}
 
-      {loadingChapters && <div className="flex items-center gap-2 text-sm text-gray-500"><Spinner /> Loading chapters…</div>}
+      {loadingChapters && (
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Spinner /> <span>Loading chapters…</span>
+        </div>
+      )}
 
       {/* Chapters */}
       {hasChapters && (

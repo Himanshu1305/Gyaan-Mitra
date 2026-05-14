@@ -93,37 +93,6 @@ Return structured JSON with chapter name as key.`;
   return result.response.text();
 }
 
-const EXAM_FORMAT_RULES = `
-STRICT CBSE EXAM PAPER FORMAT RULES:
-1. SECTION HEADERS must include question count and total marks, e.g.:
-   ## Section A — Multiple Choice Questions (10 × 1 = 10 marks)
-   ## Section B — Short Answer Questions (5 × 2 = 10 marks)
-   ## Section C — Short Answer Questions (4 × 3 = 12 marks)
-   ## Section D — Long Answer Questions (3 × 5 = 15 marks)
-2. DO NOT mention chapter names anywhere in the paper
-3. DO NOT add any examiner notes, teacher notes, or parenthetical instructions to the teacher
-4. MARKS PER QUESTION:
-   - Section A (MCQ): no marks shown per question
-   - Section B, C, D: show [X marks] at end of each question
-5. ANSWER SPACES below each question:
-   - MCQ: Answer: _______
-   - 2-mark: ___ ___ ___ ___ (4 lines)
-   - 3-mark: ___ ___ ___ ___ ___ ___ (6 lines)
-   - 4-mark: (8 lines)
-   - 5-mark: (10 lines)
-6. CONTINUOUS QUESTION NUMBERING: Q1, Q2, Q3... never restart numbering per section
-7. Use plain Markdown only — no HTML tags, no &nbsp;
-8. MCQ options: (a) ... (b) ... (c) ... (d) ...
-`;
-
-const HINDI_EXAM_RULES = `
-HINDI-SPECIFIC RULES (apply when subject is Hindi/हिंदी):
-- All questions, options, instructions in Devanagari script only
-- Hindi grammar questions must specify type: संधि/समास/अलंकार/क्रिया etc.
-- Comprehension passages taken from the actual NCERT lesson text
-- Do not switch to English mid-paper
-`;
-
 const GENERAL_FORMAT_RULES = `
 FORMATTING RULES:
 - Use clean Markdown only: ## headings, **bold**, - bullet points, 1. numbered lists
@@ -150,20 +119,7 @@ HINDI COMPLETENESS (apply when generating Hindi content):
 - Do not abbreviate or truncate the output
 `;
 
-const ANSWER_KEY_DIAGRAM_RULES = `
-ANSWER KEY DIAGRAM RULES:
-- For every question that involves a diagram or labelling, include an ASCII art diagram in the answer key
-- Format example:
-  [DIAGRAM: Diagram Name]
-  +---------------------------+
-  |       Component A         |
-  |   +----------+           |
-  |   |  Part B  |           |
-  |   +----------+           |
-  +---------------------------+
-  Labels: (1) Component A  (2) Part B
-- Never skip a diagram-related question in the answer key
-`;
+// Diagram rules are inlined directly in the FINALISE_AND_KEY prompt to avoid unused-var lint error
 
 function cleanNotes(text: string): string {
   return text
@@ -175,6 +131,28 @@ function cleanNotes(text: string): string {
         )
     )
     .join("\n");
+}
+
+function cleanAnswerSpaces(text: string): string {
+  // Replace sequences of 2+ standalone --- lines (used incorrectly as answer lines) with underscore lines
+  return text
+    .replace(/^(---\n){2,}/gm, "_____________________________\n_____________________________\n_____________________________\n")
+    .replace(/&nbsp;/g, " ");
+}
+
+function computeTotalMarks(chapters: ChapterSelection[], globalMix?: QuestionMix): number {
+  const hasPerChapter = chapters.some(c => c.questionMix);
+  if (hasPerChapter) {
+    return chapters.reduce((sum, c) => {
+      const qm = c.questionMix;
+      if (!qm) return sum;
+      return sum + qm.mcq + qm.shortTwo * 2 + qm.shortThree * 3 + qm.longFour * 4 + qm.longFive * 5;
+    }, 0);
+  }
+  if (globalMix) {
+    return globalMix.mcq + globalMix.shortTwo * 2 + globalMix.shortThree * 3 + globalMix.longFour * 4 + globalMix.longFive * 5;
+  }
+  return 80;
 }
 
 function questionMixDescription(qm: QuestionMix): string {
@@ -211,7 +189,7 @@ function buildInternalChoiceInstruction(ic: InternalChoice): string {
     D: "Section D (4 & 5-mark questions)",
   };
   const named = ic.sections.map(s => sectionNames[s] ?? `Section ${s}`).join(", ");
-  return `\nINTERNAL CHOICE: Provide internal choice (OR questions) in ${named}. Format: write the first question, then on a new line write "OR", then write the alternative question at the same marks.\n`;
+  return `\nINTERNAL CHOICE: Provide internal choice (OR questions) in ${named}. Format exactly as:\n**Q[N].** [First question] [X marks]\n**OR**\n**Q[N].** [Alternative question] [X marks]\n`;
 }
 
 function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: boolean): string {
@@ -222,75 +200,166 @@ function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: 
     .join("\n");
 
   const contentSection = isFallback
-    ? `Chapters to cover:\n${chapterList}`
+    ? `Chapters to cover (use your knowledge of NCERT ${subject} Class ${classNumber}):\n${chapterList}`
     : `NCERT Chapter Content (extracted from actual textbooks):\n${geminiOutput}\n\nChapters:\n${chapterList}`;
 
   const hasPerChapterMix = chapterSelections.some(c => c.questionMix);
   const isHindi = /hindi|हिंदी/i.test(subject);
+  const totalMarks = computeTotalMarks(chapterSelections, questionMix);
 
-  // Handle FINALISE_AND_KEY: prefix — generate cleaned paper + answer key
+  // Handle FINALISE_AND_KEY: prefix — generate cleaned paper + answer key in one call
   if (/^FINALISE_AND_KEY:/i.test(additionalInstructions || "")) {
     const originalDraft = additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
-    return `You are an expert Indian school teacher. You have a draft exam paper below. Your task:
+    return `You are generating a complete, finalised exam paper and answer key.
 
-1. Clean the exam paper: remove all chapter references, examiner notes, and teacher notes. Keep questions identical.
-2. Generate a complete answer key with model answers, marking scheme, and ASCII diagrams where needed.
-
-${EXAM_FORMAT_RULES}
-${NCERT_ACCURACY}
-${ANSWER_KEY_DIAGRAM_RULES}
-${isHindi ? HINDI_COMPLETENESS : ""}
-
-DRAFT PAPER:
+DRAFT PAPER TO FINALISE:
 ${originalDraft}
 
-Output EXACTLY in this format:
+YOUR TASKS:
+1. Clean the exam paper: remove all chapter references, examiner notes, and teacher notes. Keep every question identical — do not alter wording or marks.
+2. Generate a COMPLETE answer key for every single question.
+
+ANSWER KEY REQUIREMENTS:
+- Provide complete answers for EVERY question — do not skip any
+- MCQ section: First list all answers in format: Q1-(B), Q2-(A), Q3-(C)... then write a brief explanation for each
+- For short and long answers: write complete model answers matching NCERT content
+- For numerical problems: show complete step-by-step working with units
+- For diagram questions:
+  [DIAGRAM: Name of diagram]
+  +---------------------------+
+  |       Component A         |
+  |   +----------+           |
+  |   |  Part B  |           |
+  |   +----------+           |
+  +---------------------------+
+  Labels: (1) Component A  (2) Part B
+- All answers must match NCERT textbook content exactly
+${isHindi ? "- Write everything in Hindi (Devanagari script)" : ""}
+- Do not add any teacher notes or meta-commentary
+- Mark allocation: show marks awarded for each step in long answers
+
+OUTPUT FORMAT — use EXACTLY these delimiters:
 ===CLEAN PAPER START===
-[Cleaned exam paper here — no chapter names, no teacher notes]
+[Cleaned exam paper — no chapter names, no teacher notes, all questions intact]
 ===CLEAN PAPER END===
 
 ===ANSWER KEY START===
-[Complete answer key with model answers, marks allocation, and ASCII diagrams]
+[Complete answer key with model answers, mark allocations, and ASCII diagrams]
 ===ANSWER KEY END===`;
   }
 
   if (generationType === "exam-paper") {
-    const mixSection = hasPerChapterMix
-      ? `Chapter-wise question distribution (generate EXACTLY these questions per chapter):\n${buildChapterDistribution(chapterSelections)}`
+    const chapterDistribution = hasPerChapterMix
+      ? buildChapterDistribution(chapterSelections)
       : questionMix
-      ? `Question Mix: ${questionMixDescription(questionMix)}`
-      : "Balanced mix of MCQ, short and long answer questions";
+      ? `All chapters combined: ${questionMixDescription(questionMix)}`
+      : "Balanced mix — approximately 20 MCQ, 5 short (2m), 5 short (3m), 3 long (5m)";
+
+    const questionMixSummary = hasPerChapterMix
+      ? `Total ${totalMarks} marks across ${chapterSelections.length} chapter(s)`
+      : questionMix
+      ? questionMixDescription(questionMix)
+      : "Standard CBSE pattern";
 
     const paperType = examType || "Exam Paper";
     const paperDuration = duration || "3 hours";
     const paperDifficulty = difficulty || "Standard";
     const internalChoiceStr = internalChoice ? buildInternalChoiceInstruction(internalChoice) : "";
+    const year = new Date().getFullYear();
 
-    return `You are an expert Indian school teacher. Create a ${board} ${paperType} for Class ${classNumber} ${subject}.
-
-${EXAM_FORMAT_RULES}
-${isHindi ? HINDI_EXAM_RULES : ""}
-${NCERT_ACCURACY}
-${isHindi ? HINDI_COMPLETENESS : ""}
+    return `You are an expert CBSE exam paper setter with 20 years of experience creating board exam papers.
 
 ${contentSection}
 
-${mixSection}
-Duration: ${paperDuration}
-Difficulty: ${paperDifficulty}
+EXAM PAPER REQUIREMENTS:
+- Class: ${classNumber}
+- Subject: ${subject}
+- Board: ${board}
+- Exam Type: ${paperType}
+- Difficulty: ${paperDifficulty}
+- Duration: ${paperDuration}
+
+CHAPTER-WISE QUESTION DISTRIBUTION:
+${chapterDistribution}
+
+TOTAL QUESTION MIX:
+${questionMixSummary}
+
+STRICT FORMATTING RULES — FOLLOW EXACTLY:
+
+1. START with exam header:
+   [SCHOOL NAME]
+   ${paperType.toUpperCase()} EXAMINATION (${year})
+   Class: ${classNumber}    Subject: ${subject}    Max. Marks: ${totalMarks}
+   Time: ${paperDuration}         Date: ___________
+   Name: ___________________________    Roll No.: _______
+
+2. GENERAL INSTRUCTIONS (5-7 points in standard CBSE format):
+   - All questions are compulsory unless internal choice is provided
+   - Write legibly, show all working for numerical questions
+   - etc.
+
+3. SECTIONS — use EXACTLY this format:
+
+   ## SECTION A — Multiple Choice Questions
+   (X questions × 1 mark each = X marks)
+
+   **Q1.** [Question text]
+   (a) option  (b) option  (c) option  (d) option
+   Answer: [ ]
+
+   ## SECTION B — Short Answer Questions
+   (X questions × 2 marks each = X marks)
+
+   **Q[N].** [Question text] [2 marks]
+   _____________________________
+   _____________________________
+   _____________________________
+
+   ## SECTION C — Short Answer Questions
+   (X questions × 3 marks each = X marks)
+
+   **Q[N].** [Question text] [3 marks]
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+
+   ## SECTION D — Long Answer Questions
+   (X questions × 4/5 marks each = X marks)
+
+   **Q[N].** [Question text] [5 marks]
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+   _____________________________
+
+4. ANSWER SPACES — use ONLY underscore lines (_____________________________), NEVER use --- for answer spaces. Use --- ONLY as a section divider between major sections.
+
+5. QUESTION NUMBERING: Q1, Q2, Q3... continuous across ALL sections — never restart.
+
+6. INTERNAL CHOICE (if applicable):
+   **Q[N].** [Question] [X marks]
+   **OR**
+   **Q[N].** [Alternative question] [X marks]
+
 ${internalChoiceStr}
 Teacher instructions: ${additionalInstructions || "None"}
 
-Format as a proper exam paper:
-- School name / date / subject / class / duration header
-- Clear sections (Section A: MCQ, Section B: 2-mark, Section C: 3-mark, Section D: Long Answer)
-- Question numbers (Q1, Q2… continuous) and marks in brackets
-- Space for student name and roll number
-- General instructions at the top
+CRITICAL RULES:
+- DO NOT mention chapter names anywhere in the paper
+- DO NOT add examiner notes, teacher notes, or meta-commentary
+- ALL questions must come strictly from the NCERT chapter content above
+- Generate EXACTLY the number of questions specified — no more, no less
+- Questions must be factually accurate and match NCERT book content
+${isHindi ? "- All questions, options, and instructions in Devanagari script only\n- Hindi grammar questions must specify type: संधि/समास/अलंकार etc." : ""}
 
-DO NOT include the answer key in the question paper.
-DO NOT mention chapter names anywhere in the paper.
-DO NOT add any teacher or examiner notes.`;
+Now generate the complete ${paperType} paper:`;
   }
 
   if (generationType === "worksheet") {
@@ -452,7 +521,8 @@ export async function POST(req: NextRequest) {
       .map((b) => (b as { type: "text"; text: string }).text)
       .join("\n");
 
-    const draft = cleanNotes(rawDraft);
+    // Post-process: remove examiner notes, fix answer space formatting
+    const draft = cleanAnswerSpaces(cleanNotes(rawDraft));
 
     console.log("[generate-with-chapters] Done, draft length:", draft.length);
 
