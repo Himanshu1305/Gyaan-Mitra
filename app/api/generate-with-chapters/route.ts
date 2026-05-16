@@ -437,13 +437,18 @@ STRICT FORMATTING RULES — FOLLOW EXACTLY:
    (X questions × 1 mark each = X marks)
 
    **Q1.** [Question text]
-   (a) option  (b) option  (c) option  (d) option
+
+   (a) [Option A]
+   (b) [Option B]
+   (c) [Option C]
+   (d) [Option D]
+
    Answer: [ ]
 
    ## SECTION B — Short Answer Questions
    (X questions × 2 marks each = X marks)
 
-   **Q[N].** [Question text] [2 marks]
+   **Q[N].** [Question text]
    _____________________________
    _____________________________
    _____________________________
@@ -451,7 +456,7 @@ STRICT FORMATTING RULES — FOLLOW EXACTLY:
    ## SECTION C — Short Answer Questions
    (X questions × 3 marks each = X marks)
 
-   **Q[N].** [Question text] [3 marks]
+   **Q[N].** [Question text]
    _____________________________
    _____________________________
    _____________________________
@@ -461,7 +466,7 @@ STRICT FORMATTING RULES — FOLLOW EXACTLY:
    ## SECTION D — Long Answer Questions
    (X questions × 4/5 marks each = X marks)
 
-   **Q[N].** [Question text] [5 marks]
+   **Q[N].** [Question text]
    _____________________________
    _____________________________
    _____________________________
@@ -476,9 +481,27 @@ STRICT FORMATTING RULES — FOLLOW EXACTLY:
 5. QUESTION NUMBERING: Q1, Q2, Q3... continuous across ALL sections — never restart.
 
 6. INTERNAL CHOICE (if applicable):
-   **Q[N].** [Question] [X marks]
+   **Q[N].** [Question]
    **OR**
-   **Q[N].** [Alternative question] [X marks]
+   **Q[N].** [Alternative question]
+
+7. DIAGRAM QUESTIONS — MANDATORY:
+   When a question requires a diagram, figure, or visual:
+   - Write the question text naturally referencing the diagram
+   - On the VERY NEXT LINE after the question, add the placeholder:
+     [FIGURE: keyword1, keyword2, keyword3, keyword4]
+     OR for novel Physics/Maths diagrams:
+     [SVG: detailed description of what to draw]
+   - The placeholder MUST be on its own line
+   - NEVER write "draw a diagram" without a placeholder
+   - NEVER leave a diagram reference without a placeholder
+
+   Examples:
+   **Q15.** With the help of a labelled diagram, name any three parts of the human eye and state their functions.
+   [FIGURE: human eye diagram, lens, retina, cornea, iris, ciliary muscles]
+
+   **Q16.** Draw a ray diagram to show myopia and its correction.
+   [SVG: ray diagram showing myopic eye, object on left, rays converging in front of retina, concave lens correcting the defect, labels: object, lens, retina, focal point]
 
 ${internalChoiceStr}
 Teacher instructions: ${additionalInstructions || "None"}

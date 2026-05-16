@@ -147,7 +147,7 @@ export default function ExamPapersPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
-  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("quick");
+  const generationMode = "quick" as const;
   const [internalChoiceEnabled, setInternalChoiceEnabled] = useState(false);
   const [internalChoiceSections, setInternalChoiceSections] = useState<string[]>(["C", "D"]);
   const [draftBannerDismissed, setDraftBannerDismissed] = useState(false);
@@ -561,26 +561,7 @@ export default function ExamPapersPage() {
                   </div>
                 )}
 
-                {/* Quick / Accurate toggle */}
-                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
-                  <div>
-                    <div className="flex bg-gray-100 rounded-xl p-1">
-                      <button onClick={() => setGenerationMode("quick")}
-                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${generationMode === "quick" ? "bg-white text-secondary shadow-sm" : "text-gray-500"}`}>
-                        ⚡ Quick (30s)
-                      </button>
-                      <button onClick={() => setGenerationMode("accurate")}
-                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${generationMode === "accurate" ? "bg-white text-secondary shadow-sm" : "text-gray-500"}`}>
-                        🎯 Accurate (60–90s)
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {generationMode === "quick" ? "Uses AI knowledge of NCERT syllabus. Fast but may not match exact book wording." : "Reads actual NCERT PDFs. Slower but strictly based on book content."}
-                    </p>
-                  </div>
-                )}
-
-                {chapterResult && chapterResult.chapters.length > 0 && (
+{chapterResult && chapterResult.chapters.length > 0 && (
                   <button
                     onClick={() => {
                       if (chapterDraftReady) {
@@ -607,7 +588,7 @@ export default function ExamPapersPage() {
                       />
                     </div>
                     <p className="text-xs text-gray-400">
-                      {generationMode === "accurate" ? "Estimated time: 60–90 seconds" : "Estimated time: 20–40 seconds"}
+                      {"Estimated time: 30–90 seconds"}
                       {loadingProgressStep >= CHAPTER_PROGRESS_STEPS.length - 1 && " — Taking longer than usual, please wait…"}
                     </p>
                   </div>
