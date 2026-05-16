@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { resolveAllPlaceholders } from "@/lib/svg-generator";
 
 type QuestionMix = {
   mcq: number;
@@ -120,6 +121,161 @@ HINDI COMPLETENESS (apply when generating Hindi content):
 `;
 
 // Diagram rules are inlined directly in the FINALISE_AND_KEY prompt to avoid unused-var lint error
+
+const EXAM_PAPER_SYSTEM_PROMPT = `
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+═══════════════════════════════════════════════════════
+SECTION 1 — PAPER FORMAT (ALWAYS FOLLOW)
+═══════════════════════════════════════════════════════
+
+Every exam paper must follow this exact CBSE structure:
+
+HEADER:
+[School Name]
+[Subject] — Class [X]
+Chapter: [Chapter Name]
+Time Allowed: [X] Hours | Maximum Marks: [X]
+
+INSTRUCTIONS TO STUDENTS:
+1. All questions are compulsory.
+2. Read each question carefully before answering.
+3. Draw neat, labelled diagrams wherever required.
+4. Write answers in the space provided.
+
+---
+
+Section A — Multiple Choice Questions (1 mark each)
+Section B — Short Answer Questions (2 marks each)
+Section C — Answer in Detail (3 marks each)
+Section D — Long Answer / Case-Based Questions (5 marks each)
+
+RULES:
+- Section headings state marks per question — do NOT repeat marks on individual questions
+- Number questions sequentially across all sections — do not restart per section
+- Leave a blank line between each question
+- For MCQs: provide exactly 4 options labeled (a), (b), (c), (d)
+
+═══════════════════════════════════════════════════════
+SECTION 2 — DIFFICULTY LEVEL RULES
+═══════════════════════════════════════════════════════
+
+── EASY ──────────────────────────────────────────────
+QUESTIONS: Use exact NCERT textbook questions wherever possible. Remaining questions must be similar-style (same concept, different numbers or wording). No novel scenarios. Bloom's levels 1-2 only.
+FIGURES: Use [FIGURE: keywords] for NCERT diagrams only. No SVG generation. If no NCERT figure exists for a question, replace that question with one that does not need a diagram.
+
+── STANDARD ──────────────────────────────────────────
+QUESTIONS: Sections A & B — NCERT + similar-style mix. Sections C & D — application questions based on chapter concepts in new contexts. No out-of-syllabus content.
+FIGURES: All subjects — use [FIGURE: keywords] for any NCERT diagram. Physics, Maths, Chemistry only — use [SVG: description] in Sections C & D when no NCERT figure fits. Biology and all other subjects — [FIGURE: keywords] only, never SVG. Every diagram-based question MUST have a placeholder.
+
+── CHALLENGING ───────────────────────────────────────
+QUESTIONS: Section A — NCERT + application MCQs. Sections B, C, D — mostly novel scenarios, data interpretation, case-based questions. Chapter-locked always. No hallucination. Bloom's levels 3-6.
+FIGURES: All subjects — use [FIGURE: keywords] for any NCERT diagram. Physics and Maths — prefer [SVG: description] for novel scenarios. Chemistry — [SVG: description] for novel apparatus. Biology and all other subjects — [FIGURE: keywords] only, never SVG. Every diagram-based question MUST have a placeholder.
+
+═══════════════════════════════════════════════════════
+SECTION 3 — DIAGRAM RULES (CRITICAL — READ CAREFULLY)
+═══════════════════════════════════════════════════════
+
+IMPORTANT: All diagram placeholder text MUST be in English regardless of paper language.
+Even for Hindi medium papers — write [FIGURE: ...] and [SVG: ...] placeholders in English only.
+The system cannot parse Devanagari placeholder text.
+
+TWO placeholder types — use them exactly as specified:
+
+── TYPE 1: [FIGURE: keywords] ──
+Use for ANY diagram that exists in the NCERT textbook, for ALL subjects.
+The system automatically replaces this with the actual NCERT textbook image.
+
+FORMAT: [FIGURE: keyword1, keyword2, keyword3, keyword4, keyword5]
+
+RULES:
+- Place on its own line where the diagram should appear
+- Use 4-8 specific searchable English keywords: topic name, components, process, synonyms
+- Question text MUST naturally reference the diagram BEFORE the placeholder
+- Never place this placeholder without a preceding natural reference in the question
+
+EXAMPLES:
+"The figure below shows the human eye. Study it carefully and answer:
+(a) Which part controls the amount of light entering the eye?
+(b) Where is the image formed in a myopic eye?
+[FIGURE: human eye, lens, retina, cornea, iris, optic nerve, light]"
+
+"Study the circuit diagram below and calculate the total resistance.
+[FIGURE: series circuit, resistors, battery, ohms law, current]"
+
+"On the outline map of India provided, mark and label the following rivers.
+[FIGURE: India outline map, rivers, political boundaries, states]
+(Outline map to be provided separately to students)"
+
+"Study the flowchart below showing the structure of Indian Parliament.
+[FIGURE: Indian Parliament, Lok Sabha, Rajya Sabha, President, legislative process]"
+
+── TYPE 2: [SVG: description] ──
+Use ONLY for Physics, Maths, Chemistry when a novel diagram is needed that does NOT exist in NCERT.
+The system generates an actual rendered diagram from your description.
+NEVER use for Biology, Geography, History, Political Science, Economics, Social Science.
+
+FORMAT: [SVG: detailed precise description including all measurements, labels, directions]
+
+RULES:
+- Description must be complete — include all measurements, labels, directions, component values
+- Place on its own line where the diagram should appear
+- Question text MUST naturally reference the diagram BEFORE the placeholder
+- Write description in English even for Hindi medium papers
+
+EXAMPLES:
+"The figure below shows a ray of light passing through a glass slab. Study it and answer:
+(i) What happens to the emergent ray compared to the incident ray?
+(ii) Calculate the lateral displacement if slab thickness is 4cm and angle of incidence is 45°.
+[SVG: rectangular glass slab, incident ray hitting top-left surface at 45 degrees to normal, ray refracts inside slab toward normal, emergent ray exits bottom-right surface parallel to incident ray but displaced sideways, label: incident ray, normal at entry, refracted ray, normal at exit, emergent ray, lateral displacement d as double-headed arrow]"
+
+"Study the following circuit and find the current through R2.
+[SVG: parallel circuit, 9V battery on left, three parallel branches: R1=6ohm top branch, R2=3ohm middle branch, R3=2ohm bottom branch, ammeter A in main wire, voltmeter V across R2, conventional current direction arrows on all wires, all values labeled]"
+
+"In the figure below, triangle ABC has a right angle at B.
+[SVG: triangle ABC, right angle at B with small square symbol, AB=6cm on left side, BC=8cm on bottom, hypotenuse AC=10cm, vertices labeled A top-left B bottom-left C bottom-right]"
+
+NEVER DO THIS:
+- "Draw a diagram of the human eye." — no placeholder
+- "[FIGURE: eye]" — placeholder without preceding question reference
+- "[चित्र: आंख, लेंस]" — placeholder in Devanagari — system cannot parse this
+- "In the figure [FIGURE: eye] shown..." — placeholder not on its own line
+- "Refer to diagram below." with nothing following — placeholder must follow immediately
+
+═══════════════════════════════════════════════════════
+SECTION 4 — SUBJECT-SPECIFIC RULES
+═══════════════════════════════════════════════════════
+
+BIOLOGY: [FIGURE: keywords] only — never SVG. If a challenging question needs a novel diagram not in NCERT, rewrite it as a descriptive question that does not require a diagram.
+
+PHYSICS: Include at least one numerical in Sections C or D. Format: given values → formula → substitution → answer with units. Circuit and ray diagrams expected in most chapters.
+
+CHEMISTRY: Balance all equations. Show complete step-by-step working for numericals. Never include reactions not in the specified chapter.
+
+MATHEMATICS: Every geometry question must have a figure — no exceptions. Graphs must have labeled axes, marked origin, stated scale. Show all construction steps.
+
+GEOGRAPHY: Always include map questions. Always use [FIGURE: keywords] for maps. Always add "(Outline map to be provided separately to students)" after map placeholders.
+
+HISTORY / POLITICAL SCIENCE / ECONOMICS / SOCIOLOGY: Use [FIGURE: keywords] only for flowcharts, timelines, or maps that clearly exist in that NCERT chapter. Never force diagrams in text-based subjects.
+
+HINDI / ENGLISH / SANSKRIT: No diagrams at all. Ignore all diagram instructions. Focus on comprehension, grammar, writing, literature questions. Paper content in the selected language; placeholders in English if any arise.
+
+═══════════════════════════════════════════════════════
+SECTION 5 — QUALITY RULES (NEVER VIOLATE)
+═══════════════════════════════════════════════════════
+
+1. CHAPTER-LOCKED: Every question based on specified chapter only. No other chapters even if related.
+2. NO HALLUCINATION: Every fact, formula, diagram description must match NCERT exactly. If uncertain, do not include it.
+3. NO OUT-OF-SYLLABUS: No topics outside the specified class and chapter.
+4. MARKS CONSISTENCY: No marks on individual questions. Section headings only.
+5. DIAGRAM COMPLETENESS: If question says "figure below", "diagram below", "circuit below", "map below" or any visual reference — placeholder MUST appear on the very next line. No exceptions.
+6. COMPLETE QUESTIONS: Every question fully self-contained. Student needs only the paper and its diagrams.
+7. LANGUAGE: Write paper content in selected language. For Hindi medium — Devanagari script for all question text and options. Diagram placeholders always in English.
+8. NEP 2020: Easy = Bloom's 1-2. Standard = Bloom's 2-3. Challenging = Bloom's 3-6.
+9. ANSWER SPACES: Do not add answer lines or boxes. Frontend handles this.
+`;
 
 function cleanNotes(text: string): string {
   return text
@@ -243,7 +399,7 @@ OUTPUT FORMAT — use EXACTLY these delimiters:
     const internalChoiceStr = internalChoice ? buildInternalChoiceInstruction(internalChoice) : "";
     const year = new Date().getFullYear();
 
-    return `You are an expert CBSE exam paper setter with 20 years of experience creating board exam papers.
+    return `${EXAM_PAPER_SYSTEM_PROMPT}
 
 ${contentSection}
 
@@ -497,6 +653,12 @@ export async function POST(req: NextRequest) {
       .map((b) => (b as { type: "text"; text: string }).text)
       .join("\n");
 
+    const { resolvedContent, ncertFiguresFound, ncertFiguresMissed, svgsGenerated, svgsFailed } = await resolveAllPlaceholders(
+      rawDraft,
+      body.classNumber,
+      body.subject,
+    );
+
     // Post-process: remove examiner notes, fix answer space formatting
     let draft: string;
 
@@ -519,6 +681,7 @@ Do not mention marks for individual questions. Marks are already stated at the s
 ${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
 For Section A (MCQ): List all answers as Q1-(B), Q2-(A), Q3-(C)... then a brief explanation for each.
 For Section B (short answers): Write complete model answers matching NCERT content.
+For diagram questions: describe what the diagram shows in clear words. Name all labeled parts. Do NOT draw ASCII art.
 Do not add teacher notes or meta-commentary.
 
 EXAM PAPER:
@@ -540,15 +703,8 @@ ${paperForKey}`;
 Do not mention marks for individual questions. Marks are already stated at the section heading level.
 ${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
 For Section C (short answers): Write complete model answers matching NCERT content.
-For Section D (long answers): Show complete step-by-step working with units for numericals. For diagram questions use ASCII art:
-  [DIAGRAM: Name of diagram]
-  +---------------------------+
-  |       Component A         |
-  |   +----------+           |
-  |   |  Part B  |           |
-  |   +----------+           |
-  +---------------------------+
-  Labels: (1) Component A  (2) Part B
+For Section D (long answers): Show complete step-by-step working with units for numericals.
+For diagram questions: describe what the diagram shows in clear words. Name all labeled parts. Do NOT draw ASCII art.
 All answers must match NCERT textbook content exactly. Do not add teacher notes or meta-commentary.
 
 EXAM PAPER:
@@ -569,7 +725,7 @@ ${paperForKey}`;
 
       draft = `===CLEAN PAPER START===\n${cleanedPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${combinedAnswerKey}\n===ANSWER KEY END===`;
     } else {
-      draft = cleanAnswerSpaces(cleanNotes(rawDraft));
+      draft = cleanAnswerSpaces(cleanNotes(resolvedContent));
     }
 
     console.log("[generate-with-chapters] Done, draft length:", draft.length);
@@ -589,6 +745,10 @@ ${paperForKey}`;
       draft,
       geminiSummary: isFallback ? null : geminiOutput,
       usedFallback: isFallback,
+      ncertFiguresFound,
+      ncertFiguresMissed,
+      svgsGenerated,
+      svgsFailed,
     });
   } catch (err) {
     console.error("[generate-with-chapters] Error:", err);
