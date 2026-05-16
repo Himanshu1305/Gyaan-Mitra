@@ -676,12 +676,21 @@ export async function POST(req: NextRequest) {
       const isHindi = /hindi|हिंदी/i.test(body.subject);
 
       // Call 3a: answer key for Section A and Section B
-      const prompt3a = `Generate the answer key ONLY for Section A and Section B of the exam paper below.
-Do not mention marks for individual questions. Marks are already stated at the section heading level.
+      const prompt3a = `Generate the answer key for Section A and Section B ONLY.
+Do not mention marks for individual questions.
 ${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
-For Section A (MCQ): List all answers as Q1-(B), Q2-(A), Q3-(C)... then a brief explanation for each.
-For Section B (short answers): Write complete model answers matching NCERT content.
-For diagram questions: describe what the diagram shows in clear words. Name all labeled parts. Do NOT draw ASCII art.
+CRITICAL: Answer EVERY SINGLE question in Section A and Section B.
+Count all questions before starting. Do not skip any.
+
+Section A (MCQ answers):
+List every answer: Q1-(d), Q2-(c), Q3-(b)...
+Then write one paragraph explanation for each MCQ.
+
+Section B (2-mark answers):
+Write complete model answers for every question.
+
+For diagram questions: describe the diagram clearly in words with all labels.
+Do NOT draw ASCII art.
 Do not add teacher notes or meta-commentary.
 
 EXAM PAPER:
@@ -699,13 +708,22 @@ ${paperForKey}`;
         .join("\n");
 
       // Call 3b: answer key for Section C and Section D
-      const prompt3b = `Generate the answer key ONLY for Section C and Section D of the exam paper below.
-Do not mention marks for individual questions. Marks are already stated at the section heading level.
+      const prompt3b = `Generate the answer key for Section C and Section D ONLY.
+Do not mention marks for individual questions.
 ${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
-For Section C (short answers): Write complete model answers matching NCERT content.
-For Section D (long answers): Show complete step-by-step working with units for numericals.
-For diagram questions: describe what the diagram shows in clear words. Name all labeled parts. Do NOT draw ASCII art.
-All answers must match NCERT textbook content exactly. Do not add teacher notes or meta-commentary.
+CRITICAL: Answer EVERY SINGLE question in Section C and Section D.
+Count all questions before starting. Do not stop until all are answered.
+Use all available tokens if needed — completeness is mandatory.
+
+Section C (3-mark answers):
+Write complete model answers covering all key points for every question.
+
+Section D (5-mark answers):
+Write detailed answers. For numericals: given → formula → substitution → answer with units.
+
+For diagram questions: describe the diagram clearly in words with all labels.
+Do NOT draw ASCII art.
+Do not add teacher notes or meta-commentary.
 
 EXAM PAPER:
 ${paperForKey}`;

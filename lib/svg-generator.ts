@@ -187,26 +187,35 @@ async function searchNcertFigure(
   chapterNumber?: number
 ): Promise<NcertFigure | null> {
   try {
-    const { data } = await getServiceClient().rpc("search_ncert_figures", {
-      p_keywords: keywords,
-      p_class: classNumber,
-      p_subject: subject,
-      p_chapter: chapterNumber ?? null,
-      p_limit: 3,
-    });
-    if (data && data.length > 0) return data[0];
-
-    // Retry without chapter filter
+    // First try: chapter-specific search
     if (chapterNumber) {
-      const { data: data2 } = await getServiceClient().rpc("search_ncert_figures", {
+      const { data } = await getServiceClient().rpc("search_ncert_figures", {
         p_keywords: keywords,
         p_class: classNumber,
         p_subject: subject,
-        p_chapter: null,
-        p_limit: 3,
+        p_chapter: chapterNumber,
+        p_limit: 5,
       });
-      return data2?.[0] ?? null;
+      if (data && data.length > 0 && data[0].match_score >= 2) {
+        return data[0];
+      }
     }
+
+    // Second try: subject-wide search (no chapter filter)
+    const { data: data2 } = await getServiceClient().rpc("search_ncert_figures", {
+      p_keywords: keywords,
+      p_class: classNumber,
+      p_subject: subject,
+      p_chapter: null,
+      p_limit: 5,
+    });
+
+    if (data2 && data2.length > 0 && data2[0].match_score >= 2) {
+      return data2[0];
+    }
+
+    // No confident match found — return null so fallback SVG is used
+    // This prevents wrong images from appearing
     return null;
   } catch {
     return null;
