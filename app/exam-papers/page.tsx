@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import MarkdownContent from "@/components/ui/MarkdownContent";
+import ReactMarkdown from "react-markdown";
 import MicButton from "@/components/ui/MicButton";
 import ChapterUpload, { UploadedFile } from "@/components/ui/ChapterUpload";
 import ChapterSelector, { ChapterSelectorResult } from "@/components/shared/ChapterSelector";
@@ -89,6 +89,43 @@ function TabToggle({ mode, onChange }: { mode: "chapter" | "custom"; onChange: (
   );
 }
 
+function ExamPaper({ content }: { content: string }) {
+  return (
+    <ReactMarkdown
+      components={{
+        img({ src, alt }) {
+          if (!src) return null;
+          return (
+            <figure className="my-4 flex flex-col items-center">
+              <img
+                src={src}
+                alt={alt || "Diagram"}
+                className="max-w-full h-auto border border-gray-200 rounded-lg shadow-sm"
+                style={{ maxHeight: "400px", objectFit: "contain" }}
+                loading="lazy"
+              />
+              {alt && !src.startsWith("data:") && (
+                <figcaption className="mt-1 text-sm text-gray-500 italic text-center">
+                  {alt}
+                </figcaption>
+              )}
+            </figure>
+          );
+        },
+        h1({ children }) { return <h1 className="text-2xl font-bold text-[#1B3A6B] border-b-2 border-[#FF9933] pb-2 mb-4">{children}</h1>; },
+        h2({ children }) { return <h2 className="text-xl font-semibold text-[#1B3A6B] mt-6 mb-3">{children}</h2>; },
+        h3({ children }) { return <h3 className="text-lg font-medium text-[#1B3A6B] mt-4 mb-2">{children}</h3>; },
+        table({ children }) { return <div className="overflow-x-auto my-4"><table className="min-w-full border-collapse border border-gray-300 text-sm">{children}</table></div>; },
+        th({ children }) { return <th className="border border-gray-300 bg-[#1B3A6B] text-white px-3 py-2 text-left">{children}</th>; },
+        td({ children }) { return <td className="border border-gray-300 px-3 py-2">{children}</td>; },
+        hr() { return <hr className="border-t-2 border-[#FF9933] my-6 opacity-40" />; },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+}
+
 export default function ExamPapersPage() {
   const { user, session, subscriptionTier } = useAuth();
   const isPremium = subscriptionTier === "premium";
@@ -115,6 +152,9 @@ export default function ExamPapersPage() {
   const [internalChoiceSections, setInternalChoiceSections] = useState<string[]>(["C", "D"]);
   const [draftBannerDismissed, setDraftBannerDismissed] = useState(false);
   const [loadingProgressStep, setLoadingProgressStep] = useState(0);
+  const [ncertFiguresFound, setNcertFiguresFound] = useState(0);
+  const [ncertFiguresMissed, setNcertFiguresMissed] = useState(0);
+  const [svgsGenerated, setSvgsGenerated] = useState(0);
 
   // Custom prompt mode state
   const [customPrompt, setCustomPrompt] = useState("");
@@ -181,6 +221,9 @@ export default function ExamPapersPage() {
     setDraftBannerDismissed(false);
     setInternalChoiceEnabled(false);
     setInternalChoiceSections(["C", "D"]);
+    setNcertFiguresFound(0);
+    setNcertFiguresMissed(0);
+    setSvgsGenerated(0);
   };
 
   // Custom prompt generation (uses streaming exam-paper route)
@@ -322,6 +365,9 @@ export default function ExamPapersPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Generation failed");
       setChapterDraft(data.draft);
+      setNcertFiguresFound(data.ncertFiguresFound ?? 0);
+      setNcertFiguresMissed(data.ncertFiguresMissed ?? 0);
+      setSvgsGenerated(data.svgsGenerated ?? 0);
       setChapterDraftReady(true);
       setChapterPreviewMode("preview");
       if (user) getUsageThisMonth(user.id).then(setUsage);
@@ -608,11 +654,18 @@ export default function ExamPapersPage() {
                     </div>
                     {chapterPreviewMode === "preview" ? (
                       <div id="print-area" className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ minHeight: 400, maxHeight: 600 }}>
-                        <MarkdownContent text={chapterDraft} />
+                        <ExamPaper content={chapterDraft} />
                       </div>
                     ) : (
                       <textarea value={chapterDraft} onChange={(e) => setChapterDraft(e.target.value)} rows={20}
                         className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y" style={{ minHeight: 500 }} />
+                    )}
+                    {(ncertFiguresFound > 0 || svgsGenerated > 0 || ncertFiguresMissed > 0) && (
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                        {ncertFiguresFound > 0 && <span className="text-green-600">✅ {ncertFiguresFound} NCERT diagram{ncertFiguresFound > 1 ? "s" : ""} embedded</span>}
+                        {svgsGenerated > 0 && <span className="text-blue-600">✅ {svgsGenerated} diagram{svgsGenerated > 1 ? "s" : ""} generated</span>}
+                        {ncertFiguresMissed > 0 && <span className="text-amber-600">⚠️ {ncertFiguresMissed} placeholder{ncertFiguresMissed > 1 ? "s" : ""} not matched</span>}
+                      </div>
                     )}
                     <div className="space-y-3 pt-3 border-t border-gray-100">
                       <p className="text-sm font-semibold text-secondary">Revision Instructions</p>
@@ -658,8 +711,15 @@ export default function ExamPapersPage() {
                       ))}
                     </div>
                     <div id="print-area" className="paper-output border border-gray-200 rounded-xl p-5 bg-white overflow-y-auto" style={{ maxHeight: 600 }}>
-                      <MarkdownContent text={chapterTab === "paper" ? chapterDraft : chapterAnswerKey} />
+                      <ExamPaper content={chapterTab === "paper" ? chapterDraft : chapterAnswerKey} />
                     </div>
+                    {(ncertFiguresFound > 0 || svgsGenerated > 0 || ncertFiguresMissed > 0) && (
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                        {ncertFiguresFound > 0 && <span className="text-green-600">✅ {ncertFiguresFound} NCERT diagram{ncertFiguresFound > 1 ? "s" : ""} embedded</span>}
+                        {svgsGenerated > 0 && <span className="text-blue-600">✅ {svgsGenerated} diagram{svgsGenerated > 1 ? "s" : ""} generated</span>}
+                        {ncertFiguresMissed > 0 && <span className="text-amber-600">⚠️ {ncertFiguresMissed} placeholder{ncertFiguresMissed > 1 ? "s" : ""} not matched</span>}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -825,10 +885,10 @@ export default function ExamPapersPage() {
 
               <div className="px-6 sm:px-8 py-6" id="result-content">
                 {!loading && keyContent ? (
-                  activeTab === "question" ? <MarkdownContent text={questionContent} /> : <MarkdownContent text={keyContent} />
+                  activeTab === "question" ? <ExamPaper content={questionContent} /> : <ExamPaper content={keyContent} />
                 ) : (
                   <>
-                    <MarkdownContent text={displayResult} />
+                    <ExamPaper content={displayResult} />
                     {loading && <span className="inline-block w-0.5 h-4 bg-primary animate-pulse ml-0.5 -mb-0.5" />}
                   </>
                 )}
