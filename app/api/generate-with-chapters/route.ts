@@ -272,6 +272,58 @@ Rules:
   Include anatomical/technical terms teachers would search for
 `;
 
+const ANSWER_KEY_DIAGRAM_PROMPT = `You are a diagram classifier for Indian school exam paper ANSWER KEYS (not question papers).
+
+You will receive an answer key. For every answer that involves a diagram, decide which category applies.
+
+CATEGORY FIGURE — Show an NCERT textbook diagram as model answer:
+Use when the answer mentions ANY of these:
+"draw a neat labelled diagram", "draw a ray diagram",
+"draw a circuit diagram", "draw a schematic",
+"the diagram shows", "refer to diagram", "as shown in figure",
+"label the following parts", "the following diagram",
+"draw and label", "sketch showing"
+→ This is a model answer — teacher needs to see the correct diagram.
+
+CATEGORY SVG — Generate a custom diagram as model answer:
+Use for Physics, Maths, Chemistry when answer describes a specific novel diagram with measurements or circuit values.
+
+CATEGORY NONE — No diagram needed:
+Use for text-only answers, MCQ explanations, definitions, numerical calculations without diagrams.
+
+Return ONLY a valid JSON array. No markdown. No explanation.
+Start with [ and end with ].
+
+Format:
+[
+  {
+    "question_number": 5,
+    "decision": "FIGURE",
+    "keywords": ["human eye", "cornea", "iris", "lens", "retina", "ciliary muscles", "optic nerve"],
+    "svg_description": ""
+  },
+  {
+    "question_number": 8,
+    "decision": "SVG",
+    "keywords": [],
+    "svg_description": "ray diagram showing myopic eye correction with concave lens, object on left, rays converging in front of retina without lens, concave lens added, rays now focus on retina, labels: object, concave lens, retina, focal point"
+  },
+  {
+    "question_number": 3,
+    "decision": "NONE",
+    "keywords": [],
+    "svg_description": ""
+  }
+]
+
+Rules:
+- Include every question number that has a diagram-related answer
+- For FIGURE keywords: be very specific — include exact anatomical or technical terms
+- MCQ answer explanations are usually NONE unless they reference a specific diagram
+- For "draw a ray diagram showing myopia" → FIGURE with keywords for myopia ray diagram
+- For "draw a circuit with R1=4ohm R2=6ohm in parallel" → SVG
+`;
+
 function cleanNotes(text: string): string {
   return text
     .split("\n")
@@ -352,13 +404,15 @@ interface DiagramDecision {
 
 async function runDiagramClassifier(
   paperContent: string,
-  client: Anthropic
+  client: Anthropic,
+  isAnswerKey: boolean = false
 ): Promise<DiagramDecision[]> {
   try {
+    const systemPrompt = isAnswerKey ? ANSWER_KEY_DIAGRAM_PROMPT : DIAGRAM_CLASSIFIER_PROMPT;
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
-      system: DIAGRAM_CLASSIFIER_PROMPT,
+      system: systemPrompt,
       messages: [
         {
           role: 'user',
@@ -804,6 +858,9 @@ For short and long answer questions: Write complete model answers for every ques
 
 For diagram questions: describe the diagram clearly in words with all labels.
 Do NOT draw ASCII art.
+For answers involving diagrams: write a clear description of what the diagram shows, then on the next line write:
+[Diagram: brief description of what to draw]
+This helps the system generate the correct diagram for the model answer.
 Do not add teacher notes or meta-commentary.
 
 EXAM PAPER:
@@ -833,6 +890,9 @@ For numericals: given → formula → substitution → answer with units.
 
 For diagram questions: describe the diagram clearly in words with all labels.
 Do NOT draw ASCII art.
+For answers involving diagrams: write a clear description of what the diagram shows, then on the next line write:
+[Diagram: brief description of what to draw]
+This helps the system generate the correct diagram for the model answer.
 Do not add teacher notes or meta-commentary.
 
 EXAM PAPER:
@@ -883,7 +943,25 @@ ${paperForKey}`;
         combinedAnswerKey = combinedAnswerKey + "\n\n---\n\n" + cleanNotes(responseCatchup);
       }
 
-      draft = `===CLEAN PAPER START===\n${resolvedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${combinedAnswerKey}\n===ANSWER KEY END===`;
+      // Classify and add diagrams to answer key
+      const answerKeyDecisions = await runDiagramClassifier(
+        combinedAnswerKey,
+        client,
+        true // isAnswerKey flag
+      );
+      const answerKeyWithPlaceholders = insertDiagramPlaceholders(
+        combinedAnswerKey,
+        answerKeyDecisions
+      );
+      const {
+        resolvedContent: resolvedAnswerKey,
+      } = await resolveAllPlaceholders(
+        answerKeyWithPlaceholders,
+        body.classNumber,
+        body.subject
+      );
+
+      draft = `===CLEAN PAPER START===\n${resolvedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
     } else {
       // Pass 2: Classify diagrams for each question
       const diagramDecisions = await runDiagramClassifier(rawDraft, client);
