@@ -116,16 +116,35 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
     setFailedStep(null);
   }, [failedStep, selectedClass, selectedSubject, selectedBookCodes]);
 
+  // Prefetch subjects for all classes on mount so class selection is instant
+  useEffect(() => {
+    const prefetchAll = async () => {
+      for (const cls of [6, 7, 8, 9, 10, 11, 12]) {
+        if (!subjectCache.current.has(cls)) {
+          const { data } = await supabase
+            .rpc("get_subjects_for_class", { p_class: cls });
+          if (data) {
+            subjectCache.current.set(
+              cls,
+              (data as { subject: string }[]).map(r => r.subject)
+            );
+          }
+        }
+      }
+    };
+    prefetchAll();
+  }, []);
+
   // Step 1 — fetch subjects when class changes
   useEffect(() => {
     if (!selectedClass) return;
     setError("");
     setFailedStep(null);
 
-    // Check cache first — avoids Supabase round-trip on re-visits
-    const cached = subjectCache.current.get(selectedClass);
-    if (cached) {
-      setSubjects(cached);
+    // Cache hit — show instantly, no loading spinner
+    if (subjectCache.current.has(selectedClass)) {
+      setSubjects(subjectCache.current.get(selectedClass)!);
+      setLoadingSubjects(false);
       setSelectedSubject(null);
       setBooks([]);
       setSelectedBookCodes([]);
@@ -145,9 +164,7 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
     setLoadingSubjects(true);
 
     supabase
-      .from("ncert_chapters")
-      .select("subject")
-      .eq("class_number", selectedClass)
+      .rpc("get_subjects_for_class", { p_class: selectedClass })
       .then(({ data, error: err }) => {
         setLoadingSubjects(false);
         if (err) {
@@ -160,9 +177,9 @@ export default function ChapterSelector({ onChaptersSelected, showMarks = true, 
           setFailedStep(1);
           return;
         }
-        const unique = Array.from(new Set((data as { subject: string }[]).map(r => r.subject))).sort();
-        subjectCache.current.set(selectedClass, unique);
-        setSubjects(unique);
+        const subjects = (data as { subject: string }[]).map(r => r.subject);
+        subjectCache.current.set(selectedClass, subjects);
+        setSubjects(subjects);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass, retrySubjectCount]);
