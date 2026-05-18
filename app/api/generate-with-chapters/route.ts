@@ -781,19 +781,26 @@ export async function POST(req: NextRequest) {
       const paperForKey = resolvedFinalPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
       const isHindi = /hindi|हिंदी/i.test(body.subject);
 
-      // Call 3a: answer key for Section A and Section B
-      const prompt3a = `Generate the answer key for Section A and Section B ONLY.
+      // Count total questions by scanning for Q\d+[.)] pattern
+      const qNumMatches = paperForKey.match(/\bQ(\d+)[.)]/g) || [];
+      const qNums = qNumMatches
+        .map(m => parseInt(m.replace(/\D/g, ''), 10))
+        .filter(n => !isNaN(n) && n > 0);
+      const totalQuestions = qNums.length > 0 ? Math.max(...qNums) : 30;
+      const halfQ = Math.ceil(totalQuestions / 2);
+      console.log(`[generate-with-chapters] Answer key: totalQuestions=${totalQuestions}, halfQ=${halfQ}`);
+
+      // Call 3a: answer Q1 to Q[halfQ]
+      const prompt3a = `Generate the answer key for questions Q1 to Q${halfQ} ONLY.
 Do not mention marks for individual questions.
 ${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
-CRITICAL: Answer EVERY SINGLE question in Section A and Section B.
-Count all questions before starting. Do not skip any.
+You must answer exactly these question numbers: Q1 to Q${halfQ}.
+Count carefully. Do not skip any. If you finish early, you have missed questions — go back and complete all.
 
-Section A (MCQ answers):
-List every answer: Q1-(d), Q2-(c), Q3-(b)...
+For MCQ answers: List every answer as Q1-(d), Q2-(c), Q3-(b)...
 Then write one paragraph explanation for each MCQ.
 
-Section B (2-mark answers):
-Write complete model answers for every question.
+For short and long answer questions: Write complete model answers for every question.
 
 For diagram questions: describe the diagram clearly in words with all labels.
 Do NOT draw ASCII art.
@@ -813,19 +820,16 @@ ${paperForKey}`;
         .map((b) => (b as { type: "text"; text: string }).text)
         .join("\n");
 
-      // Call 3b: answer key for Section C and Section D
-      const prompt3b = `Generate the answer key for Section C and Section D ONLY.
+      // Call 3b: answer Q[halfQ+1] to Q[totalQuestions]
+      const prompt3b = `Generate the answer key for questions Q${halfQ + 1} to Q${totalQuestions} ONLY.
 Do not mention marks for individual questions.
 ${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
-CRITICAL: Answer EVERY SINGLE question in Section C and Section D.
-Count all questions before starting. Do not stop until all are answered.
+You must answer exactly these question numbers: Q${halfQ + 1} to Q${totalQuestions}.
+Count carefully. Do not skip any. If you finish early, you have missed questions — go back and complete all.
 Use all available tokens if needed — completeness is mandatory.
 
-Section C (3-mark answers):
 Write complete model answers covering all key points for every question.
-
-Section D (5-mark answers):
-Write detailed answers. For numericals: given → formula → substitution → answer with units.
+For numericals: given → formula → substitution → answer with units.
 
 For diagram questions: describe the diagram clearly in words with all labels.
 Do NOT draw ASCII art.
@@ -845,7 +849,39 @@ ${paperForKey}`;
         .map((b) => (b as { type: "text"; text: string }).text)
         .join("\n");
 
-      const combinedAnswerKey = cleanNotes(responseA) + "\n\n---\n\n" + cleanNotes(responseB);
+      let combinedAnswerKey = cleanNotes(responseA) + "\n\n---\n\n" + cleanNotes(responseB);
+
+      // Validation: find which question numbers appear in the combined answer key
+      const answeredNums = new Set<number>();
+      for (const qm of (combinedAnswerKey.match(/\bQ(\d+)\b/g) || [])) {
+        const n = parseInt(qm.slice(1), 10);
+        if (n > 0) answeredNums.add(n);
+      }
+      const missing = Array.from({ length: totalQuestions }, (_, i) => i + 1)
+        .filter(n => !answeredNums.has(n));
+
+      if (missing.length > 0) {
+        console.log("[generate-with-chapters] Answer key missing questions:", missing);
+        const promptCatchup = `The answer key is missing answers for these questions: ${missing.map(n => `Q${n}`).join(', ')}.
+Generate ONLY the missing answers now. Do not repeat already-answered questions.
+${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
+
+EXAM PAPER:
+${paperForKey}`;
+
+        const msgCatchup = await client.messages.create({
+          model: "claude-sonnet-4-6",
+          max_tokens: 4000,
+          messages: [{ role: "user", content: promptCatchup }],
+        });
+
+        const responseCatchup = msgCatchup.content
+          .filter((b) => b.type === "text")
+          .map((b) => (b as { type: "text"; text: string }).text)
+          .join("\n");
+
+        combinedAnswerKey = combinedAnswerKey + "\n\n---\n\n" + cleanNotes(responseCatchup);
+      }
 
       draft = `===CLEAN PAPER START===\n${resolvedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${combinedAnswerKey}\n===ANSWER KEY END===`;
     } else {
