@@ -164,117 +164,112 @@ SECTION 2 — DIFFICULTY LEVEL RULES
 
 ── EASY ──────────────────────────────────────────────
 QUESTIONS: Use exact NCERT textbook questions wherever possible. Remaining questions must be similar-style (same concept, different numbers or wording). No novel scenarios. Bloom's levels 1-2 only.
-FIGURES: Use [FIGURE: keywords] for NCERT diagrams only. No SVG generation. If no NCERT figure exists for a question, replace that question with one that does not need a diagram.
 
 ── STANDARD ──────────────────────────────────────────
 QUESTIONS: Sections A & B — NCERT + similar-style mix. Sections C & D — application questions based on chapter concepts in new contexts. No out-of-syllabus content.
-FIGURES: All subjects — use [FIGURE: keywords] for any NCERT diagram. Physics, Maths, Chemistry only — use [SVG: description] in Sections C & D when no NCERT figure fits. Biology and all other subjects — [FIGURE: keywords] only, never SVG. Every diagram-based question MUST have a placeholder.
 
 ── CHALLENGING ───────────────────────────────────────
 QUESTIONS: Section A — NCERT + application MCQs. Sections B, C, D — mostly novel scenarios, data interpretation, case-based questions. Chapter-locked always. No hallucination. Bloom's levels 3-6.
-FIGURES: All subjects — use [FIGURE: keywords] for any NCERT diagram. Physics and Maths — prefer [SVG: description] for novel scenarios. Chemistry — [SVG: description] for novel apparatus. Biology and all other subjects — [FIGURE: keywords] only, never SVG. Every diagram-based question MUST have a placeholder.
 
 ═══════════════════════════════════════════════════════
-SECTION 3 — DIAGRAM RULES (CRITICAL — READ CAREFULLY)
+SECTION 3 — SUBJECT-SPECIFIC RULES
 ═══════════════════════════════════════════════════════
 
-IMPORTANT: All diagram placeholder text MUST be in English regardless of paper language.
-Even for Hindi medium papers — write [FIGURE: ...] and [SVG: ...] placeholders in English only.
-The system cannot parse Devanagari placeholder text.
+BIOLOGY: Include questions on life processes, cell biology, reproduction, and ecology as per chapter content.
 
-TWO placeholder types — use them exactly as specified:
-
-── TYPE 1: [FIGURE: keywords] ──
-Use for ANY diagram that exists in the NCERT textbook, for ALL subjects.
-The system automatically replaces this with the actual NCERT textbook image.
-
-FORMAT: [FIGURE: keyword1, keyword2, keyword3, keyword4, keyword5]
-
-RULES:
-- Place on its own line where the diagram should appear
-- Use 4-8 specific searchable English keywords: topic name, components, process, synonyms
-- Question text MUST naturally reference the diagram BEFORE the placeholder
-- Never place this placeholder without a preceding natural reference in the question
-
-EXAMPLES:
-"The figure below shows the human eye. Study it carefully and answer:
-(a) Which part controls the amount of light entering the eye?
-(b) Where is the image formed in a myopic eye?
-[FIGURE: human eye, lens, retina, cornea, iris, optic nerve, light]"
-
-"Study the circuit diagram below and calculate the total resistance.
-[FIGURE: series circuit, resistors, battery, ohms law, current]"
-
-"On the outline map of India provided, mark and label the following rivers.
-[FIGURE: India outline map, rivers, political boundaries, states]
-(Outline map to be provided separately to students)"
-
-"Study the flowchart below showing the structure of Indian Parliament.
-[FIGURE: Indian Parliament, Lok Sabha, Rajya Sabha, President, legislative process]"
-
-── TYPE 2: [SVG: description] ──
-Use ONLY for Physics, Maths, Chemistry when a novel diagram is needed that does NOT exist in NCERT.
-The system generates an actual rendered diagram from your description.
-NEVER use for Biology, Geography, History, Political Science, Economics, Social Science.
-
-FORMAT: [SVG: detailed precise description including all measurements, labels, directions]
-
-RULES:
-- Description must be complete — include all measurements, labels, directions, component values
-- Place on its own line where the diagram should appear
-- Question text MUST naturally reference the diagram BEFORE the placeholder
-- Write description in English even for Hindi medium papers
-
-EXAMPLES:
-"The figure below shows a ray of light passing through a glass slab. Study it and answer:
-(i) What happens to the emergent ray compared to the incident ray?
-(ii) Calculate the lateral displacement if slab thickness is 4cm and angle of incidence is 45°.
-[SVG: rectangular glass slab, incident ray hitting top-left surface at 45 degrees to normal, ray refracts inside slab toward normal, emergent ray exits bottom-right surface parallel to incident ray but displaced sideways, label: incident ray, normal at entry, refracted ray, normal at exit, emergent ray, lateral displacement d as double-headed arrow]"
-
-"Study the following circuit and find the current through R2.
-[SVG: parallel circuit, 9V battery on left, three parallel branches: R1=6ohm top branch, R2=3ohm middle branch, R3=2ohm bottom branch, ammeter A in main wire, voltmeter V across R2, conventional current direction arrows on all wires, all values labeled]"
-
-"In the figure below, triangle ABC has a right angle at B.
-[SVG: triangle ABC, right angle at B with small square symbol, AB=6cm on left side, BC=8cm on bottom, hypotenuse AC=10cm, vertices labeled A top-left B bottom-left C bottom-right]"
-
-NEVER DO THIS:
-- "Draw a diagram of the human eye." — no placeholder
-- "[FIGURE: eye]" — placeholder without preceding question reference
-- "[चित्र: आंख, लेंस]" — placeholder in Devanagari — system cannot parse this
-- "In the figure [FIGURE: eye] shown..." — placeholder not on its own line
-- "Refer to diagram below." with nothing following — placeholder must follow immediately
-
-═══════════════════════════════════════════════════════
-SECTION 4 — SUBJECT-SPECIFIC RULES
-═══════════════════════════════════════════════════════
-
-BIOLOGY: [FIGURE: keywords] only — never SVG. If a challenging question needs a novel diagram not in NCERT, rewrite it as a descriptive question that does not require a diagram.
-
-PHYSICS: Include at least one numerical in Sections C or D. Format: given values → formula → substitution → answer with units. Circuit and ray diagrams expected in most chapters.
+PHYSICS: Include at least one numerical in Sections C or D. Format: given values → formula → substitution → answer with units.
 
 CHEMISTRY: Balance all equations. Show complete step-by-step working for numericals. Never include reactions not in the specified chapter.
 
-MATHEMATICS: Every geometry question must have a figure — no exceptions. Graphs must have labeled axes, marked origin, stated scale. Show all construction steps.
+MATHEMATICS: Include geometry, algebra, and application-based questions as per chapter. Graphs must have labeled axes, marked origin, stated scale. Show all construction steps.
 
-GEOGRAPHY: Always include map questions. Always use [FIGURE: keywords] for maps. Always add "(Outline map to be provided separately to students)" after map placeholders.
+GEOGRAPHY: Always include map questions. Add "(Outline map to be provided separately to students)" for map-based questions.
 
-HISTORY / POLITICAL SCIENCE / ECONOMICS / SOCIOLOGY: Use [FIGURE: keywords] only for flowcharts, timelines, or maps that clearly exist in that NCERT chapter. Never force diagrams in text-based subjects.
+HISTORY / POLITICAL SCIENCE / ECONOMICS / SOCIOLOGY: Focus on text-based, analytical questions appropriate to the chapter.
 
-HINDI / ENGLISH / SANSKRIT: No diagrams at all. Ignore all diagram instructions. Focus on comprehension, grammar, writing, literature questions. Paper content in the selected language; placeholders in English if any arise.
+HINDI / ENGLISH / SANSKRIT: Focus on comprehension, grammar, writing, and literature questions. Paper content in the selected language.
 
 ═══════════════════════════════════════════════════════
-SECTION 5 — QUALITY RULES (NEVER VIOLATE)
+SECTION 4 — QUALITY RULES (NEVER VIOLATE)
 ═══════════════════════════════════════════════════════
 
 1. CHAPTER-LOCKED: Every question based on specified chapter only. No other chapters even if related.
 2. NO HALLUCINATION: Every fact, formula, diagram description must match NCERT exactly. If uncertain, do not include it.
 3. NO OUT-OF-SYLLABUS: No topics outside the specified class and chapter.
 4. MARKS CONSISTENCY: No marks on individual questions. Section headings only.
-5. DIAGRAM COMPLETENESS: If question says "figure below", "diagram below", "circuit below", "map below" or any visual reference — placeholder MUST appear on the very next line. No exceptions.
+5. QUESTIONS ONLY: Do not add any diagram placeholders, [FIGURE:], or [SVG:] tags. Diagrams are handled separately after generation.
 6. COMPLETE QUESTIONS: Every question fully self-contained. Student needs only the paper and its diagrams.
-7. LANGUAGE: Write paper content in selected language. For Hindi medium — Devanagari script for all question text and options. Diagram placeholders always in English.
+7. LANGUAGE: Write paper content in selected language. For Hindi medium — Devanagari script for all question text and options.
 8. NEP 2020: Easy = Bloom's 1-2. Standard = Bloom's 2-3. Challenging = Bloom's 3-6.
 9. ANSWER SPACES: Do not add answer lines or boxes. Frontend handles this.
+`;
+
+const DIAGRAM_CLASSIFIER_PROMPT = `You are a diagram classifier for Indian school exam papers (CBSE/ICSE Classes 6-12).
+
+You will receive a complete exam paper. For EVERY question, decide which diagram category applies.
+
+CATEGORY NONE — Student draws the diagram themselves:
+Use when question contains ANY of these phrases:
+"draw a diagram", "draw a neat", "draw a labelled", "draw a ray diagram",
+"draw a circuit diagram", "draw and label", "sketch a diagram", "sketch the",
+"with the help of a diagram explain", "with a neat diagram", "with a labelled diagram",
+"draw the following", "draw a schematic", "construct a diagram"
+→ Student draws it in the exam. Never provide a diagram.
+
+CATEGORY FIGURE — Provide an NCERT textbook diagram for student to study/analyse:
+Use when question contains ANY of these phrases:
+"study the diagram", "study the figure", "refer to the diagram", "refer to the figure",
+"the diagram below shows", "the figure below shows", "in the given figure",
+"observe the diagram", "observe the following diagram", "based on the diagram",
+"in the circuit shown", "the following diagram shows", "from the diagram",
+"label the parts", "identify the parts marked", "name the parts shown"
+→ Provide actual NCERT textbook image for student to study.
+
+CATEGORY SVG — Generate a custom diagram for student to analyse:
+Use ONLY for Physics, Maths, Chemistry when:
+- Question provides specific values/measurements for a novel scenario
+- No standard NCERT diagram would match (custom circuit values, specific geometry)
+- Question says "the circuit below" or "the figure shows" with specific novel data
+→ Generate SVG from description.
+
+CATEGORY NONE for these always — regardless of subject:
+- Any question asking student to "draw", "sketch", "construct"
+- Questions about language/literature/history/economics/political science
+  (these subjects rarely need diagrams in exam papers)
+
+Return ONLY a valid JSON array. No markdown. No explanation. No code fences.
+Start with [ and end with ].
+
+Format:
+[
+  {
+    "question_number": 1,
+    "decision": "NONE",
+    "keywords": [],
+    "svg_description": ""
+  },
+  {
+    "question_number": 5,
+    "decision": "FIGURE",
+    "keywords": ["human eye", "cornea", "iris", "crystalline lens", "retina", "ciliary muscles", "optic nerve"],
+    "svg_description": ""
+  },
+  {
+    "question_number": 8,
+    "decision": "SVG",
+    "keywords": [],
+    "svg_description": "parallel circuit with 12V battery on left, three parallel branches: R1=4ohm top, R2=6ohm middle, R3=12ohm bottom, ammeter A in main wire, voltmeter V across R2, conventional current direction arrows, all components labeled"
+  }
+]
+
+Rules:
+- Include EVERY question number in the paper — even Section A MCQs
+- MCQs are almost always NONE unless they show a diagram for student to identify
+- Only output question_number, decision, keywords, svg_description
+- keywords: 5-10 specific searchable terms for FIGURE decisions (empty array for NONE/SVG)
+- svg_description: detailed description for SVG decisions (empty string for NONE/FIGURE)
+- For FIGURE keywords: be specific — "human eye cross section" not just "eye"
+  Include anatomical/technical terms teachers would search for
 `;
 
 function cleanNotes(text: string): string {
@@ -345,7 +340,101 @@ function buildInternalChoiceInstruction(ic: InternalChoice): string {
     D: "Section D (4 & 5-mark questions)",
   };
   const named = ic.sections.map(s => sectionNames[s] ?? `Section ${s}`).join(", ");
-  return `\nINTERNAL CHOICE: Provide internal choice (OR questions) in ${named}. Format exactly as:\n**Q[N].** [First question] [X marks]\n**OR**\n**Q[N].** [Alternative question] [X marks]\n`;
+  return `\nINTERNAL CHOICE: Provide internal choice (OR questions) in ${named}. Format exactly as:\n**Q[N].** [First question]\n**OR**\n**Q[N].** [Alternative question]\n`;
+}
+
+interface DiagramDecision {
+  question_number: number;
+  decision: 'NONE' | 'FIGURE' | 'SVG';
+  keywords: string[];
+  svg_description: string;
+}
+
+async function runDiagramClassifier(
+  paperContent: string,
+  client: Anthropic
+): Promise<DiagramDecision[]> {
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      system: DIAGRAM_CLASSIFIER_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: `Classify diagrams for every question in this exam paper:\n\n${paperContent}`,
+        },
+      ],
+    });
+
+    const rawText = response.content
+      .filter((b) => b.type === 'text')
+      .map((b) => (b as { type: 'text'; text: string }).text)
+      .join('')
+      .trim();
+
+    const startIdx = rawText.indexOf('[');
+    const endIdx = rawText.lastIndexOf(']');
+    if (startIdx === -1 || endIdx === -1) return [];
+
+    const jsonStr = rawText.slice(startIdx, endIdx + 1);
+    const decisions: DiagramDecision[] = JSON.parse(jsonStr);
+    return decisions;
+  } catch (err) {
+    console.error('Diagram classifier error:', err);
+    return [];
+  }
+}
+
+function insertDiagramPlaceholders(
+  paperContent: string,
+  decisions: DiagramDecision[]
+): string {
+  const diagramDecisions = decisions.filter(
+    (d) => d.decision === 'FIGURE' || d.decision === 'SVG'
+  );
+
+  if (diagramDecisions.length === 0) return paperContent;
+
+  let result = paperContent;
+
+  for (const decision of diagramDecisions) {
+    let placeholder = '';
+    if (decision.decision === 'FIGURE') {
+      placeholder = `\n[FIGURE: ${decision.keywords.join(', ')}]`;
+    } else if (decision.decision === 'SVG') {
+      placeholder = `\n[SVG: ${decision.svg_description}]`;
+    }
+
+    const lines = result.split('\n');
+    let inserted = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (
+        line.match(new RegExp(`Q${decision.question_number}[.)\\s]`)) &&
+        line.length > 5
+      ) {
+        let insertAt = i + 1;
+        while (
+          insertAt < lines.length &&
+          lines[insertAt].trim() !== '' &&
+          !lines[insertAt].match(/^[\*]?Q\d+[.)]/)
+        ) {
+          insertAt++;
+        }
+        lines.splice(insertAt, 0, placeholder.trim());
+        inserted = true;
+        break;
+      }
+    }
+
+    if (inserted) {
+      result = lines.join('\n');
+    }
+  }
+
+  return result;
 }
 
 function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: boolean): string {
@@ -484,24 +573,6 @@ STRICT FORMATTING RULES — FOLLOW EXACTLY:
    **Q[N].** [Question]
    **OR**
    **Q[N].** [Alternative question]
-
-7. DIAGRAM QUESTIONS — MANDATORY:
-   When a question requires a diagram, figure, or visual:
-   - Write the question text naturally referencing the diagram
-   - On the VERY NEXT LINE after the question, add the placeholder:
-     [FIGURE: keyword1, keyword2, keyword3, keyword4]
-     OR for novel Physics/Maths diagrams:
-     [SVG: detailed description of what to draw]
-   - The placeholder MUST be on its own line
-   - NEVER write "draw a diagram" without a placeholder
-   - NEVER leave a diagram reference without a placeholder
-
-   Examples:
-   **Q15.** With the help of a labelled diagram, name any three parts of the human eye and state their functions.
-   [FIGURE: human eye diagram, lens, retina, cornea, iris, ciliary muscles]
-
-   **Q16.** Draw a ray diagram to show myopia and its correction.
-   [SVG: ray diagram showing myopic eye, object on left, rays converging in front of retina, concave lens correcting the defect, labels: object, lens, retina, focal point]
 
 ${internalChoiceStr}
 Teacher instructions: ${additionalInstructions || "None"}
@@ -676,14 +747,12 @@ export async function POST(req: NextRequest) {
       .map((b) => (b as { type: "text"; text: string }).text)
       .join("\n");
 
-    const { resolvedContent, ncertFiguresFound, ncertFiguresMissed, svgsGenerated, svgsFailed } = await resolveAllPlaceholders(
-      rawDraft,
-      body.classNumber,
-      body.subject,
-    );
-
     // Post-process: remove examiner notes, fix answer space formatting
     let draft: string;
+    let ncertFiguresFound = 0;
+    let ncertFiguresMissed = 0;
+    let svgsGenerated = 0;
+    let svgsFailed = 0;
 
     if (isFinalise) {
       // Parse cleaned paper from Call 1
@@ -695,7 +764,21 @@ export async function POST(req: NextRequest) {
         ? rawDraft.slice(psi + PAPER_START.length, pei).trim()
         : cleanAnswerSpaces(cleanNotes(rawDraft));
 
-      const paperForKey = cleanedPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
+      // Pass 2: Classify diagrams for cleaned paper
+      const finaliseDecisions = await runDiagramClassifier(cleanedPaper, client);
+      const finaliseWithPlaceholders = insertDiagramPlaceholders(cleanedPaper, finaliseDecisions);
+      const resolveResult = await resolveAllPlaceholders(
+        finaliseWithPlaceholders,
+        body.classNumber,
+        body.subject,
+      );
+      const resolvedFinalPaper = resolveResult.resolvedContent;
+      ncertFiguresFound = resolveResult.ncertFiguresFound;
+      ncertFiguresMissed = resolveResult.ncertFiguresMissed;
+      svgsGenerated = resolveResult.svgsGenerated;
+      svgsFailed = resolveResult.svgsFailed;
+
+      const paperForKey = resolvedFinalPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
       const isHindi = /hindi|हिंदी/i.test(body.subject);
 
       // Call 3a: answer key for Section A and Section B
@@ -764,9 +847,21 @@ ${paperForKey}`;
 
       const combinedAnswerKey = cleanNotes(responseA) + "\n\n---\n\n" + cleanNotes(responseB);
 
-      draft = `===CLEAN PAPER START===\n${cleanedPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${combinedAnswerKey}\n===ANSWER KEY END===`;
+      draft = `===CLEAN PAPER START===\n${resolvedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${combinedAnswerKey}\n===ANSWER KEY END===`;
     } else {
-      draft = cleanAnswerSpaces(cleanNotes(resolvedContent));
+      // Pass 2: Classify diagrams for each question
+      const diagramDecisions = await runDiagramClassifier(rawDraft, client);
+      const paperWithPlaceholders = insertDiagramPlaceholders(rawDraft, diagramDecisions);
+      const resolveResult = await resolveAllPlaceholders(
+        paperWithPlaceholders,
+        body.classNumber,
+        body.subject,
+      );
+      ncertFiguresFound = resolveResult.ncertFiguresFound;
+      ncertFiguresMissed = resolveResult.ncertFiguresMissed;
+      svgsGenerated = resolveResult.svgsGenerated;
+      svgsFailed = resolveResult.svgsFailed;
+      draft = cleanAnswerSpaces(cleanNotes(resolveResult.resolvedContent));
     }
 
     console.log("[generate-with-chapters] Done, draft length:", draft.length);

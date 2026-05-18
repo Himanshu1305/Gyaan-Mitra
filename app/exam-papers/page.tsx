@@ -26,6 +26,13 @@ const CHAPTER_PROGRESS_STEPS = [
   "⏳ Almost done — finalising your exam paper...",
 ];
 
+const generationStages = [
+  "Generating questions from NCERT content...",
+  "Classifying diagram requirements...",
+  "Fetching textbook figures...",
+  "Almost done — finalising your paper...",
+];
+
 function cleanOutput(text: string): string {
   return text
     .replace(/&emsp;/g, "   ")
@@ -152,6 +159,7 @@ export default function ExamPapersPage() {
   const [internalChoiceSections, setInternalChoiceSections] = useState<string[]>(["C", "D"]);
   const [draftBannerDismissed, setDraftBannerDismissed] = useState(false);
   const [loadingProgressStep, setLoadingProgressStep] = useState(0);
+  const [generationStage, setGenerationStage] = useState(0);
   const [ncertFiguresFound, setNcertFiguresFound] = useState(0);
   const [ncertFiguresMissed, setNcertFiguresMissed] = useState(0);
   const [svgsGenerated, setSvgsGenerated] = useState(0);
@@ -206,6 +214,19 @@ export default function ExamPapersPage() {
       setLoadingProgressStep(step);
     }, 15000);
     return () => clearInterval(id);
+  }, [chapterLoading]);
+
+  useEffect(() => {
+    if (!chapterLoading) {
+      setGenerationStage(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setGenerationStage(prev =>
+        prev < generationStages.length - 1 ? prev + 1 : prev
+      );
+    }, 8000);
+    return () => clearInterval(interval);
   }, [chapterLoading]);
 
   const handleStartFresh = () => {
@@ -579,7 +600,7 @@ export default function ExamPapersPage() {
                   <div className="space-y-3 py-2 px-1">
                     <div className="flex items-center gap-3">
                       <svg className="animate-spin w-5 h-5 text-[#FF9933] flex-shrink-0" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" /></svg>
-                      <span className="text-sm font-medium text-[#1B3A6B]">{CHAPTER_PROGRESS_STEPS[loadingProgressStep]}</span>
+                      <span className="text-sm font-medium text-[#1B3A6B]">{generationStages[generationStage]}</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                       <div
@@ -588,7 +609,7 @@ export default function ExamPapersPage() {
                       />
                     </div>
                     <p className="text-xs text-gray-400">
-                      {"Estimated time: 30–90 seconds"}
+                      {"Estimated time: 60-90 seconds — Analysing NCERT content and adding diagrams"}
                       {loadingProgressStep >= CHAPTER_PROGRESS_STEPS.length - 1 && " — Taking longer than usual, please wait…"}
                     </p>
                   </div>

@@ -30,6 +30,8 @@ interface NcertFigure {
   figure_caption: string;
   figure_number: string | null;
   description: string;
+  diagram_type: string;
+  match_score: number;
 }
 
 // ── SVG System Prompt ─────────────────────────────────────────
@@ -186,36 +188,52 @@ async function searchNcertFigure(
   subject: string,
   chapterNumber?: number
 ): Promise<NcertFigure | null> {
+  const strictSubjects = [
+    'science', 'physics', 'chemistry', 'biology', 'mathematics', 'maths'
+  ];
+  const isStrictSubject = strictSubjects.some((s) =>
+    subject?.toLowerCase().includes(s)
+  );
+  const acceptedTypes = isStrictSubject
+    ? ['diagram', 'circuit', 'geometric_figure', 'biological_diagram',
+       'chemical_structure', 'graph', 'flowchart']
+    : null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filterByType = (data: any[]): any[] => {
+    if (!acceptedTypes || !data) return data || [];
+    return data.filter((d) => acceptedTypes.includes(d.diagram_type));
+  };
+
   try {
     // First try: chapter-specific search
     if (chapterNumber) {
-      const { data } = await getServiceClient().rpc("search_ncert_figures", {
+      const { data } = await getServiceClient().rpc('search_ncert_figures', {
         p_keywords: keywords,
         p_class: classNumber,
         p_subject: subject,
         p_chapter: chapterNumber,
-        p_limit: 5,
+        p_limit: 10,
       });
-      if (data && data.length > 0 && data[0].match_score >= 2) {
-        return data[0];
+      const filtered = filterByType(data);
+      if (filtered.length > 0 && filtered[0].match_score >= 2) {
+        return filtered[0];
       }
     }
 
-    // Second try: subject-wide search (no chapter filter)
-    const { data: data2 } = await getServiceClient().rpc("search_ncert_figures", {
+    // Second try: subject-wide search
+    const { data: data2 } = await getServiceClient().rpc('search_ncert_figures', {
       p_keywords: keywords,
       p_class: classNumber,
       p_subject: subject,
       p_chapter: null,
-      p_limit: 5,
+      p_limit: 10,
     });
-
-    if (data2 && data2.length > 0 && data2[0].match_score >= 2) {
-      return data2[0];
+    const filtered2 = filterByType(data2);
+    if (filtered2.length > 0 && filtered2[0].match_score >= 2) {
+      return filtered2[0];
     }
 
-    // No confident match found — return null so fallback SVG is used
-    // This prevents wrong images from appearing
     return null;
   } catch {
     return null;
