@@ -408,7 +408,10 @@ async function runDiagramClassifier(
   isAnswerKey: boolean = false
 ): Promise<DiagramDecision[]> {
   try {
-    const systemPrompt = isAnswerKey ? ANSWER_KEY_DIAGRAM_PROMPT : DIAGRAM_CLASSIFIER_PROMPT;
+    const systemPrompt = isAnswerKey
+      ? ANSWER_KEY_DIAGRAM_PROMPT
+      : DIAGRAM_CLASSIFIER_PROMPT;
+
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
@@ -416,7 +419,7 @@ async function runDiagramClassifier(
       messages: [
         {
           role: 'user',
-          content: `Classify diagrams for every question in this exam paper:\n\n${paperContent}`,
+          content: `Classify diagrams for every question:\n\n${paperContent.slice(0, 8000)}`,
         },
       ],
     });
@@ -427,15 +430,32 @@ async function runDiagramClassifier(
       .join('')
       .trim();
 
+    console.log('[CLASSIFIER RAW OUTPUT]:', rawText.slice(0, 500));
+
+    // Strategy 1: find outermost [ ]
+    let jsonStr = '';
     const startIdx = rawText.indexOf('[');
     const endIdx = rawText.lastIndexOf(']');
-    if (startIdx === -1 || endIdx === -1) return [];
+    if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+      jsonStr = rawText.slice(startIdx, endIdx + 1);
+    }
 
-    const jsonStr = rawText.slice(startIdx, endIdx + 1);
+    // Strategy 2: strip markdown fences
+    if (!jsonStr && rawText.includes('```')) {
+      const match = rawText.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (match) jsonStr = match[1].trim();
+    }
+
+    if (!jsonStr) {
+      console.log('[CLASSIFIER] No JSON found in response');
+      return [];
+    }
+
     const decisions: DiagramDecision[] = JSON.parse(jsonStr);
-    return decisions;
+    console.log('[CLASSIFIER DECISIONS]:', JSON.stringify(decisions.filter(d => d.decision !== 'NONE')));
+    return Array.isArray(decisions) ? decisions : [];
   } catch (err) {
-    console.error('Diagram classifier error:', err);
+    console.error('[CLASSIFIER ERROR] non-fatal:', err);
     return [];
   }
 }
@@ -693,6 +713,13 @@ Create a comprehensive lesson plan covering:
 Format clearly and professionally.`;
 }
 
+function formatMcqOptions(content: string): string {
+  return content.replace(
+    /\(([abcd])\)\s+([^([\n]+?)(?=\s*\([abcd]\)|\n|$)/gi,
+    (match, letter, text) => `\n(${letter}) ${text.trim()}`
+  );
+}
+
 const FREE_LIMIT = 5;
 
 function monthYear(): string {
@@ -831,8 +858,9 @@ export async function POST(req: NextRequest) {
       ncertFiguresMissed = resolveResult.ncertFiguresMissed;
       svgsGenerated = resolveResult.svgsGenerated;
       svgsFailed = resolveResult.svgsFailed;
+      const formattedFinalPaper = formatMcqOptions(resolvedFinalPaper);
 
-      const paperForKey = resolvedFinalPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
+      const paperForKey = formattedFinalPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
       const isHindi = /hindi|हिंदी/i.test(body.subject);
 
       // Count total questions by scanning for Q\d+[.)] pattern
@@ -961,7 +989,7 @@ ${paperForKey}`;
         body.subject
       );
 
-      draft = `===CLEAN PAPER START===\n${resolvedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
+      draft = `===CLEAN PAPER START===\n${formattedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
     } else {
       // Pass 2: Classify diagrams for each question
       const diagramDecisions = await runDiagramClassifier(rawDraft, client);
@@ -975,7 +1003,8 @@ ${paperForKey}`;
       ncertFiguresMissed = resolveResult.ncertFiguresMissed;
       svgsGenerated = resolveResult.svgsGenerated;
       svgsFailed = resolveResult.svgsFailed;
-      draft = cleanAnswerSpaces(cleanNotes(resolveResult.resolvedContent));
+      const formattedContent = formatMcqOptions(resolveResult.resolvedContent);
+      draft = cleanAnswerSpaces(cleanNotes(formattedContent));
     }
 
     console.log("[generate-with-chapters] Done, draft length:", draft.length);

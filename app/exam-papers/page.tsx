@@ -126,6 +126,36 @@ function ExamPaper({ content }: { content: string }) {
         th({ children }) { return <th className="border border-gray-300 bg-[#1B3A6B] text-white px-3 py-2 text-left">{children}</th>; },
         td({ children }) { return <td className="border border-gray-300 px-3 py-2">{children}</td>; },
         hr() { return <hr className="border-t-2 border-[#FF9933] my-6 opacity-40" />; },
+        p({ children }) {
+          const text = Array.isArray(children)
+            ? children.map((c) => (typeof c === 'string' ? c : '')).join('')
+            : typeof children === 'string'
+            ? children
+            : '';
+          const trimmed = text.trim();
+
+          if (/^\([abcd]\)\s/i.test(trimmed)) {
+            return <p className="ml-6 my-0.5 text-gray-800">{children}</p>;
+          }
+          if (/^Q\d+[.)]\s/.test(trimmed)) {
+            return <p className="font-semibold mt-4 mb-1">{children}</p>;
+          }
+          if (/^Answer:\s*\[/.test(trimmed)) {
+            return (
+              <p className="ml-6 mt-1 mb-3 text-gray-400 text-sm">
+                {children}
+              </p>
+            );
+          }
+          if (trimmed === 'OR') {
+            return (
+              <p className="font-bold text-[#FF9933] my-3 text-center">
+                {children}
+              </p>
+            );
+          }
+          return <p className="my-2">{children}</p>;
+        },
       }}
     >
       {content}

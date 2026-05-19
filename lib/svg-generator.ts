@@ -305,6 +305,11 @@ export async function resolveAllPlaceholders(
   let svgsGenerated = 0;
   let svgsFailed = 0;
 
+  console.log('[FIGURES] Input placeholders found:', {
+    figures: extractFigurePlaceholders(content).map(p => p.fullMatch),
+    svgs: extractSvgPlaceholders(content).map(p => p.fullMatch.slice(0, 50)),
+  });
+
   // ── Step 1: [FIGURE: keywords] → NCERT images ──────────────
   const figurePlaceholders = extractFigurePlaceholders(resolvedContent);
 
@@ -352,6 +357,13 @@ export async function resolveAllPlaceholders(
     resolvedContent = resolvedContent.split(placeholder.fullMatch).join(replacement);
     if (svgCode) { svgsGenerated++; } else { svgsFailed++; }
   }
+
+  console.log('[FIGURES] Resolution results:', {
+    ncertFiguresFound,
+    ncertFiguresMissed,
+    svgsGenerated,
+    svgsFailed,
+  });
 
   return {
     resolvedContent,
