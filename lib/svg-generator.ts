@@ -245,7 +245,7 @@ async function searchNcertFigure(
 async function generateSingleSvg(description: string): Promise<string | null> {
   try {
     const response = await getAnthropic().messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6-20251101",
       max_tokens: 2000,
       system: SVG_SYSTEM_PROMPT,
       messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],

@@ -424,7 +424,7 @@ async function runDiagramClassifier(
     }
 
     const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6-20251101',
       max_tokens: 2000,
       system: systemPrompt,
       messages: [
