@@ -187,21 +187,26 @@ TYPE B — Study the figure (diagram PROVIDED in paper):
 Provide a diagram and ask student to analyse it.
 Format:
 "Study the diagram of [topic] shown below and answer:
-(a) Name the parts labeled A, B, C in the diagram.
-(b) Which labeled part [does X]? Explain how.
-(c) [Application question based on the diagram]"
+(a) Name any three parts visible in the diagram and state
+    the function of each.
+(b) [Specific question about one visible part]
+(c) [Application question based on what the diagram shows]"
 
 TYPE B examples for Human Eye chapter:
 "Study the diagram of the human eye shown below and answer:
-(a) Name the parts labeled A, B, and C.
-(b) Which part controls the amount of light entering the eye?
-(c) A person cannot see objects beyond 2m. Which part is
-    affected? Name the defect."
+(a) Name any three parts visible in the diagram. State the
+    function of each part named.
+(b) Which part shown in the diagram controls the amount of
+    light entering the eye? How does it do this?
+(c) A person cannot see objects beyond 2m. Which part of the
+    eye shown is likely affected? Name the defect."
 
-"Study the ray diagram shown below and answer:
-(a) Identify the defect of vision shown.
-(b) What type of lens corrects this defect?
-(c) State one cause of this defect."
+"Study the ray diagram shown below which illustrates a defect
+of vision and answer:
+(a) Identify the defect of vision shown in the diagram.
+(b) State two causes of this defect.
+(c) What type of corrective lens is needed?
+    Calculate the power if the far point is 2m."
 
 TYPE B placement rules:
 - At least 1 TYPE B in Section C
@@ -311,6 +316,13 @@ Rules:
 - svg_description: detailed description for SVG decisions (empty string for NONE/FIGURE)
 - For FIGURE keywords: be specific — "human eye cross section" not just "eye"
   Include anatomical/technical terms teachers would search for
+- For human eye structure questions: use keywords that match actual NCERT textbook
+  diagrams — "human eye cross section", "eye anatomy", "parts of eye",
+  "cornea iris lens retina"
+- For ray diagram questions: use keywords specific to the defect —
+  "myopia ray diagram", "hypermetropia correction", "concave lens ray diagram",
+  "short sightedness correction ray diagram"
+  These are different images from eye anatomy diagrams.
 `;
 
 const ANSWER_KEY_DIAGRAM_PROMPT = `You are a diagram classifier for Indian school exam paper ANSWER KEYS (not question papers).
