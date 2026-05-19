@@ -268,7 +268,9 @@ Use when question contains ANY of these phrases:
 "the diagram below shows", "the figure below shows", "in the given figure",
 "observe the diagram", "observe the following diagram", "based on the diagram",
 "in the circuit shown", "the following diagram shows", "from the diagram",
-"label the parts", "identify the parts marked", "name the parts shown"
+"label the parts", "identify the parts marked", "name the parts shown",
+"study the diagram showing", "study the following diagram", "study the diagram of",
+"the diagram above shows", "the following figure shows", "referring to the diagram"
 → Provide actual NCERT textbook image for student to study.
 
 CATEGORY SVG — Generate a custom diagram for student to analyse:
@@ -323,6 +325,18 @@ Rules:
   "myopia ray diagram", "hypermetropia correction", "concave lens ray diagram",
   "short sightedness correction ray diagram"
   These are different images from eye anatomy diagrams.
+- For scattering/atmospheric refraction diagrams, use keywords:
+  "scattering of light", "atmospheric particles", "Tyndall effect",
+  "light scattering", "blue sky scattering"
+- For prism/dispersion diagrams, use keywords:
+  "dispersion of light", "glass prism", "white light spectrum",
+  "VIBGYOR", "prism refraction"
+- For rainbow formation diagrams, use keywords:
+  "rainbow formation", "water droplet", "internal reflection",
+  "dispersion rainbow", "sunlight raindrop"
+- For atmospheric refraction diagrams, use keywords:
+  "atmospheric refraction", "star twinkling", "apparent position",
+  "advance sunrise", "delayed sunset"
 `;
 
 const ANSWER_KEY_DIAGRAM_PROMPT = `You are a diagram classifier for Indian school exam paper ANSWER KEYS (not question papers).
@@ -465,16 +479,8 @@ async function runDiagramClassifier(
       ? ANSWER_KEY_DIAGRAM_PROMPT
       : DIAGRAM_CLASSIFIER_PROMPT;
 
-    // Extract only Sections C and D for classification
-    // Full paper is too long - classifier only needs higher-mark questions
-    let content: string;
-    const cdMatch = paperContent.match(/##\s*SECTION\s*[CD]/i);
-    if (cdMatch && cdMatch.index) {
-      const cdContent = paperContent.slice(cdMatch.index);
-      content = cdContent.slice(0, 4000);
-    } else {
-      content = paperContent.slice(0, 4000);
-    }
+    // Send full paper to classifier, truncated to 6000 chars
+    const contentToClassify = paperContent.slice(0, 6000);
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
@@ -483,7 +489,7 @@ async function runDiagramClassifier(
       messages: [
         {
           role: 'user',
-          content: `Classify diagrams for every question:\n\n${content}`,
+          content: `Classify diagrams for every question:\n\n${contentToClassify}`,
         },
       ],
     });
