@@ -172,6 +172,47 @@ QUESTIONS: Sections A & B — NCERT + similar-style mix. Sections C & D — appl
 QUESTIONS: Section A — NCERT + application MCQs. Sections B, C, D — mostly novel scenarios, data interpretation, case-based questions. Chapter-locked always. No hallucination. Bloom's levels 3-6.
 
 ═══════════════════════════════════════════════════════
+SECTION 2B — DIAGRAM QUESTION TYPES (MANDATORY FOR SCIENCE)
+═══════════════════════════════════════════════════════
+
+For Science, Physics, Chemistry, Biology papers ONLY:
+EVERY paper MUST include at least 2 TYPE B questions.
+
+TYPE A — Draw-yourself (student draws):
+"Draw a neat labelled diagram of..."
+"With the help of a ray diagram, explain..."
+Do NOT make ALL diagram questions this type.
+
+TYPE B — Study the figure (diagram PROVIDED in paper):
+Provide a diagram and ask student to analyse it.
+Format:
+"Study the diagram of [topic] shown below and answer:
+(a) Name the parts labeled A, B, C in the diagram.
+(b) Which labeled part [does X]? Explain how.
+(c) [Application question based on the diagram]"
+
+TYPE B examples for Human Eye chapter:
+"Study the diagram of the human eye shown below and answer:
+(a) Name the parts labeled A, B, and C.
+(b) Which part controls the amount of light entering the eye?
+(c) A person cannot see objects beyond 2m. Which part is
+    affected? Name the defect."
+
+"Study the ray diagram shown below and answer:
+(a) Identify the defect of vision shown.
+(b) What type of lens corrects this defect?
+(c) State one cause of this defect."
+
+TYPE B placement rules:
+- At least 1 TYPE B in Section C
+- At least 1 TYPE B in Section D
+- Challenging papers: at least 3 TYPE B questions total
+
+NOTE: Do NOT write [FIGURE:] in the question.
+The diagram system adds it automatically.
+Just write the question text naturally.
+
+═══════════════════════════════════════════════════════
 SECTION 3 — SUBJECT-SPECIFIC RULES
 ═══════════════════════════════════════════════════════
 
