@@ -412,6 +412,17 @@ async function runDiagramClassifier(
       ? ANSWER_KEY_DIAGRAM_PROMPT
       : DIAGRAM_CLASSIFIER_PROMPT;
 
+    // Extract only Sections C and D for classification
+    // Full paper is too long - classifier only needs higher-mark questions
+    let content: string;
+    const cdMatch = paperContent.match(/##\s*SECTION\s*[CD]/i);
+    if (cdMatch && cdMatch.index) {
+      const cdContent = paperContent.slice(cdMatch.index);
+      content = cdContent.slice(0, 4000);
+    } else {
+      content = paperContent.slice(0, 4000);
+    }
+
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
@@ -419,7 +430,7 @@ async function runDiagramClassifier(
       messages: [
         {
           role: 'user',
-          content: `Classify diagrams for every question:\n\n${paperContent.slice(0, 8000)}`,
+          content: `Classify diagrams for every question:\n\n${content}`,
         },
       ],
     });
@@ -451,9 +462,22 @@ async function runDiagramClassifier(
       return [];
     }
 
-    const decisions: DiagramDecision[] = JSON.parse(jsonStr);
-    console.log('[CLASSIFIER DECISIONS]:', JSON.stringify(decisions.filter(d => d.decision !== 'NONE')));
-    return Array.isArray(decisions) ? decisions : [];
+    // Pre-validate before parsing
+    if (!jsonStr.startsWith('[') || !jsonStr.endsWith(']') || jsonStr.length <= 2) {
+      console.log('[CLASSIFIER] Invalid JSON structure, skipping parse');
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(jsonStr);
+      if (!Array.isArray(parsed)) return [];
+      console.log('[CLASSIFIER SUCCESS] decisions:', parsed.length,
+        'non-NONE:', parsed.filter((d: DiagramDecision) => d.decision !== 'NONE').length);
+      return parsed;
+    } catch (parseErr) {
+      console.error('[CLASSIFIER PARSE FAIL]', parseErr, 'jsonStr preview:', jsonStr.slice(0, 200));
+      return [];
+    }
   } catch (err) {
     console.error('[CLASSIFIER ERROR] non-fatal:', err);
     return [];
