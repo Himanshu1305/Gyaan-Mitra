@@ -503,20 +503,23 @@ async function runDiagramClassifier(
       ? ANSWER_KEY_DIAGRAM_PROMPT
       : DIAGRAM_CLASSIFIER_PROMPT;
 
-    // Send full paper to classifier, truncated to 6000 chars
-    const contentToClassify = paperContent.slice(0, 6000);
+    // Send full paper to classifier, truncated to 4000 chars
+    const contentToClassify = paperContent.slice(0, 4000);
 
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
-      system: systemPrompt,
-      messages: [
-        {
+    const response = await Promise.race([
+      client.messages.create({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{
           role: 'user',
           content: `Classify diagrams for every question:\n\n${contentToClassify}`,
-        },
-      ],
-    });
+        }],
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Classifier timeout')), 15000)
+      )
+    ]) as Anthropic.Message;
 
     const rawText = response.content
       .filter((b) => b.type === 'text')

@@ -244,6 +244,7 @@ async function searchNcertFigure(
 
 async function generateSingleSvg(description: string): Promise<string | null> {
   try {
+    console.log('[SVG] Generating for:', description.slice(0, 100));
     const response = await getAnthropic().messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
@@ -257,6 +258,8 @@ async function generateSingleSvg(description: string): Promise<string | null> {
       .join("")
       .trim();
 
+    console.log('[SVG] Raw response length:', rawText.length, 'starts with:', rawText.slice(0, 50));
+
     // Strip markdown fences if present
     let svgCode = rawText;
     if (rawText.includes("```")) {
@@ -265,7 +268,10 @@ async function generateSingleSvg(description: string): Promise<string | null> {
     }
 
     // Validate it's SVG
-    if (!svgCode.includes("<svg") || !svgCode.includes("</svg>")) return null;
+    if (!svgCode.includes("<svg") || !svgCode.includes("</svg>")) {
+      console.log('[SVG] FAILED validation - not valid SVG');
+      return null;
+    }
 
     // Ensure xmlns (required for data URI rendering in all browsers)
     if (!svgCode.includes("xmlns=")) {
@@ -277,8 +283,10 @@ async function generateSingleSvg(description: string): Promise<string | null> {
       svgCode = svgCode.replace("<svg", '<svg width="100%" height="auto"');
     }
 
+    console.log('[SVG] SUCCESS - SVG length:', svgCode.length);
     return svgCode;
-  } catch {
+  } catch (err) {
+    console.error('[SVG] ERROR:', err);
     return null;
   }
 }
