@@ -120,8 +120,6 @@ HINDI COMPLETENESS (apply when generating Hindi content):
 - Do not abbreviate or truncate the output
 `;
 
-// Diagram rules are inlined directly in the FINALISE_AND_KEY prompt to avoid unused-var lint error
-
 const EXAM_PAPER_SYSTEM_PROMPT = `
 You are an expert Indian school exam paper setter with 20+ years of experience
 setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
@@ -172,53 +170,81 @@ QUESTIONS: Sections A & B — NCERT + similar-style mix. Sections C & D — appl
 QUESTIONS: Section A — NCERT + application MCQs. Sections B, C, D — mostly novel scenarios, data interpretation, case-based questions. Chapter-locked always. No hallucination. Bloom's levels 3-6.
 
 ═══════════════════════════════════════════════════════
-SECTION 2B — DIAGRAM QUESTION TYPES (MANDATORY FOR SCIENCE)
+SECTION 3 — DIAGRAM MARKERS (READ CAREFULLY)
 ═══════════════════════════════════════════════════════
 
-For Science, Physics, Chemistry, Biology papers ONLY:
-EVERY paper MUST include at least 2 TYPE B questions.
+When a question PROVIDES a diagram for the student to study,
+add a marker on the very next line after the question text.
 
-TYPE A — Draw-yourself (student draws):
-"Draw a neat labelled diagram of..."
-"With the help of a ray diagram, explain..."
-Do NOT make ALL diagram questions this type.
+MARKER FORMAT:
+%%DIAGRAM:TYPE:description%%
 
-TYPE B — Study the figure (diagram PROVIDED in paper):
-Provide a diagram and ask student to analyse it.
-Format:
-"Study the diagram of [topic] shown below and answer:
-(a) Name any three parts visible in the diagram and state
-    the function of each.
-(b) [Specific question about one visible part]
-(c) [Application question based on what the diagram shows]"
+TYPE is either FIGURE or SVG:
 
-TYPE B examples for Human Eye chapter:
-"Study the diagram of the human eye shown below and answer:
-(a) Name any three parts visible in the diagram. State the
-    function of each part named.
-(b) Which part shown in the diagram controls the amount of
-    light entering the eye? How does it do this?
-(c) A person cannot see objects beyond 2m. Which part of the
-    eye shown is likely affected? Name the defect."
+FIGURE — for anatomical/biological diagrams that exist in NCERT:
+%%DIAGRAM:FIGURE:keyword1, keyword2, keyword3, keyword4%%
+Use for: human eye structure, cell diagrams, plant diagrams,
+         maps, biological processes
 
-"Study the ray diagram shown below which illustrates a defect
-of vision and answer:
-(a) Identify the defect of vision shown in the diagram.
+SVG — for physics/optics/geometry diagrams to be generated:
+%%DIAGRAM:SVG:detailed description of what to draw%%
+Use for: ray diagrams, circuit diagrams, prism diagrams,
+         rainbow formation, atmospheric refraction,
+         force diagrams, geometric constructions
+
+WHEN TO ADD A MARKER:
+Add %%DIAGRAM:%% ONLY when the question says:
+"Study the diagram shown below"
+"The figure below shows"
+"Refer to the diagram"
+"Observe the following diagram"
+"In the circuit shown below"
+"The ray diagram below shows"
+"Study the ray diagram"
+
+DO NOT ADD A MARKER when the question says:
+"Draw a diagram"
+"Draw a neat labelled diagram"
+"Draw a ray diagram"
+"With the help of a diagram"
+"Sketch a diagram"
+These are draw-yourself questions — student draws in exam.
+
+EXAMPLES:
+
+CORRECT — Study question with FIGURE marker:
+Q11. Study the diagram of the human eye shown below and answer:
+%%DIAGRAM:FIGURE:human eye cross section, cornea, iris, pupil, crystalline lens, ciliary muscles, retina, optic nerve%%
+(a) Name any three parts visible in the diagram.
+(b) Which part controls the amount of light entering the eye?
+
+CORRECT — Study question with SVG marker:
+Q12. Study the ray diagram shown below showing a defect of vision:
+%%DIAGRAM:SVG:ray diagram of myopic eye, parallel rays from distant object converging in front of retina not on it, elongated eyeball, labels: parallel rays, eye lens, focal point in front of retina, retina%%
+(a) Identify the defect shown.
 (b) State two causes of this defect.
-(c) What type of corrective lens is needed?
-    Calculate the power if the far point is 2m."
 
-TYPE B placement rules:
-- At least 1 TYPE B in Section C
-- At least 1 TYPE B in Section D
-- Challenging papers: at least 3 TYPE B questions total
+CORRECT — Draw question with NO marker:
+Q13. Draw a neat labelled ray diagram to show the defect of myopia
+and its correction using a concave lens.
+[no marker — student draws this in the exam]
 
-NOTE: Do NOT write [FIGURE:] in the question.
-The diagram system adds it automatically.
-Just write the question text naturally.
+INCORRECT — Never do this:
+Q14. Draw a neat labelled diagram of the human eye.
+%%DIAGRAM:FIGURE:human eye%% ← WRONG — student draws this
+
+SCIENCE/PHYSICS SUBJECT RULES:
+- Ray diagrams (myopia, hypermetropia, prism, rainbow) → SVG
+- Eye anatomy, cell diagrams, biological structures → FIGURE
+- Circuit diagrams with specific values → SVG
+- Maps, graphs → FIGURE
+
+Every paper for Science, Physics, Chemistry, Biology MUST include
+at least 2 questions where YOU provide the diagram (study questions).
+These must have the %%DIAGRAM:%% marker.
 
 ═══════════════════════════════════════════════════════
-SECTION 3 — SUBJECT-SPECIFIC RULES
+SECTION 4 — SUBJECT-SPECIFIC RULES
 ═══════════════════════════════════════════════════════
 
 BIOLOGY: Include questions on life processes, cell biology, reproduction, and ecology as per chapter content.
@@ -236,183 +262,17 @@ HISTORY / POLITICAL SCIENCE / ECONOMICS / SOCIOLOGY: Focus on text-based, analyt
 HINDI / ENGLISH / SANSKRIT: Focus on comprehension, grammar, writing, and literature questions. Paper content in the selected language.
 
 ═══════════════════════════════════════════════════════
-SECTION 4 — QUALITY RULES (NEVER VIOLATE)
+SECTION 5 — QUALITY RULES (NEVER VIOLATE)
 ═══════════════════════════════════════════════════════
 
 1. CHAPTER-LOCKED: Every question based on specified chapter only. No other chapters even if related.
 2. NO HALLUCINATION: Every fact, formula, diagram description must match NCERT exactly. If uncertain, do not include it.
 3. NO OUT-OF-SYLLABUS: No topics outside the specified class and chapter.
 4. MARKS CONSISTENCY: No marks on individual questions. Section headings only.
-5. QUESTIONS ONLY: Do not add any diagram placeholders, [FIGURE:], or [SVG:] tags. Diagrams are handled separately after generation.
-6. COMPLETE QUESTIONS: Every question fully self-contained. Student needs only the paper and its diagrams.
-7. LANGUAGE: Write paper content in selected language. For Hindi medium — Devanagari script for all question text and options.
-8. NEP 2020: Easy = Bloom's 1-2. Standard = Bloom's 2-3. Challenging = Bloom's 3-6.
-9. ANSWER SPACES: Do not add answer lines or boxes. Frontend handles this.
-`;
-
-const DIAGRAM_CLASSIFIER_PROMPT = `You are a diagram classifier for Indian school exam papers (CBSE/ICSE Classes 6-12).
-
-You will receive a complete exam paper. For EVERY question, decide which diagram category applies.
-
-CATEGORY NONE — Student draws the diagram themselves:
-Use when question contains ANY of these phrases:
-"draw a diagram", "draw a neat", "draw a labelled", "draw a ray diagram",
-"draw a circuit diagram", "draw and label", "sketch a diagram", "sketch the",
-"with the help of a diagram explain", "with a neat diagram", "with a labelled diagram",
-"draw the following", "draw a schematic", "construct a diagram"
-→ Student draws it in the exam. Never provide a diagram.
-
-CATEGORY FIGURE — Provide an NCERT textbook diagram for student to study/analyse:
-Use when question contains ANY of these phrases:
-"study the diagram", "study the figure", "refer to the diagram", "refer to the figure",
-"the diagram below shows", "the figure below shows", "in the given figure",
-"observe the diagram", "observe the following diagram", "based on the diagram",
-"in the circuit shown", "the following diagram shows", "from the diagram",
-"label the parts", "identify the parts marked", "name the parts shown",
-"study the diagram showing", "study the following diagram", "study the diagram of",
-"the diagram above shows", "the following figure shows", "referring to the diagram"
-→ Provide actual NCERT textbook image for student to study.
-
-CATEGORY SVG — Generate a custom diagram:
-Also trigger SVG when question contains ANY of these phrases:
-"ray diagram", "defect of vision diagram", "path of light",
-"refraction through prism", "dispersion of light diagram",
-"rainbow formation diagram", "atmospheric refraction diagram",
-"correction of myopia", "correction of hypermetropia",
-"light through prism", "spectrum formation"
-
-Use SVG (not FIGURE) for these specific diagram types even in Biology/Science papers:
-- Ray diagrams (myopia correction, hypermetropia correction, any defect of vision ray diagram)
-- Prism dispersion diagrams (white light through prism)
-- Atmospheric refraction diagrams (star twinkling, advance sunrise)
-- Rainbow formation diagrams (light through water droplet)
-- Any diagram described as showing "path of light rays"
-- Circuit diagrams with specific values
-
-Use FIGURE for:
-- Human eye anatomy/structure (cross-section)
-- Plant/animal cell diagrams
-- Maps, graphs, flowcharts
-- Any photograph or illustration
-→ Generate SVG from description.
-
-IMPORTANT OVERRIDE RULE:
-Even for Science/Biology subjects, use SVG (not FIGURE) when the question specifically
-asks to study a RAY DIAGRAM showing:
-- A defect of vision (myopia, hypermetropia)
-- Correction of a vision defect
-- Light passing through a prism
-- Formation of a rainbow
-- Atmospheric refraction effects
-- Path of light rays through any optical system
-
-These are physics/optics diagrams that must be generated as SVG.
-FIGURE should only be used for anatomical diagrams (eye structure, cell diagrams) and maps.
-
-CATEGORY NONE for these always — regardless of subject:
-- Any question asking student to "draw", "sketch", "construct"
-- Questions about language/literature/history/economics/political science
-  (these subjects rarely need diagrams in exam papers)
-
-Return ONLY a valid JSON array. No markdown. No explanation. No code fences.
-Start with [ and end with ].
-
-Format:
-[
-  {
-    "question_number": 1,
-    "decision": "NONE",
-    "keywords": [],
-    "svg_description": ""
-  },
-  {
-    "question_number": 5,
-    "decision": "FIGURE",
-    "keywords": ["human eye", "cornea", "iris", "crystalline lens", "retina", "ciliary muscles", "optic nerve"],
-    "svg_description": ""
-  },
-  {
-    "question_number": 8,
-    "decision": "SVG",
-    "keywords": [],
-    "svg_description": "parallel circuit with 12V battery on left, three parallel branches: R1=4ohm top, R2=6ohm middle, R3=12ohm bottom, ammeter A in main wire, voltmeter V across R2, conventional current direction arrows, all components labeled"
-  }
-]
-
-Rules:
-- Include EVERY question number in the paper — even Section A MCQs
-- MCQs are almost always NONE unless they show a diagram for student to identify
-- Only output question_number, decision, keywords, svg_description
-- keywords: 5-10 specific searchable terms for FIGURE decisions (empty array for NONE/SVG)
-- svg_description: detailed description for SVG decisions (empty string for NONE/FIGURE)
-- For FIGURE keywords: be specific — "human eye cross section" not just "eye"
-  Include anatomical/technical terms teachers would search for
-- For human eye structure questions: use keywords that match actual NCERT textbook
-  diagrams — "human eye cross section", "eye anatomy", "parts of eye",
-  "cornea iris lens retina"
-- For ray diagram questions: always use SVG (not FIGURE) — use these svg_description examples:
-  Myopia: "ray diagram of myopic eye showing parallel rays from distant object converging in front of retina not on it, elongated eyeball shape, labels: parallel rays from object at infinity, eye lens, point of convergence, retina, the image forms in front of retina"
-  Myopia correction: "ray diagram showing correction of myopia using concave lens, parallel rays first diverged by concave lens then converged by eye lens exactly onto retina, labels: object at infinity, concave lens, diverged rays, eye lens, image on retina"
-  Hypermetropia: "ray diagram of hypermetropic eye showing rays from nearby object converging behind retina, small eyeball, labels: nearby object, eye lens, image behind retina, retina, near point farther than 25cm"
-- For prism dispersion questions: always use SVG —
-  svg_description: "triangular glass prism with narrow white light beam entering one face, VIBGYOR spectrum emerging from other face, violet bends most at bottom, red bends least at top, labels: incident white light, glass prism, emergent spectrum, V I B G Y O R, screen showing spectrum"
-- For rainbow formation questions: always use SVG —
-  svg_description: "spherical water droplet cross-section showing sunlight ray entering, refracting at curved surface, internally reflecting at back, refracting again on exit at different angle, violet at 40 degrees red at 42 degrees from original direction, labels: sunlight, water droplet, refraction, total internal reflection, violet ray, red ray"
-- For atmospheric refraction/star twinkling questions: always use SVG —
-  svg_description: "layers of atmosphere with increasing density downward, starlight ray bending progressively toward normal as it enters denser layers, star actual position shown with dotted line, apparent position shown higher up, observer on earth surface, labels: star actual position, apparent position, atmosphere layers, observer, earth"
-- For scattering questions: always use SVG — svg_description describes the specific phenomenon (Tyndall effect particles, blue sky scattering, etc.)
-`;
-
-const ANSWER_KEY_DIAGRAM_PROMPT = `You are a diagram classifier for Indian school exam paper ANSWER KEYS (not question papers).
-
-You will receive an answer key. For every answer that involves a diagram, decide which category applies.
-
-CATEGORY FIGURE — Show an NCERT textbook diagram as model answer:
-Use when the answer mentions ANY of these:
-"draw a neat labelled diagram", "draw a ray diagram",
-"draw a circuit diagram", "draw a schematic",
-"the diagram shows", "refer to diagram", "as shown in figure",
-"label the following parts", "the following diagram",
-"draw and label", "sketch showing"
-→ This is a model answer — teacher needs to see the correct diagram.
-
-CATEGORY SVG — Generate a custom diagram as model answer:
-Use for Physics, Maths, Chemistry when answer describes a specific novel diagram with measurements or circuit values.
-
-CATEGORY NONE — No diagram needed:
-Use for text-only answers, MCQ explanations, definitions, numerical calculations without diagrams.
-
-Return ONLY a valid JSON array. No markdown. No explanation.
-Start with [ and end with ].
-
-Format:
-[
-  {
-    "question_number": 5,
-    "decision": "FIGURE",
-    "keywords": ["human eye", "cornea", "iris", "lens", "retina", "ciliary muscles", "optic nerve"],
-    "svg_description": ""
-  },
-  {
-    "question_number": 8,
-    "decision": "SVG",
-    "keywords": [],
-    "svg_description": "ray diagram showing myopic eye correction with concave lens, object on left, rays converging in front of retina without lens, concave lens added, rays now focus on retina, labels: object, concave lens, retina, focal point"
-  },
-  {
-    "question_number": 3,
-    "decision": "NONE",
-    "keywords": [],
-    "svg_description": ""
-  }
-]
-
-Rules:
-- Include every question number that has a diagram-related answer
-- For FIGURE keywords: be very specific — include exact anatomical or technical terms
-- MCQ answer explanations are usually NONE unless they reference a specific diagram
-- For "draw a ray diagram showing myopia" → FIGURE with keywords for myopia ray diagram
-- For "draw a circuit with R1=4ohm R2=6ohm in parallel" → SVG
+5. COMPLETE QUESTIONS: Every question fully self-contained. Student needs only the paper and its diagrams.
+6. LANGUAGE: Write paper content in selected language. For Hindi medium — Devanagari script for all question text and options.
+7. NEP 2020: Easy = Bloom's 1-2. Standard = Bloom's 2-3. Challenging = Bloom's 3-6.
+8. ANSWER SPACES: Do not add answer lines or boxes. Frontend handles this.
 `;
 
 function cleanNotes(text: string): string {
@@ -484,141 +344,6 @@ function buildInternalChoiceInstruction(ic: InternalChoice): string {
   };
   const named = ic.sections.map(s => sectionNames[s] ?? `Section ${s}`).join(", ");
   return `\nINTERNAL CHOICE: Provide internal choice (OR questions) in ${named}. Format exactly as:\n**Q[N].** [First question]\n**OR**\n**Q[N].** [Alternative question]\n`;
-}
-
-interface DiagramDecision {
-  question_number: number;
-  decision: 'NONE' | 'FIGURE' | 'SVG';
-  keywords: string[];
-  svg_description: string;
-}
-
-async function runDiagramClassifier(
-  paperContent: string,
-  client: Anthropic,
-  isAnswerKey: boolean = false
-): Promise<DiagramDecision[]> {
-  try {
-    const systemPrompt = isAnswerKey
-      ? ANSWER_KEY_DIAGRAM_PROMPT
-      : DIAGRAM_CLASSIFIER_PROMPT;
-
-    // Send full paper to classifier, truncated to 4000 chars
-    const contentToClassify = paperContent.slice(0, 4000);
-
-    const response = await Promise.race([
-      client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
-        system: systemPrompt,
-        messages: [{
-          role: 'user',
-          content: `Classify diagrams for every question:\n\n${contentToClassify}`,
-        }],
-      }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Classifier timeout')), 15000)
-      )
-    ]) as Anthropic.Message;
-
-    const rawText = response.content
-      .filter((b) => b.type === 'text')
-      .map((b) => (b as { type: 'text'; text: string }).text)
-      .join('')
-      .trim();
-
-    console.log('[CLASSIFIER RAW OUTPUT]:', rawText.slice(0, 500));
-
-    // Strategy 1: find outermost [ ]
-    let jsonStr = '';
-    const startIdx = rawText.indexOf('[');
-    const endIdx = rawText.lastIndexOf(']');
-    if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-      jsonStr = rawText.slice(startIdx, endIdx + 1);
-    }
-
-    // Strategy 2: strip markdown fences
-    if (!jsonStr && rawText.includes('```')) {
-      const match = rawText.match(/```(?:json)?\s*([\s\S]*?)```/);
-      if (match) jsonStr = match[1].trim();
-    }
-
-    if (!jsonStr) {
-      console.log('[CLASSIFIER] No JSON found in response');
-      return [];
-    }
-
-    // Pre-validate before parsing
-    if (!jsonStr.startsWith('[') || !jsonStr.endsWith(']') || jsonStr.length <= 2) {
-      console.log('[CLASSIFIER] Invalid JSON structure, skipping parse');
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(jsonStr);
-      if (!Array.isArray(parsed)) return [];
-      console.log('[CLASSIFIER SUCCESS] decisions:', parsed.length,
-        'non-NONE:', parsed.filter((d: DiagramDecision) => d.decision !== 'NONE').length);
-      return parsed;
-    } catch (parseErr) {
-      console.error('[CLASSIFIER PARSE FAIL]', parseErr, 'jsonStr preview:', jsonStr.slice(0, 200));
-      return [];
-    }
-  } catch (err) {
-    console.error('[CLASSIFIER ERROR] non-fatal:', err);
-    return [];
-  }
-}
-
-function insertDiagramPlaceholders(
-  paperContent: string,
-  decisions: DiagramDecision[]
-): string {
-  const diagramDecisions = decisions.filter(
-    (d) => d.decision === 'FIGURE' || d.decision === 'SVG'
-  );
-
-  if (diagramDecisions.length === 0) return paperContent;
-
-  let result = paperContent;
-
-  for (const decision of diagramDecisions) {
-    let placeholder = '';
-    if (decision.decision === 'FIGURE') {
-      placeholder = `\n[FIGURE: ${decision.keywords.join(', ')}]`;
-    } else if (decision.decision === 'SVG') {
-      placeholder = `\n[SVG: ${decision.svg_description}]`;
-    }
-
-    const lines = result.split('\n');
-    let inserted = false;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (
-        line.match(new RegExp(`Q${decision.question_number}[.)\\s]`)) &&
-        line.length > 5
-      ) {
-        let insertAt = i + 1;
-        while (
-          insertAt < lines.length &&
-          lines[insertAt].trim() !== '' &&
-          !lines[insertAt].match(/^[\*]?Q\d+[.)]/)
-        ) {
-          insertAt++;
-        }
-        lines.splice(insertAt, 0, placeholder.trim());
-        inserted = true;
-        break;
-      }
-    }
-
-    if (inserted) {
-      result = lines.join('\n');
-    }
-  }
-
-  return result;
 }
 
 function buildClaudePrompt(body: RequestBody, geminiOutput: string, isFallback: boolean): string {
@@ -830,6 +555,142 @@ function formatMcqOptions(content: string): string {
   );
 }
 
+interface ValidationIssue {
+  lineIndex: number;
+  type: 'remove_marker' | 'remove_marks' | 'missing_marker';
+  description: string;
+  suggestedFix?: string;
+}
+
+function validatePaper(content: string): {
+  issues: ValidationIssue[];
+  hasIssues: boolean;
+} {
+  const lines = content.split('\n');
+  const issues: ValidationIssue[] = [];
+
+  const drawYourselfPhrases = [
+    'draw a diagram', 'draw a neat', 'draw a labelled',
+    'draw a ray diagram', 'draw a circuit', 'draw and label',
+    'sketch a diagram', 'sketch the', 'with a neat diagram',
+    'with the help of a diagram', 'with a labelled diagram',
+    'draw the following', 'draw a schematic',
+  ];
+
+  const studyFigurePhrases = [
+    'study the diagram', 'study the ray diagram',
+    'study the figure', 'the figure below shows',
+    'the diagram below shows', 'refer to the diagram',
+    'observe the diagram', 'in the circuit shown',
+    'the ray diagram below', 'shown below and answer',
+    'given below and answer',
+  ];
+
+  const marksPattern = /\[\d+\s*marks?\]|\(\d+\s*marks?\)/gi;
+  const markerPattern = /%%DIAGRAM:[A-Z]+:[^%]+%%/;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineLower = line.toLowerCase();
+
+    // Check 1: marker after draw-yourself question
+    const isDrawYourself = drawYourselfPhrases.some(p =>
+      lineLower.includes(p)
+    );
+    if (isDrawYourself) {
+      for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+        if (markerPattern.test(lines[j])) {
+          issues.push({
+            lineIndex: j,
+            type: 'remove_marker',
+            description: `Line ${j + 1}: %%DIAGRAM:%% marker after draw-yourself question on line ${i + 1}. Remove this marker.`,
+          });
+        }
+      }
+    }
+
+    // Check 2: marks on individual questions
+    if (marksPattern.test(line) && /^\*\*Q\d+/.test(line)) {
+      issues.push({
+        lineIndex: i,
+        type: 'remove_marks',
+        description: `Line ${i + 1}: Individual question has marks notation. Remove marks from question text.`,
+        suggestedFix: line.replace(marksPattern, '').trim(),
+      });
+      marksPattern.lastIndex = 0;
+    }
+    marksPattern.lastIndex = 0;
+
+    // Check 3: study-figure question missing marker
+    const isStudyFigure = studyFigurePhrases.some(p =>
+      lineLower.includes(p)
+    );
+    if (isStudyFigure) {
+      const hasMarker = [i + 1, i + 2, i + 3].some(
+        j => j < lines.length && markerPattern.test(lines[j])
+      );
+      if (!hasMarker) {
+        issues.push({
+          lineIndex: i,
+          type: 'missing_marker',
+          description: `Line ${i + 1}: "Study the diagram" question has no %%DIAGRAM:%% marker on following lines.`,
+        });
+      }
+    }
+  }
+
+  return { issues, hasIssues: issues.length > 0 };
+}
+
+async function applyTargetedFix(
+  content: string,
+  issues: ValidationIssue[],
+  client: Anthropic
+): Promise<string> {
+  if (issues.length === 0) return content;
+
+  const issueList = issues
+    .map(issue => `- ${issue.description}`)
+    .join('\n');
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 8000,
+      messages: [{
+        role: 'user',
+        content: `Fix ONLY these specific issues in the exam paper below.
+Do NOT change any questions, answers, or other content.
+Do NOT regenerate or rewrite anything.
+Make only the minimal changes needed to fix these issues:
+
+ISSUES TO FIX:
+${issueList}
+
+For "remove_marker" issues: Delete the %%DIAGRAM:%% line entirely.
+For "remove_marks" issues: Remove [X marks] or (X marks) from that line only.
+For "missing_marker" issues: Add an appropriate %%DIAGRAM:%% marker on the line after the question. Use your judgment for FIGURE vs SVG and appropriate keywords/description.
+
+Return the complete corrected paper with no other changes.
+
+EXAM PAPER:
+${content}`,
+      }],
+    });
+
+    const fixed = response.content
+      .filter(b => b.type === 'text')
+      .map(b => (b as { type: 'text'; text: string }).text)
+      .join('')
+      .trim();
+
+    return fixed || content;
+  } catch (err) {
+    console.error('[TARGETED FIX] Error:', err);
+    return content;
+  }
+}
+
 const FREE_LIMIT = 5;
 
 function monthYear(): string {
@@ -955,11 +816,21 @@ export async function POST(req: NextRequest) {
         ? rawDraft.slice(psi + PAPER_START.length, pei).trim()
         : cleanAnswerSpaces(cleanNotes(rawDraft));
 
-      // Pass 2: Classify diagrams for cleaned paper
-      const finaliseDecisions = await runDiagramClassifier(cleanedPaper, client);
-      const finaliseWithPlaceholders = insertDiagramPlaceholders(cleanedPaper, finaliseDecisions);
+      // Layer 1: Code validation
+      const { issues: finaliseIssues, hasIssues: finaliseHasIssues } =
+        validatePaper(cleanedPaper);
+
+      // Layer 2: Targeted fix
+      let validatedFinalPaper = cleanedPaper;
+      if (finaliseHasIssues) {
+        validatedFinalPaper = await applyTargetedFix(
+          cleanedPaper, finaliseIssues, client
+        );
+      }
+
+      // Layer 3: Resolve %%DIAGRAM:%% markers
       const resolveResult = await resolveAllPlaceholders(
-        finaliseWithPlaceholders,
+        validatedFinalPaper,
         body.classNumber,
         body.subject,
       );
@@ -1081,31 +952,33 @@ ${paperForKey}`;
         combinedAnswerKey = combinedAnswerKey + "\n\n---\n\n" + cleanNotes(responseCatchup);
       }
 
-      // Classify and add diagrams to answer key
-      const answerKeyDecisions = await runDiagramClassifier(
-        combinedAnswerKey,
-        client,
-        true // isAnswerKey flag
-      );
-      const answerKeyWithPlaceholders = insertDiagramPlaceholders(
-        combinedAnswerKey,
-        answerKeyDecisions
-      );
+      // Resolve %%DIAGRAM:%% markers in answer key
       const {
         resolvedContent: resolvedAnswerKey,
       } = await resolveAllPlaceholders(
-        answerKeyWithPlaceholders,
+        combinedAnswerKey,
         body.classNumber,
         body.subject
       );
 
       draft = `===CLEAN PAPER START===\n${formattedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
     } else {
-      // Pass 2: Classify diagrams for each question
-      const diagramDecisions = await runDiagramClassifier(rawDraft, client);
-      const paperWithPlaceholders = insertDiagramPlaceholders(rawDraft, diagramDecisions);
+      // Layer 1: Code validation (instant, always)
+      const { issues, hasIssues } = validatePaper(rawDraft);
+      console.log('[VALIDATION] Issues found:', issues.length,
+        hasIssues ? issues.map(i => i.type).join(', ') : 'none');
+
+      // Layer 2: Targeted fix (only when issues found)
+      let validatedDraft = rawDraft;
+      if (hasIssues) {
+        console.log('[VALIDATION] Applying targeted fix...');
+        validatedDraft = await applyTargetedFix(rawDraft, issues, client);
+        console.log('[VALIDATION] Fix applied');
+      }
+
+      // Layer 3: Resolve %%DIAGRAM:%% markers to images/SVGs
       const resolveResult = await resolveAllPlaceholders(
-        paperWithPlaceholders,
+        validatedDraft,
         body.classNumber,
         body.subject,
       );

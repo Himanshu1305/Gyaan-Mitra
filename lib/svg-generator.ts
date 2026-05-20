@@ -180,6 +180,38 @@ function extractSvgPlaceholders(content: string): SvgPlaceholder[] {
   return results;
 }
 
+// New format: %%DIAGRAM:FIGURE:keywords%%
+function extractDiagramFigurePlaceholders(content: string): Array<{
+  fullMatch: string;
+  keywords: string[];
+}> {
+  const results = [];
+  const regex = /%%DIAGRAM:FIGURE:([^%]+)%%/gi;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    const keywords = match[1]
+      .split(',')
+      .map(k => k.trim())
+      .filter(Boolean);
+    results.push({ fullMatch: match[0], keywords });
+  }
+  return results;
+}
+
+// New format: %%DIAGRAM:SVG:description%%
+function extractDiagramSvgPlaceholders(content: string): Array<{
+  fullMatch: string;
+  description: string;
+}> {
+  const results = [];
+  const regex = /%%DIAGRAM:SVG:([^%]+)%%/gi;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    results.push({ fullMatch: match[0], description: match[1].trim() });
+  }
+  return results;
+}
+
 // ── Search NCERT Figures ──────────────────────────────────────
 
 async function searchNcertFigure(
@@ -364,6 +396,42 @@ export async function resolveAllPlaceholders(
         );
     resolvedContent = resolvedContent.split(placeholder.fullMatch).join(replacement);
     if (svgCode) { svgsGenerated++; } else { svgsFailed++; }
+  }
+
+  // ── Step 3: %%DIAGRAM:FIGURE:%% → NCERT images ─────────────
+  const diagramFigurePlaceholders = extractDiagramFigurePlaceholders(resolvedContent);
+  for (const placeholder of diagramFigurePlaceholders) {
+    const figure = classNumber && subject
+      ? await searchNcertFigure(placeholder.keywords, classNumber, subject, chapterNumber)
+      : null;
+    if (figure) {
+      const imgMarkdown = `\n![${figure.figure_caption || 'Diagram'}](${figure.public_url})\n*${figure.figure_caption || 'Diagram'}*\n`;
+      resolvedContent = resolvedContent.split(placeholder.fullMatch).join(imgMarkdown);
+      ncertFiguresFound++;
+    } else {
+      resolvedContent = resolvedContent.split(placeholder.fullMatch).join('');
+      ncertFiguresMissed++;
+    }
+  }
+
+  // ── Step 4: %%DIAGRAM:SVG:%% → generated SVGs ──────────────
+  const diagramSvgPlaceholders = extractDiagramSvgPlaceholders(resolvedContent);
+  const diagramSvgResolutions = await Promise.all(
+    diagramSvgPlaceholders.map(async (p) => ({
+      placeholder: p,
+      svgCode: await generateSingleSvg(p.description),
+    }))
+  );
+  for (const { placeholder, svgCode } of diagramSvgResolutions) {
+    if (svgCode) {
+      const encoded = encodeURIComponent(svgCode);
+      const imgMarkdown = `\n![${placeholder.description.slice(0, 50)}](data:image/svg+xml;charset=utf-8,${encoded})\n`;
+      resolvedContent = resolvedContent.split(placeholder.fullMatch).join(imgMarkdown);
+      svgsGenerated++;
+    } else {
+      resolvedContent = resolvedContent.split(placeholder.fullMatch).join('');
+      svgsFailed++;
+    }
   }
 
   console.log('[FIGURES] Resolution results:', {
