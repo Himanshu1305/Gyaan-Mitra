@@ -274,6 +274,13 @@ Use when question contains ANY of these phrases:
 → Provide actual NCERT textbook image for student to study.
 
 CATEGORY SVG — Generate a custom diagram:
+Also trigger SVG when question contains ANY of these phrases:
+"ray diagram", "defect of vision diagram", "path of light",
+"refraction through prism", "dispersion of light diagram",
+"rainbow formation diagram", "atmospheric refraction diagram",
+"correction of myopia", "correction of hypermetropia",
+"light through prism", "spectrum formation"
+
 Use SVG (not FIGURE) for these specific diagram types even in Biology/Science papers:
 - Ray diagrams (myopia correction, hypermetropia correction, any defect of vision ray diagram)
 - Prism dispersion diagrams (white light through prism)
@@ -288,6 +295,19 @@ Use FIGURE for:
 - Maps, graphs, flowcharts
 - Any photograph or illustration
 → Generate SVG from description.
+
+IMPORTANT OVERRIDE RULE:
+Even for Science/Biology subjects, use SVG (not FIGURE) when the question specifically
+asks to study a RAY DIAGRAM showing:
+- A defect of vision (myopia, hypermetropia)
+- Correction of a vision defect
+- Light passing through a prism
+- Formation of a rainbow
+- Atmospheric refraction effects
+- Path of light rays through any optical system
+
+These are physics/optics diagrams that must be generated as SVG.
+FIGURE should only be used for anatomical diagrams (eye structure, cell diagrams) and maps.
 
 CATEGORY NONE for these always — regardless of subject:
 - Any question asking student to "draw", "sketch", "construct"
@@ -331,15 +351,16 @@ Rules:
   diagrams — "human eye cross section", "eye anatomy", "parts of eye",
   "cornea iris lens retina"
 - For ray diagram questions: always use SVG (not FIGURE) — use these svg_description examples:
-  Myopia: "ray diagram showing myopic eye, parallel rays from distant object converging in front of retina instead of on retina, elongated eyeball, labels: object at infinity, parallel rays, eye lens, point of convergence in front of retina, retina"
-  Hypermetropia: "ray diagram showing hypermetropic eye, rays from nearby object converging behind retina, short eyeball, labels: nearby object, eye lens, point of convergence behind retina, retina, normal near point N prime, near point N"
-  Myopia correction: "ray diagram showing correction of myopia with concave lens, parallel rays from distant object first diverged by concave lens then converged by eye lens exactly on retina, labels: object, concave lens, eye lens, image on retina"
+  Myopia: "ray diagram of myopic eye showing parallel rays from distant object converging in front of retina not on it, elongated eyeball shape, labels: parallel rays from object at infinity, eye lens, point of convergence, retina, the image forms in front of retina"
+  Myopia correction: "ray diagram showing correction of myopia using concave lens, parallel rays first diverged by concave lens then converged by eye lens exactly onto retina, labels: object at infinity, concave lens, diverged rays, eye lens, image on retina"
+  Hypermetropia: "ray diagram of hypermetropic eye showing rays from nearby object converging behind retina, small eyeball, labels: nearby object, eye lens, image behind retina, retina, near point farther than 25cm"
 - For prism dispersion questions: always use SVG —
-  svg_description: "triangular glass prism with white light beam entering one face, splitting into VIBGYOR spectrum emerging from other face, violet deviating most at bottom, red deviating least at top, labels: white light, prism, violet, indigo, blue, green, yellow, orange, red, screen"
+  svg_description: "triangular glass prism with narrow white light beam entering one face, VIBGYOR spectrum emerging from other face, violet bends most at bottom, red bends least at top, labels: incident white light, glass prism, emergent spectrum, V I B G Y O R, screen showing spectrum"
 - For rainbow formation questions: always use SVG —
-  svg_description: "spherical water droplet showing sunlight entering, refracting at entry, internally reflecting at back surface, refracting again at exit, different colors emerging at different angles, violet at 40 degrees, red at 42 degrees, labels: sunlight, water droplet, refraction, internal reflection, violet, red"
-- For scattering/atmospheric refraction questions: always use SVG —
-  svg_description describes the specific phenomenon (Tyndall effect particles, advance sunrise geometry, etc.)
+  svg_description: "spherical water droplet cross-section showing sunlight ray entering, refracting at curved surface, internally reflecting at back, refracting again on exit at different angle, violet at 40 degrees red at 42 degrees from original direction, labels: sunlight, water droplet, refraction, total internal reflection, violet ray, red ray"
+- For atmospheric refraction/star twinkling questions: always use SVG —
+  svg_description: "layers of atmosphere with increasing density downward, starlight ray bending progressively toward normal as it enters denser layers, star actual position shown with dotted line, apparent position shown higher up, observer on earth surface, labels: star actual position, apparent position, atmosphere layers, observer, earth"
+- For scattering questions: always use SVG — svg_description describes the specific phenomenon (Tyndall effect particles, blue sky scattering, etc.)
 `;
 
 const ANSWER_KEY_DIAGRAM_PROMPT = `You are a diagram classifier for Indian school exam paper ANSWER KEYS (not question papers).
