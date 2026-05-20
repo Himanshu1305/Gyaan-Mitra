@@ -273,11 +273,20 @@ Use when question contains ANY of these phrases:
 "the diagram above shows", "the following figure shows", "referring to the diagram"
 → Provide actual NCERT textbook image for student to study.
 
-CATEGORY SVG — Generate a custom diagram for student to analyse:
-Use ONLY for Physics, Maths, Chemistry when:
-- Question provides specific values/measurements for a novel scenario
-- No standard NCERT diagram would match (custom circuit values, specific geometry)
-- Question says "the circuit below" or "the figure shows" with specific novel data
+CATEGORY SVG — Generate a custom diagram:
+Use SVG (not FIGURE) for these specific diagram types even in Biology/Science papers:
+- Ray diagrams (myopia correction, hypermetropia correction, any defect of vision ray diagram)
+- Prism dispersion diagrams (white light through prism)
+- Atmospheric refraction diagrams (star twinkling, advance sunrise)
+- Rainbow formation diagrams (light through water droplet)
+- Any diagram described as showing "path of light rays"
+- Circuit diagrams with specific values
+
+Use FIGURE for:
+- Human eye anatomy/structure (cross-section)
+- Plant/animal cell diagrams
+- Maps, graphs, flowcharts
+- Any photograph or illustration
 → Generate SVG from description.
 
 CATEGORY NONE for these always — regardless of subject:
@@ -321,22 +330,16 @@ Rules:
 - For human eye structure questions: use keywords that match actual NCERT textbook
   diagrams — "human eye cross section", "eye anatomy", "parts of eye",
   "cornea iris lens retina"
-- For ray diagram questions: use keywords specific to the defect —
-  "myopia ray diagram", "hypermetropia correction", "concave lens ray diagram",
-  "short sightedness correction ray diagram"
-  These are different images from eye anatomy diagrams.
-- For scattering/atmospheric refraction diagrams, use keywords:
-  "scattering of light", "atmospheric particles", "Tyndall effect",
-  "light scattering", "blue sky scattering"
-- For prism/dispersion diagrams, use keywords:
-  "dispersion of light", "glass prism", "white light spectrum",
-  "VIBGYOR", "prism refraction"
-- For rainbow formation diagrams, use keywords:
-  "rainbow formation", "water droplet", "internal reflection",
-  "dispersion rainbow", "sunlight raindrop"
-- For atmospheric refraction diagrams, use keywords:
-  "atmospheric refraction", "star twinkling", "apparent position",
-  "advance sunrise", "delayed sunset"
+- For ray diagram questions: always use SVG (not FIGURE) — use these svg_description examples:
+  Myopia: "ray diagram showing myopic eye, parallel rays from distant object converging in front of retina instead of on retina, elongated eyeball, labels: object at infinity, parallel rays, eye lens, point of convergence in front of retina, retina"
+  Hypermetropia: "ray diagram showing hypermetropic eye, rays from nearby object converging behind retina, short eyeball, labels: nearby object, eye lens, point of convergence behind retina, retina, normal near point N prime, near point N"
+  Myopia correction: "ray diagram showing correction of myopia with concave lens, parallel rays from distant object first diverged by concave lens then converged by eye lens exactly on retina, labels: object, concave lens, eye lens, image on retina"
+- For prism dispersion questions: always use SVG —
+  svg_description: "triangular glass prism with white light beam entering one face, splitting into VIBGYOR spectrum emerging from other face, violet deviating most at bottom, red deviating least at top, labels: white light, prism, violet, indigo, blue, green, yellow, orange, red, screen"
+- For rainbow formation questions: always use SVG —
+  svg_description: "spherical water droplet showing sunlight entering, refracting at entry, internally reflecting at back surface, refracting again at exit, different colors emerging at different angles, violet at 40 degrees, red at 42 degrees, labels: sunlight, water droplet, refraction, internal reflection, violet, red"
+- For scattering/atmospheric refraction questions: always use SVG —
+  svg_description describes the specific phenomenon (Tyndall effect particles, advance sunrise geometry, etc.)
 `;
 
 const ANSWER_KEY_DIAGRAM_PROMPT = `You are a diagram classifier for Indian school exam paper ANSWER KEYS (not question papers).
