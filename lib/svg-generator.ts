@@ -301,6 +301,17 @@ async function generateSingleSvg(description: string): Promise<string | null> {
       svgCode = m ? m[1].trim() : rawText;
     }
 
+    // Strip <thinking> blocks (Claude extended thinking)
+    svgCode = svgCode.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').trim();
+
+    // Also try to extract just the SVG if buried in text
+    if (!svgCode.includes('<svg')) {
+      const svgMatch = svgCode.match(/<svg[\s\S]*<\/svg>/i);
+      if (svgMatch) {
+        svgCode = svgMatch[0];
+      }
+    }
+
     // Validate it's SVG
     if (!svgCode.includes("<svg") || !svgCode.includes("</svg>")) {
       console.log('[SVG] FAILED validation - not valid SVG');
