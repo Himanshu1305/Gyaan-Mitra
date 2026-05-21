@@ -102,16 +102,27 @@ function ExamPaper({ content }: { content: string }) {
       components={{
         img({ src, alt }) {
           if (!src) return null;
+          if (src.startsWith("data:")) {
+            return (
+              <figure className="my-4 flex flex-col items-center">
+                <img
+                  src={src}
+                  alt={alt || "Diagram"}
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+              </figure>
+            );
+          }
           return (
             <figure className="my-4 flex flex-col items-center">
               <img
                 src={src}
                 alt={alt || "Diagram"}
                 className="max-w-full h-auto border border-gray-200 rounded-lg shadow-sm"
-                style={{ maxHeight: "400px", objectFit: "contain" }}
+                style={{ maxWidth: "100%", height: "auto" }}
                 loading="lazy"
               />
-              {alt && !src.startsWith("data:") && (
+              {alt && (
                 <figcaption className="mt-1 text-sm text-gray-500 italic text-center">
                   {alt}
                 </figcaption>
