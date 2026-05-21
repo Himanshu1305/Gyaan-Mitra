@@ -293,6 +293,8 @@ async function generateSingleSvg(description: string): Promise<string | null> {
       .trim();
 
     console.log('[SVG] Raw response length:', rawText.length, 'starts with:', rawText.slice(0, 50));
+    console.log('[SVG] Ends with:', rawText.slice(-50));
+    console.log('[SVG] Has closing tag:', rawText.includes('</svg>'));
 
     // Strip markdown fences if present
     let svgCode = rawText;
@@ -311,6 +313,8 @@ async function generateSingleSvg(description: string): Promise<string | null> {
         svgCode = svgMatch[0];
       }
     }
+
+    console.log('[SVG] svgCode after strip, last 50:', svgCode.slice(-50));
 
     // Validate it's SVG
     if (!svgCode.includes("<svg") || !svgCode.includes("</svg>")) {
