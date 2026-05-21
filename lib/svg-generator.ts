@@ -195,6 +195,7 @@ function extractDiagramFigurePlaceholders(content: string): Array<{
       .filter(Boolean);
     results.push({ fullMatch: match[0], keywords });
   }
+  console.log('[EXTRACT-FIGURE] Found:', results.length);
   return results;
 }
 
@@ -209,6 +210,7 @@ function extractDiagramSvgPlaceholders(content: string): Array<{
   while ((match = regex.exec(content)) !== null) {
     results.push({ fullMatch: match[0], description: match[1].trim() });
   }
+  console.log('[EXTRACT-SVG] Found:', results.length);
   return results;
 }
 
@@ -416,21 +418,22 @@ export async function resolveAllPlaceholders(
 
   // ── Step 4: %%DIAGRAM:SVG:%% → generated SVGs ──────────────
   const diagramSvgPlaceholders = extractDiagramSvgPlaceholders(resolvedContent);
-  const diagramSvgResolutions = await Promise.all(
-    diagramSvgPlaceholders.map(async (p) => ({
-      placeholder: p,
-      svgCode: await generateSingleSvg(p.description),
-    }))
-  );
-  for (const { placeholder, svgCode } of diagramSvgResolutions) {
+  console.log('[DIAGRAM-SVG] Found:', diagramSvgPlaceholders.length);
+
+  for (const placeholder of diagramSvgPlaceholders) {
+    const svgCode = await generateSingleSvg(placeholder.description);
     if (svgCode) {
       const encoded = encodeURIComponent(svgCode);
       const imgMarkdown = `\n![${placeholder.description.slice(0, 50)}](data:image/svg+xml;charset=utf-8,${encoded})\n`;
       resolvedContent = resolvedContent.split(placeholder.fullMatch).join(imgMarkdown);
       svgsGenerated++;
+      console.log('[DIAGRAM-SVG] Inserted SVG for:',
+        placeholder.description.slice(0, 50));
     } else {
       resolvedContent = resolvedContent.split(placeholder.fullMatch).join('');
       svgsFailed++;
+      console.log('[DIAGRAM-SVG] FAILED for:',
+        placeholder.description.slice(0, 50));
     }
   }
 
