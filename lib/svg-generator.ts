@@ -280,9 +280,9 @@ async function generateSingleSvg(description: string): Promise<string | null> {
   try {
     console.log('[SVG] Generating for:', description.slice(0, 100));
     const response = await getAnthropic().messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2000,
-      system: SVG_SYSTEM_PROMPT,
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 3000,
+      system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels.`,
       messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
     });
 
@@ -302,9 +302,6 @@ async function generateSingleSvg(description: string): Promise<string | null> {
       const m = rawText.match(/```(?:svg)?\s*([\s\S]*?)```/);
       svgCode = m ? m[1].trim() : rawText;
     }
-
-    // Strip <thinking> blocks (Claude extended thinking)
-    svgCode = svgCode.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '').trim();
 
     // Also try to extract just the SVG if buried in text
     if (!svgCode.includes('<svg')) {
