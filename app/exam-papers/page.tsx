@@ -102,24 +102,36 @@ function ExamPaper({ content }: { content: string }) {
       components={{
         img({ src, alt }) {
           if (!src) return null;
-          if (src.startsWith("data:")) {
-            return (
-              <figure className="my-4 flex flex-col items-center">
-                <img
-                  src={src}
-                  alt={alt || "Diagram"}
-                  style={{ maxWidth: "100%", height: "auto" }}
-                />
-              </figure>
-            );
+
+          if (src.startsWith('data:image/svg+xml')) {
+            try {
+              const encoded = src.replace('data:image/svg+xml;charset=utf-8,', '');
+              const svgCode = decodeURIComponent(encoded);
+              return (
+                <figure className="my-4 flex flex-col items-center">
+                  <div
+                    className="w-full max-w-2xl"
+                    dangerouslySetInnerHTML={{ __html: svgCode }}
+                  />
+                  {alt && (
+                    <figcaption className="mt-1 text-sm text-gray-500 italic text-center">
+                      {alt}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            } catch {
+              return null;
+            }
           }
+
           return (
             <figure className="my-4 flex flex-col items-center">
               <img
                 src={src}
-                alt={alt || "Diagram"}
+                alt={alt || 'Diagram'}
                 className="max-w-full h-auto border border-gray-200 rounded-lg shadow-sm"
-                style={{ maxWidth: "100%", height: "auto" }}
+                style={{ maxWidth: '100%', height: 'auto' }}
                 loading="lazy"
               />
               {alt && (
