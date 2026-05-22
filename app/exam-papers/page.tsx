@@ -542,6 +542,15 @@ export default function ExamPapersPage() {
           h1 { font-size: 16pt; text-align: center; }
           h2 { font-size: 14pt; }
           h3 { font-size: 12pt; }
+          svg line, svg path, svg polyline, svg polygon, svg rect, svg ellipse, svg circle {
+            stroke: #000000 !important;
+          }
+          svg text {
+            fill: #000000 !important;
+          }
+          svg [fill]:not(svg):not(g) {
+            fill: transparent !important;
+          }
         }
       `}</style>
       <Navbar />

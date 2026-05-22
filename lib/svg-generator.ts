@@ -390,8 +390,18 @@ export async function resolveAllPlaceholders(
   console.log('[DIAGRAM-SVG] Found:', diagramSvgPlaceholders.length);
 
   for (const placeholder of diagramSvgPlaceholders) {
-    const svgCode = await generateSingleSvg(placeholder.description);
+    let svgCode = await generateSingleSvg(placeholder.description);
     if (svgCode) {
+      // Post-process: strip answer-revealing text patterns
+      const answerPatterns = [
+        />[^<]*(?:behind retina|in front of retina|most deviated|least deviated|elongated eyeball|shortened eyeball|focal point behind|image forms|forms behind|forms in front|correct position|incorrect position)[^<]*</gi,
+      ];
+      for (const pattern of answerPatterns) {
+        svgCode = svgCode.replace(pattern, (match) => {
+          return match.replace(/>([^<]+)</, '><');
+        });
+      }
+
       const encoded = encodeURIComponent(svgCode);
       const imgMarkdown = `\n![${placeholder.description.slice(0, 50)}](data:image/svg+xml;charset=utf-8,${encoded})\n`;
       resolvedContent = resolvedContent.split(placeholder.fullMatch).join(imgMarkdown);
