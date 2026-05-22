@@ -583,7 +583,9 @@ function validatePaper(content: string): {
     'the diagram below shows', 'refer to the diagram',
     'observe the diagram', 'in the circuit shown',
     'the ray diagram below', 'shown below and answer',
-    'given below and answer',
+    'given below and answer', 'passage of white light',
+    'scattering of light by', 'defect of vision shown',
+    'dispersion of white light', 'the following diagram',
   ];
 
   const marksPattern = /\[\d+\s*marks?\]|\(\d+\s*marks?\)/gi;
