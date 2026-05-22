@@ -928,12 +928,17 @@ export async function POST(req: NextRequest) {
 
       // Count total questions by scanning for Q\d+[.)] pattern
       const qNumMatches = paperForKey.match(/\bQ(\d+)[.)]/g) || [];
-      const qNums = qNumMatches
-        .map(m => parseInt(m.replace(/\D/g, ''), 10))
-        .filter(n => !isNaN(n) && n > 0);
+      const qNums = [...new Set(
+        qNumMatches
+          .map(m => parseInt(m.replace(/\D/g, ''), 10))
+          .filter(n => !isNaN(n) && n > 0)
+      )].sort((a, b) => a - b);
       const totalQuestions = qNums.length > 0 ? Math.max(...qNums) : 30;
-      const halfQ = Math.ceil(totalQuestions / 2);
-      console.log(`[generate-with-chapters] Answer key: totalQuestions=${totalQuestions}, halfQ=${halfQ}`);
+      const splitQuestion = Math.ceil(totalQuestions / 2);
+      const halfQ = splitQuestion;
+      console.log('[ANSWER KEY] Total questions found:', totalQuestions);
+      console.log('[ANSWER KEY] Split at question:', splitQuestion);
+      console.log('[ANSWER KEY] Question numbers detected:', qNums.join(', '));
 
       // Call 3a: answer Q1 to Q[halfQ]
       const prompt3a = `Generate the answer key for questions Q1 to Q${halfQ} ONLY.

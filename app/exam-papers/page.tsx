@@ -5,11 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
-
-const customUrlTransform = (url: string) => {
-  if (url.startsWith('data:image/svg+xml')) return url;
-  return defaultUrlTransform(url);
-};
+import remarkGfm from "remark-gfm";
 import MicButton from "@/components/ui/MicButton";
 import ChapterUpload, { UploadedFile } from "@/components/ui/ChapterUpload";
 import ChapterSelector, { ChapterSelectorResult } from "@/components/shared/ChapterSelector";
@@ -17,6 +13,11 @@ import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 import { getUsageThisMonth, FREE_LIMIT } from "@/lib/usage";
 import { getFriendlyError } from "@/lib/api-errors";
+
+const customUrlTransform = (url: string) => {
+  if (url.startsWith('data:image/svg+xml')) return url;
+  return defaultUrlTransform(url);
+};
 
 const EXAM_TYPES = ["Unit Test", "Half-Yearly Exam", "Annual Exam", "Class Test"];
 const DURATIONS = ["1 hour", "1.5 hours", "2 hours", "2.5 hours", "3 hours"];
@@ -104,6 +105,7 @@ function TabToggle({ mode, onChange }: { mode: "chapter" | "custom"; onChange: (
 function ExamPaper({ content }: { content: string }) {
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
       urlTransform={customUrlTransform}
       components={{
         img({ src, alt }) {
@@ -151,9 +153,36 @@ function ExamPaper({ content }: { content: string }) {
         h1({ children }) { return <h1 className="text-2xl font-bold text-[#1B3A6B] border-b-2 border-[#FF9933] pb-2 mb-4">{children}</h1>; },
         h2({ children }) { return <h2 className="text-xl font-semibold text-[#1B3A6B] mt-6 mb-3">{children}</h2>; },
         h3({ children }) { return <h3 className="text-lg font-medium text-[#1B3A6B] mt-4 mb-2">{children}</h3>; },
-        table({ children }) { return <div className="overflow-x-auto my-4"><table className="min-w-full border-collapse border border-gray-300 text-sm">{children}</table></div>; },
-        th({ children }) { return <th className="border border-gray-300 bg-[#1B3A6B] text-white px-3 py-2 text-left">{children}</th>; },
-        td({ children }) { return <td className="border border-gray-300 px-3 py-2">{children}</td>; },
+        table({ children }) {
+          return (
+            <div className="overflow-x-auto my-4">
+              <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '14px' }}>
+                {children}
+              </table>
+            </div>
+          );
+        },
+        th({ children }) {
+          return (
+            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5', textAlign: 'left', fontWeight: 'bold' }}>
+              {children}
+            </th>
+          );
+        },
+        td({ children }) {
+          return (
+            <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+              {children}
+            </td>
+          );
+        },
+        tr({ children }) {
+          return (
+            <tr style={{ borderBottom: '1px solid #ddd' }}>
+              {children}
+            </tr>
+          );
+        },
         hr() { return <hr className="border-t-2 border-[#FF9933] my-6 opacity-40" />; },
         p({ children }) {
           const text = Array.isArray(children)
