@@ -952,14 +952,18 @@ ${paperForKey}`;
         combinedAnswerKey = combinedAnswerKey + "\n\n---\n\n" + cleanNotes(responseCatchup);
       }
 
-      // Resolve %%DIAGRAM:%% markers in answer key
-      const {
-        resolvedContent: resolvedAnswerKey,
-      } = await resolveAllPlaceholders(
-        combinedAnswerKey,
-        body.classNumber,
-        body.subject
-      );
+      // Resolve %%DIAGRAM:%% markers in answer key (non-fatal)
+      let resolvedAnswerKey = combinedAnswerKey;
+      try {
+        const resolveResult = await resolveAllPlaceholders(
+          combinedAnswerKey,
+          body.classNumber,
+          body.subject
+        );
+        resolvedAnswerKey = resolveResult.resolvedContent;
+      } catch (err) {
+        console.error('[generate-with-chapters] Answer key diagram resolution failed (non-fatal):', err);
+      }
 
       draft = `===CLEAN PAPER START===\n${formattedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
     } else {
