@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { defaultUrlTransform } from "react-markdown";
+
+const customUrlTransform = (url: string) => {
+  if (url.startsWith('data:image/svg+xml')) return url;
+  return defaultUrlTransform(url);
+};
 import MicButton from "@/components/ui/MicButton";
 import ChapterUpload, { UploadedFile } from "@/components/ui/ChapterUpload";
 import ChapterSelector, { ChapterSelectorResult } from "@/components/shared/ChapterSelector";
@@ -99,6 +104,7 @@ function TabToggle({ mode, onChange }: { mode: "chapter" | "custom"; onChange: (
 function ExamPaper({ content }: { content: string }) {
   return (
     <ReactMarkdown
+      urlTransform={customUrlTransform}
       components={{
         img({ src, alt }) {
           if (!src) return null;
