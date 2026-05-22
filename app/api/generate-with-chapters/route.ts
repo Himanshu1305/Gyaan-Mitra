@@ -736,21 +736,23 @@ async function applyTargetedFix(
       max_tokens: 8000,
       messages: [{
         role: 'user',
-        content: `Fix ONLY these specific issues in the exam paper below.
-Do NOT change any questions, answers, or other content.
-Do NOT regenerate or rewrite anything.
-Make only the minimal changes needed to fix these issues:
+        content: `You are a text editor. Make ONLY these specific changes to the exam paper below. Return ONLY the complete corrected exam paper with no explanations, no reasoning, no commentary before or after.
 
-ISSUES TO FIX:
+CHANGES TO MAKE:
 ${issueList}
+
+Rules:
+- Start your response IMMEDIATELY with the paper header (e.g. [SCHOOL NAME] or # [SCHOOL NAME])
+- End your response with the last line of the paper
+- Do NOT include any explanation of what you changed
+- Do NOT include phrases like "I need to find" or "Let me" or "Here is"
+- Return the COMPLETE paper, not just the changed sections
 
 For "remove_marker" issues: Delete the %%DIAGRAM:%% line entirely.
 For "remove_marks" issues: Remove [X marks] or (X marks) from that line only.
 For "missing_marker" issues: Add an appropriate %%DIAGRAM:%% marker on the line after the question. Use your judgment for FIGURE vs SVG and appropriate keywords/description.
 
-Return the complete corrected paper with no other changes.
-
-EXAM PAPER:
+EXAM PAPER TO CORRECT:
 ${content}`,
       }],
     });

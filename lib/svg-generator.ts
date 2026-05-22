@@ -233,7 +233,7 @@ async function generateSingleSvg(description: string): Promise<string | null> {
       getAnthropic().messages.create({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 3000,
-        system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.`,
+        system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled. Do NOT include text that reveals the answer such as: 'Image Formed in Front of Retina' (just say 'Image'), 'Image Formed Behind Retina' (just say 'Image'), 'Violet deviates most' or 'Red deviates least', 'Most deviated' or 'Least deviated' — only label what the element IS, not what it means. Ensure all text labels fit within the viewBox: start text at x=10 minimum near left edge, end text at viewBox width minus 20px near right edge.`,
         messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
       })
     );
@@ -248,10 +248,10 @@ async function generateSingleSvg(description: string): Promise<string | null> {
     console.log('[SVG] Ends with:', rawText.slice(-50));
     console.log('[SVG] Has closing tag:', rawText.includes('</svg>'));
 
-    // Strip markdown fences if present
+    // Strip markdown fences including ```xml variant
     let svgCode = rawText;
     if (rawText.includes("```")) {
-      const m = rawText.match(/```(?:svg)?\s*([\s\S]*?)```/);
+      const m = rawText.match(/```(?:svg|xml)?\s*([\s\S]*?)```/);
       svgCode = m ? m[1].trim() : rawText;
     }
 
