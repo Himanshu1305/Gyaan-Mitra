@@ -562,6 +562,81 @@ interface ValidationIssue {
   suggestedFix?: string;
 }
 
+function insertMissingDiagramMarkers(content: string): string {
+  const blocks = content.split(/(?=\*\*Q\d+\.)/);
+
+  const svgTriggers = [
+    'study the ray diagram', 'ray diagram shown below',
+    'defect of vision shown', 'passage of white light',
+    'dispersion of white light', 'atmospheric refraction diagram',
+    'formation of rainbow', 'circuit shown below',
+    'the ray diagram below', 'ray diagram of',
+  ];
+
+  const figureTriggers = [
+    'study the diagram of the human eye',
+    'diagram of the human eye shown',
+    'structure of the human eye shown',
+    'parts of the human eye shown below',
+  ];
+
+  const negativePhrases = [
+    'do not draw', 'need not draw', 'without drawing',
+    'no need to draw', 'need not sketch',
+  ];
+
+  const markerPattern = /%%DIAGRAM:[A-Z]+:[^%]+%%/;
+
+  const processedBlocks = blocks.map(block => {
+    const blockLower = block.toLowerCase();
+
+    if (markerPattern.test(block)) return block;
+    if (negativePhrases.some(p => blockLower.includes(p))) return block;
+
+    const hasFigureTrigger = figureTriggers.some(p => blockLower.includes(p));
+    if (hasFigureTrigger) {
+      console.log('[INSERT-MARKER] Adding FIGURE marker to block:', block.slice(0, 60));
+      const insertPos = block.indexOf('\n') > 0 ? block.indexOf('\n') : block.length;
+      return block.slice(0, insertPos) +
+        '\n%%DIAGRAM:FIGURE:human eye cross section, cornea, iris, pupil, crystalline lens, ciliary muscles, retina, optic nerve%%' +
+        block.slice(insertPos);
+    }
+
+    const hasSvgTrigger = svgTriggers.some(p => blockLower.includes(p));
+    if (hasSvgTrigger) {
+      let svgDescription = 'scientific diagram as described in the question';
+
+      if (blockLower.includes('myopia') || blockLower.includes('short sight') || blockLower.includes('near sight')) {
+        svgDescription = 'ray diagram of myopic eye showing parallel rays from distant object converging in front of retina, elongated eyeball';
+      } else if (blockLower.includes('hypermetropia') || blockLower.includes('far sight') || blockLower.includes('hyperopia')) {
+        svgDescription = 'ray diagram of hypermetropic eye showing rays from nearby object converging behind retina, shortened eyeball';
+      } else if (blockLower.includes('prism') || blockLower.includes('dispersion') || blockLower.includes('vibgyor') || blockLower.includes('white light')) {
+        svgDescription = 'triangular glass prism with white light entering one face and VIBGYOR spectrum emerging from other face, violet deviating most, red deviating least';
+      } else if (blockLower.includes('rainbow')) {
+        svgDescription = 'spherical water droplet showing sunlight entering, internal reflection, and emerging as spectrum forming rainbow, violet at 40 degrees red at 42 degrees';
+      } else if (blockLower.includes('atmospheric refraction') || blockLower.includes('twinkling') || blockLower.includes('star')) {
+        svgDescription = 'atmospheric refraction diagram showing layers of atmosphere with increasing density, starlight bending progressively, actual and apparent position of star';
+      } else if (blockLower.includes('circuit')) {
+        svgDescription = 'electric circuit diagram with battery, switch, resistors and connecting wires as described in the question';
+      } else if (blockLower.includes('correction') && blockLower.includes('myopia')) {
+        svgDescription = 'ray diagram showing correction of myopia using concave lens, parallel rays diverged by concave lens then focused on retina by eye lens';
+      } else if (blockLower.includes('correction') && blockLower.includes('hypermetropia')) {
+        svgDescription = 'ray diagram showing correction of hypermetropia using convex lens, rays from nearby object converged by convex lens then focused on retina';
+      }
+
+      console.log('[INSERT-MARKER] Adding SVG marker to block:', block.slice(0, 60));
+      const insertPos = block.indexOf('\n') > 0 ? block.indexOf('\n') : block.length;
+      return block.slice(0, insertPos) +
+        `\n%%DIAGRAM:SVG:${svgDescription}%%` +
+        block.slice(insertPos);
+    }
+
+    return block;
+  });
+
+  return processedBlocks.join('');
+}
+
 function validatePaper(content: string): {
   issues: ValidationIssue[];
   hasIssues: boolean;
@@ -818,15 +893,18 @@ export async function POST(req: NextRequest) {
         ? rawDraft.slice(psi + PAPER_START.length, pei).trim()
         : cleanAnswerSpaces(cleanNotes(rawDraft));
 
+      // Deterministic diagram marker insertion
+      const cleanedPaperWithMarkers = insertMissingDiagramMarkers(cleanedPaper);
+
       // Layer 1: Code validation
       const { issues: finaliseIssues, hasIssues: finaliseHasIssues } =
-        validatePaper(cleanedPaper);
+        validatePaper(cleanedPaperWithMarkers);
 
       // Layer 2: Targeted fix
-      let validatedFinalPaper = cleanedPaper;
+      let validatedFinalPaper = cleanedPaperWithMarkers;
       if (finaliseHasIssues) {
         validatedFinalPaper = await applyTargetedFix(
-          cleanedPaper, finaliseIssues, client
+          cleanedPaperWithMarkers, finaliseIssues, client
         );
       }
 
@@ -969,16 +1047,19 @@ ${paperForKey}`;
 
       draft = `===CLEAN PAPER START===\n${formattedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
     } else {
+      // Deterministic diagram marker insertion
+      const draftWithMarkers = insertMissingDiagramMarkers(rawDraft);
+
       // Layer 1: Code validation (instant, always)
-      const { issues, hasIssues } = validatePaper(rawDraft);
+      const { issues, hasIssues } = validatePaper(draftWithMarkers);
       console.log('[VALIDATION] Issues found:', issues.length,
         hasIssues ? issues.map(i => i.type).join(', ') : 'none');
 
       // Layer 2: Targeted fix (only when issues found)
-      let validatedDraft = rawDraft;
+      let validatedDraft = draftWithMarkers;
       if (hasIssues) {
         console.log('[VALIDATION] Applying targeted fix...');
-        validatedDraft = await applyTargetedFix(rawDraft, issues, client);
+        validatedDraft = await applyTargetedFix(draftWithMarkers, issues, client);
         console.log('[VALIDATION] Fix applied');
       }
 
