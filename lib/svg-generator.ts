@@ -204,7 +204,7 @@ async function generateSingleSvg(description: string): Promise<string | null> {
     const response = await getAnthropic().messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 3000,
-      system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels.`,
+      system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.`,
       messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
     });
 
