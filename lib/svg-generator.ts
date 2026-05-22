@@ -196,17 +196,47 @@ async function searchNcertFigure(
   }
 }
 
+// ── Retry Helper ──────────────────────────────────────────────
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function callAnthropicWithRetry<T>(
+  apiCallFn: () => Promise<T>,
+  retries = 3,
+  delayMs = 1000
+): Promise<T> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await apiCallFn();
+    } catch (err: unknown) {
+      const status = (err as { status?: number })?.status;
+      const isTransient = status === 529 || status === 429;
+      const isLastRetry = i === retries - 1;
+      if (isTransient && !isLastRetry) {
+        console.log(`[SVG RETRY] Overloaded (${status}). Attempt ${i + 1}/${retries} in ${delayMs}ms`);
+        await delay(delayMs);
+        delayMs *= 2;
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 // ── Generate SVG ──────────────────────────────────────────────
 
 async function generateSingleSvg(description: string): Promise<string | null> {
   try {
     console.log('[SVG] Generating for:', description.slice(0, 100));
-    const response = await getAnthropic().messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 3000,
-      system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.`,
-      messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
-    });
+    const response = await callAnthropicWithRetry(() =>
+      getAnthropic().messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 3000,
+        system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.`,
+        messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
+      })
+    );
 
     const rawText = response.content
       .filter((b) => b.type === "text")
@@ -254,8 +284,13 @@ async function generateSingleSvg(description: string): Promise<string | null> {
     console.log('[SVG] SUCCESS - SVG length:', svgCode.length);
     return svgCode;
   } catch (err) {
-    console.error('[SVG] ERROR:', err);
-    return null;
+    console.error('[SVG] All retries failed:', err);
+    return `<svg width="100%" height="auto" viewBox="0 0 500 120" xmlns="http://www.w3.org/2000/svg">
+  <rect width="500" height="120" fill="#fff9e6" stroke="#f0ad4e" stroke-width="2" rx="8"/>
+  <text x="250" y="45" text-anchor="middle" font-family="Arial" font-size="14" fill="#856404" font-weight="bold">Diagram temporarily unavailable</text>
+  <text x="250" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#856404">Please refer to your NCERT textbook for this diagram.</text>
+  <text x="250" y="92" text-anchor="middle" font-family="Arial" font-size="11" fill="#856404" font-style="italic">(Server was busy — regenerate the paper to try again)</text>
+</svg>`;
   }
 }
 
