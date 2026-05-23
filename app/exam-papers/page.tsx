@@ -162,16 +162,18 @@ function ExamPaper({ content }: { content: string }) {
             </div>
           );
         },
+        thead({ children }) { return <thead>{children}</thead>; },
+        tbody({ children }) { return <tbody>{children}</tbody>; },
         th({ children }) {
           return (
-            <th style={{ border: '1px solid #ddd', padding: '8px', backgroundColor: '#f5f5f5', textAlign: 'left', fontWeight: 'bold' }}>
+            <th style={{ border: '1px solid #ccc', padding: '8px 12px', backgroundColor: '#f5f5f5', textAlign: 'left', fontWeight: 'bold' }}>
               {children}
             </th>
           );
         },
         td({ children }) {
           return (
-            <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+            <td style={{ border: '1px solid #ccc', padding: '8px 12px' }}>
               {children}
             </td>
           );

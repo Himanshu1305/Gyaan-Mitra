@@ -226,14 +226,26 @@ async function callAnthropicWithRetry<T>(
 
 // ── Generate SVG ──────────────────────────────────────────────
 
-async function generateSingleSvg(description: string): Promise<string | null> {
+export async function generateSingleSvg(description: string): Promise<string | null> {
   try {
     console.log('[SVG] Generating for:', description.slice(0, 100));
     const response = await callAnthropicWithRetry(() =>
       getAnthropic().messages.create({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 3000,
-        system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled. Do NOT include text that reveals the answer such as: 'Image Formed in Front of Retina' (just say 'Image'), 'Image Formed Behind Retina' (just say 'Image'), 'Violet deviates most' or 'Red deviates least', 'Most deviated' or 'Least deviated' — only label what the element IS, not what it means. Ensure all text labels fit within the viewBox: start text at x=10 minimum near left edge, end text at viewBox width minus 20px near right edge.`,
+        system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.
+
+BANNED labels (never include — they reveal answers to students):
+- "Image formed in front of retina" or "Image formed behind retina" → label as "Image" only
+- "Focal point in front of retina" or "Focal point behind retina" → label as "F" only
+- "Violet deviates most", "Red deviates least", "Most deviated", "Least deviated" → label as "Violet" or "Red" only
+- "Correct position", "Incorrect position", "Blurred", "Clear image" → omit entirely
+- "Eye too long", "Eye too short", "Elongated eyeball", "Shortened eyeball" → label the structure only (e.g. "Eyeball")
+- "Rays converge before/behind retina" → draw the ray path without the explanatory text label
+- "Defect: myopia", "Defect: hypermetropia" → omit defect labels
+Rule: label WHAT a structure IS, never WHAT IT MEANS or WHY it matters.
+
+Ensure all text labels fit within the viewBox: start text at x=10 minimum near left edge, end text at viewBox width minus 20px near right edge.`,
         messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
       })
     );

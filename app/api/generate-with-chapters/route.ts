@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { resolveAllPlaceholders } from "@/lib/svg-generator";
+import { resolveAllPlaceholders, generateSingleSvg } from "@/lib/svg-generator";
 
 type QuestionMix = {
   mcq: number;
@@ -926,117 +926,117 @@ export async function POST(req: NextRequest) {
       const paperForKey = formattedFinalPaper || body.additionalInstructions.replace(/^FINALISE_AND_KEY:/i, "").trim();
       const isHindi = /hindi|हिंदी/i.test(body.subject);
 
-      // Count total questions by scanning for Q\d+[.)] pattern
-      const qNumMatches = paperForKey.match(/\bQ(\d+)[.)]/g) || [];
-      const qNums = [...new Set(
-        qNumMatches
-          .map(m => parseInt(m.replace(/\D/g, ''), 10))
-          .filter(n => !isNaN(n) && n > 0)
-      )].sort((a, b) => a - b);
-      const totalQuestions = qNums.length > 0 ? Math.max(...qNums) : 30;
-      const splitQuestion = Math.ceil(totalQuestions / 2);
-      const halfQ = splitQuestion;
-      console.log('[ANSWER KEY] Total questions found:', totalQuestions);
-      console.log('[ANSWER KEY] Split at question:', splitQuestion);
-      console.log('[ANSWER KEY] Question numbers detected:', qNums.join(', '));
+      // Strip SVG/image data URIs to reduce context size for answer key calls
+      const paperTextOnly = paperForKey
+        .replace(/!\[[^\]]*\]\(data:[^)]{0,100000}\)/g, '[diagram]')
+        .replace(/!\[[^\]]*\]\(https?:\/\/[^)]*\)/g, '[diagram]');
 
-      // Call 3a: answer Q1 to Q[halfQ]
-      const prompt3a = `Generate the answer key for questions Q1 to Q${halfQ} ONLY.
-Do not mention marks for individual questions.
-${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
-You must answer exactly these question numbers: Q1 to Q${halfQ}.
-Count carefully. Do not skip any. If you finish early, you have missed questions — go back and complete all.
+      // Split paper into sections for parallel answer key generation
+      const sectionSplitRegex = /(?=^#{1,3}\s*SECTION\s+[A-F])/gim;
+      const sectionChunks = paperTextOnly.split(sectionSplitRegex).filter(s => s.trim());
 
-For MCQ answers: List every answer as Q1-(d), Q2-(c), Q3-(b)...
-Then write one paragraph explanation for each MCQ.
-
-For short and long answer questions: Write complete model answers for every question.
-
-For diagram questions: describe the diagram clearly in words with all labels.
-Do NOT draw ASCII art.
-For answers involving diagrams: write a clear description of what the diagram shows, then on the next line write:
-[Diagram: brief description of what to draw]
-This helps the system generate the correct diagram for the model answer.
-Do not add teacher notes or meta-commentary.
-
-EXAM PAPER:
-${paperForKey}`;
-
-      const msg3a = await client.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 8000,
-        messages: [{ role: "user", content: prompt3a }],
-      });
-
-      const responseA = msg3a.content
-        .filter((b) => b.type === "text")
-        .map((b) => (b as { type: "text"; text: string }).text)
-        .join("\n");
-
-      // Call 3b: answer Q[halfQ+1] to Q[totalQuestions]
-      const prompt3b = `Generate the answer key for questions Q${halfQ + 1} to Q${totalQuestions} ONLY.
-Do not mention marks for individual questions.
-${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
-You must answer exactly these question numbers: Q${halfQ + 1} to Q${totalQuestions}.
-Count carefully. Do not skip any. If you finish early, you have missed questions — go back and complete all.
-Use all available tokens if needed — completeness is mandatory.
-
-Write complete model answers covering all key points for every question.
-For numericals: given → formula → substitution → answer with units.
-
-For diagram questions: describe the diagram clearly in words with all labels.
-Do NOT draw ASCII art.
-For answers involving diagrams: write a clear description of what the diagram shows, then on the next line write:
-[Diagram: brief description of what to draw]
-This helps the system generate the correct diagram for the model answer.
-Do not add teacher notes or meta-commentary.
-
-EXAM PAPER:
-${paperForKey}`;
-
-      const msg3b = await client.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 8000,
-        messages: [{ role: "user", content: prompt3b }],
-      });
-
-      const responseB = msg3b.content
-        .filter((b) => b.type === "text")
-        .map((b) => (b as { type: "text"; text: string }).text)
-        .join("\n");
-
-      let combinedAnswerKey = cleanNotes(responseA) + "\n\n---\n\n" + cleanNotes(responseB);
-
-      // Validation: find which question numbers appear in the combined answer key
-      const answeredNums = new Set<number>();
-      for (const qm of (combinedAnswerKey.match(/\bQ(\d+)\b/g) || [])) {
-        const n = parseInt(qm.slice(1), 10);
-        if (n > 0) answeredNums.add(n);
+      const sections: Array<{ letter: string; content: string }> = [];
+      for (const chunk of sectionChunks) {
+        const letterMatch = chunk.match(/^#{1,3}\s*SECTION\s+([A-F])/im);
+        if (letterMatch) {
+          sections.push({ letter: letterMatch[1], content: chunk });
+        }
       }
-      const missing = Array.from({ length: totalQuestions }, (_, i) => i + 1)
-        .filter(n => !answeredNums.has(n));
+      if (sections.length === 0) {
+        sections.push({ letter: 'A', content: paperTextOnly });
+      }
+      console.log('[ANSWER KEY] Sections found:', sections.map(s => s.letter));
 
-      if (missing.length > 0) {
-        console.log("[generate-with-chapters] Answer key missing questions:", missing);
-        const promptCatchup = `The answer key is missing answers for these questions: ${missing.map(n => `Q${n}`).join(', ')}.
-Generate ONLY the missing answers now. Do not repeat already-answered questions.
-${isHindi ? "Write everything in Hindi (Devanagari script).\n" : ""}
+      // Generate answer key per section in parallel
+      const sectionAnswerPromises = sections.map(async (section) => {
+        try {
+          const sectionPrompt = `Generate a complete answer key for Section ${section.letter} ONLY.
+${isHindi ? 'Write all answers in Hindi (Devanagari script).\n' : ''}
+RULES:
+- Answer EVERY question in this section without exception
+- For MCQs: Q1: (b) — then one sentence explanation
+- For short answers: complete model answer with all key points
+- For long answers: detailed answer, full working for numericals
+- For OR questions answer BOTH options:
+  Q14. [Main question answer]
+  Q14 (OR). [Alternative question answer]
+- For questions asking the student to draw a diagram: write the complete text answer, then on a new line write exactly:
+  [REQUIRE_ANSWER_DIAGRAM: descriptive-slug]
+  Use these slugs (pick closest match):
+  physics-myopia-ray-diagram
+  physics-myopia-correction
+  physics-hypermetropia-ray-diagram
+  physics-hypermetropia-correction
+  physics-prism-dispersion
+  physics-rainbow-formation
+  physics-atmospheric-refraction
+  biology-human-eye-anatomy
+  physics-series-circuit
+  physics-parallel-circuit
+- Do NOT add marks on individual answers
+- Do NOT add teacher notes or meta-commentary
 
-EXAM PAPER:
-${paperForKey}`;
+SECTION ${section.letter} CONTENT:
+${section.content}`;
 
-        const msgCatchup = await client.messages.create({
-          model: "claude-sonnet-4-6",
-          max_tokens: 4000,
-          messages: [{ role: "user", content: promptCatchup }],
-        });
+          const resp = await client.messages.create({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 4000,
+            messages: [{ role: 'user', content: sectionPrompt }],
+          });
 
-        const responseCatchup = msgCatchup.content
-          .filter((b) => b.type === "text")
-          .map((b) => (b as { type: "text"; text: string }).text)
-          .join("\n");
+          const text = resp.content
+            .filter((b) => b.type === 'text')
+            .map((b) => (b as { type: 'text'; text: string }).text)
+            .join('');
 
-        combinedAnswerKey = combinedAnswerKey + "\n\n---\n\n" + cleanNotes(responseCatchup);
+          console.log(`[ANSWER KEY] Section ${section.letter}: ${text.length} chars`);
+          return `## ANSWER KEY — SECTION ${section.letter}\n\n${text}`;
+        } catch (err) {
+          console.error(`[ANSWER KEY] Section ${section.letter} failed:`, err);
+          return `## ANSWER KEY — SECTION ${section.letter}\n\n(Generation failed — please regenerate)`;
+        }
+      });
+
+      const sectionAnswers = await Promise.all(sectionAnswerPromises);
+      let combinedAnswerKey = sectionAnswers.map(cleanNotes).join('\n\n---\n\n');
+
+      // Resolve [REQUIRE_ANSWER_DIAGRAM: slug] placeholders to SVGs
+      const DIAGRAM_SLUG_MAP: Record<string, string> = {
+        'physics-myopia-ray-diagram': 'ray diagram of myopic eye: parallel rays from distant object, eye lens, rays converging in front of retina (not on it), elongated eyeball shape, labels: Incident ray, Eye lens, F, Retina',
+        'physics-myopia-correction': 'ray diagram correcting myopia: biconcave lens in front of eye, parallel rays diverged by concave lens then focused on retina by eye lens, labels: Concave lens, Eye lens, Retina',
+        'physics-hypermetropia-ray-diagram': 'ray diagram of hypermetropic eye: rays from nearby object, eye lens, rays converging behind retina, shortened eyeball shape, labels: Near object, Eye lens, F, Retina',
+        'physics-hypermetropia-correction': 'ray diagram correcting hypermetropia: biconvex lens in front of eye, diverging rays from near object converged by convex lens then focused on retina, labels: Convex lens, Eye lens, Retina',
+        'physics-prism-dispersion': 'triangular glass prism with white light beam entering one face, VIBGYOR spectrum emerging from opposite face, labels: White light, Glass prism, V I B G Y O R',
+        'physics-rainbow-formation': 'spherical water droplet showing sunlight entering, refracting, total internal reflection inside droplet, emerging as spectrum, elevation angles 40-42 degrees, labels: Sun rays, Water droplet, Violet, Red',
+        'physics-atmospheric-refraction': 'vertical atmosphere cross-section with increasing density layers from top to bottom, starlight path bending toward normal at each layer boundary, labels: Atmosphere, Actual star position, Apparent star position, Observer',
+        'biology-human-eye-anatomy': 'human eye cross-section with all major parts labeled: Cornea, Iris, Pupil, Crystalline lens, Ciliary muscles, Vitreous humor, Retina, Fovea, Blind spot, Optic nerve',
+        'physics-series-circuit': 'series electric circuit: battery, three resistors R1 R2 R3 connected end-to-end, ammeter in series, voltmeter across battery, current direction arrows, labels: Battery, R1, R2, R3, A (ammeter), V (voltmeter)',
+        'physics-parallel-circuit': 'parallel electric circuit: battery, three parallel branches each with resistor R1 R2 R3, ammeter in main branch, voltmeter across battery, current direction arrows, labels: Battery, R1, R2, R3, A, V',
+      };
+
+      const requireDiagramRegex = /\[REQUIRE_ANSWER_DIAGRAM:\s*([^\]]+)\]/g;
+      const diagramMatches: RegExpExecArray[] = [];
+      let _dm: RegExpExecArray | null;
+      while ((_dm = requireDiagramRegex.exec(combinedAnswerKey)) !== null) {
+        diagramMatches.push(_dm);
+      }
+
+      for (const match of diagramMatches) {
+        const slug = match[1].trim();
+        const description = DIAGRAM_SLUG_MAP[slug] || `diagram showing ${slug.replace(/-/g, ' ')}`;
+        try {
+          const svgCode = await generateSingleSvg(description);
+          if (svgCode) {
+            const encoded = encodeURIComponent(svgCode);
+            const imgMd = `\n![${slug}](data:image/svg+xml;charset=utf-8,${encoded})\n`;
+            combinedAnswerKey = combinedAnswerKey.replace(match[0], imgMd);
+          } else {
+            combinedAnswerKey = combinedAnswerKey.replace(match[0], `\n*[Refer to NCERT textbook: ${slug.replace(/-/g, ' ')}]*\n`);
+          }
+        } catch {
+          combinedAnswerKey = combinedAnswerKey.replace(match[0], `\n*[Refer to NCERT textbook: ${slug.replace(/-/g, ' ')}]*\n`);
+        }
       }
 
       // Resolve %%DIAGRAM:%% markers in answer key (non-fatal)
