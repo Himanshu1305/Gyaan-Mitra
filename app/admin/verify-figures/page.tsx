@@ -88,49 +88,62 @@ export default function VerifyFiguresPage() {
 
   // ── API helper ────────────────────────────────────────────────────────────
 
-  async function adminGet(params: Record<string, string>) {
-    const qs = new URLSearchParams(params).toString();
-    const res = await fetch(`/api/admin/figures?${qs}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    return res.json() as Promise<{ data: unknown; error: string | null }>;
+  async function adminGet(params: Record<string, string>): Promise<{ data: unknown; error: string | null }> {
+    if (!token) return { data: null, error: "Not authenticated" };
+    try {
+      const qs = new URLSearchParams(params).toString();
+      const res = await fetch(`/api/admin/figures?${qs}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return { data: null, error: `HTTP ${res.status}` };
+      return await res.json();
+    } catch (err) {
+      return { data: null, error: String(err) };
+    }
   }
 
-  async function adminPost(body: Record<string, unknown>) {
-    const res = await fetch("/api/admin/figures", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(body),
-    });
-    return res.json() as Promise<{ error: string | null }>;
+  async function adminPost(body: Record<string, unknown>): Promise<{ error: string | null }> {
+    if (!token) return { error: "Not authenticated" };
+    try {
+      const res = await fetch("/api/admin/figures", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) return { error: `HTTP ${res.status}` };
+      return await res.json();
+    } catch (err) {
+      return { error: String(err) };
+    }
   }
 
   // ── Chapter list ──────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!selectedSubject) { setChapters([]); setSelectedChapter(""); return; }
+    if (!selectedSubject || !token) { setChapters([]); setSelectedChapter(""); return; }
     (async () => {
-      const result = await adminGet({
-        type: "chapters",
-        class: String(selectedClass),
-        subject: selectedSubject,
-      });
-      if (!result.data) { setChapters([]); return; }
-      const rows = result.data as Array<{ chapter_number: number; chapter_name: string | null }>;
-      const seen = new Set<number>();
-      const unique = rows.filter((r) => {
-        if (seen.has(r.chapter_number)) return false;
-        seen.add(r.chapter_number);
-        return true;
-      });
-      setChapters(unique);
-      setSelectedChapter("");
+      try {
+        const result = await adminGet({
+          type: "chapters",
+          class: String(selectedClass),
+          subject: selectedSubject,
+        });
+        if (!result.data) { setChapters([]); return; }
+        const rows = result.data as Array<{ chapter_number: number; chapter_name: string | null }>;
+        const seen = new Set<number>();
+        const unique = rows.filter((r) => {
+          if (seen.has(r.chapter_number)) return false;
+          seen.add(r.chapter_number);
+          return true;
+        });
+        setChapters(unique);
+        setSelectedChapter("");
+      } catch {
+        setChapters([]);
+      }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedClass, selectedSubject]);
+  }, [selectedClass, selectedSubject, token]);
 
   // ── Populate edit fields ──────────────────────────────────────────────────
 
@@ -146,6 +159,7 @@ export default function VerifyFiguresPage() {
   // ── Load images ───────────────────────────────────────────────────────────
 
   async function loadImages() {
+    if (!token) { setLoadError("Not authenticated — please sign in."); return; }
     setLoadingImages(true);
     setLoadError("");
     setImages([]);
@@ -332,11 +346,6 @@ export default function VerifyFiguresPage() {
   const subjects = SUBJECTS_BY_CLASS[selectedClass] || [];
   const progressPct = stats.total > 0 ? Math.round((reviewed / stats.total) * 100) : 0;
 
-  if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-400">Loading…</div>;
-  }
-  if (!user || user.email !== "usdvisionai@gmail.com") return null;
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -411,10 +420,10 @@ export default function VerifyFiguresPage() {
 
           <button
             onClick={loadImages}
-            disabled={loadingImages}
+            disabled={loadingImages || !token}
             className="px-5 py-2 rounded-lg bg-[#1B3A6B] text-white text-sm font-semibold hover:bg-[#162d55] disabled:opacity-50 transition-colors"
           >
-            {loadingImages ? "Loading…" : "Load Images"}
+            {!token ? "Sign in to load" : loadingImages ? "Loading…" : "Load Images"}
           </button>
 
           {images.length > 0 && (
