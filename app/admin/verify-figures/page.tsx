@@ -138,7 +138,8 @@ export default function VerifyFiguresPage() {
         });
         setChapters(unique);
         setSelectedChapter("");
-      } catch {
+      } catch (err) {
+        console.error("[verify-figures] chapters load exception:", err);
         setChapters([]);
       }
     })();
@@ -165,23 +166,19 @@ export default function VerifyFiguresPage() {
     setImages([]);
     setCurrentIndex(0);
     setActionMsg("");
-
-    const filters = {
-      type: "figures",
-      class: String(selectedClass),
-      subject: selectedSubject,
-      chapter: selectedChapter,
-      status: statusFilter,
-    };
-    console.log("[verify-figures] loadImages filters:", filters);
-
     try {
+      const filters = {
+        type: "figures",
+        class: String(selectedClass),
+        subject: selectedSubject,
+        chapter: selectedChapter,
+        status: statusFilter,
+      };
+      console.log("[verify-figures] loadImages filters:", filters);
       const result = await adminGet(filters);
-      console.log("[verify-figures] loadImages error:", result.error);
+      console.log("[verify-figures] loadImages error field:", result.error);
       console.log("[verify-figures] loadImages rows returned:", Array.isArray(result.data) ? result.data.length : result.data);
-
-      if (result.error) throw new Error(result.error);
-
+      if (result.error) throw new Error(`API error: ${result.error}`);
       const rows = (result.data as NcertFigureRow[]) || [];
       setImages(rows);
       if (rows.length > 0) populateEditFields(rows[0]);
@@ -197,19 +194,27 @@ export default function VerifyFiguresPage() {
   // ── Load stats ────────────────────────────────────────────────────────────
 
   async function loadStats() {
-    const result = await adminGet({
-      type: "stats",
-      class: String(selectedClass),
-      subject: selectedSubject,
-      chapter: selectedChapter,
-    });
-    const data = (result.data as Array<{ is_active: boolean | null; reviewed_at: string | null }>) || [];
-    const total = data.length;
-    const verifiedCount = data.filter((r) => r.is_active && r.reviewed_at).length;
-    const rejectedCount = data.filter((r) => r.is_active === false).length;
-    const reviewedCount = verifiedCount + rejectedCount;
-    setStats({ total, verified: verifiedCount, rejected: rejectedCount, remaining: total - reviewedCount });
-    setReviewed(reviewedCount);
+    try {
+      const result = await adminGet({
+        type: "stats",
+        class: String(selectedClass),
+        subject: selectedSubject,
+        chapter: selectedChapter,
+      });
+      if (result.error) {
+        console.error("[verify-figures] loadStats error:", result.error);
+        return;
+      }
+      const data = (result.data as Array<{ is_active: boolean | null; reviewed_at: string | null }>) || [];
+      const total = data.length;
+      const verifiedCount = data.filter((r) => r.is_active && r.reviewed_at).length;
+      const rejectedCount = data.filter((r) => r.is_active === false).length;
+      const reviewedCount = verifiedCount + rejectedCount;
+      setStats({ total, verified: verifiedCount, rejected: rejectedCount, remaining: total - reviewedCount });
+      setReviewed(reviewedCount);
+    } catch (err) {
+      console.error("[verify-figures] loadStats exception:", err);
+    }
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────
