@@ -79,12 +79,35 @@ export default function VerifyFiguresPage() {
   const [stats, setStats] = useState({ total: 0, verified: 0, rejected: 0, remaining: 0 });
   const [reviewed, setReviewed] = useState(0);
 
+  // Page-level error banner (catches unhandled errors + rejections)
+  const [pageError, setPageError] = useState<string | null>(null);
+
   // Auth guard
   useEffect(() => {
     if (authLoading) return;
     if (!user) { router.push("/login"); return; }
     if (user.email !== "usdvisionai@gmail.com") { router.push("/"); return; }
   }, [authLoading, user, router]);
+
+  // Global error capture — surfaces any unhandled error or promise rejection on screen
+  useEffect(() => {
+    const onError = (event: ErrorEvent) => {
+      const msg = event.error?.message ?? String(event.error ?? event.message ?? "Unknown error");
+      console.error("[verify-figures] uncaught error:", event.error);
+      setPageError(msg);
+    };
+    const onRejection = (event: PromiseRejectionEvent) => {
+      const msg = event.reason?.message ?? String(event.reason ?? "Unhandled promise rejection");
+      console.error("[verify-figures] unhandled rejection:", event.reason);
+      setPageError(msg);
+    };
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+    };
+  }, []);
 
   // ── API helper ────────────────────────────────────────────────────────────
 
@@ -353,6 +376,15 @@ export default function VerifyFiguresPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Global error banner */}
+      {pageError && (
+        <div className="bg-red-600 text-white px-4 py-3 text-sm font-mono flex items-start gap-3">
+          <span className="font-bold flex-shrink-0">Error:</span>
+          <span className="break-all">{pageError}</span>
+          <button onClick={() => setPageError(null)} className="ml-auto flex-shrink-0 underline text-xs">dismiss</button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-[#1B3A6B] text-white px-6 py-3 flex items-center justify-between">
         <h1 className="font-bold text-lg">🖼️ NCERT Figure Verification</h1>
@@ -389,7 +421,7 @@ export default function VerifyFiguresPage() {
               className="rounded-lg border border-gray-200 px-3 py-2 text-sm min-w-[140px] focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]"
             >
               <option value="">All Subjects</option>
-              {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
+              {(subjects || []).map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
 
@@ -401,7 +433,7 @@ export default function VerifyFiguresPage() {
               className="rounded-lg border border-gray-200 px-3 py-2 text-sm min-w-[200px] focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]"
             >
               <option value="">All Chapters</option>
-              {chapters.map((c) => (
+              {(chapters || []).map((c) => (
                 <option key={c.chapter_number} value={c.chapter_number}>
                   {c.chapter_number}. {c.chapter_name || `Chapter ${c.chapter_number}`}
                 </option>
@@ -479,16 +511,16 @@ export default function VerifyFiguresPage() {
                 </span>
                 <span
                   className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
-                    currentImage.reviewed_at && currentImage.is_active
+                    currentImage?.reviewed_at && currentImage?.is_active
                       ? "bg-green-100 text-green-700"
-                      : currentImage.is_active === false
+                      : currentImage?.is_active === false
                       ? "bg-red-100 text-red-700"
                       : "bg-gray-100 text-gray-500"
                   }`}
                 >
-                  {currentImage.reviewed_at && currentImage.is_active
+                  {currentImage?.reviewed_at && currentImage?.is_active
                     ? "Verified"
-                    : currentImage.is_active === false
+                    : currentImage?.is_active === false
                     ? "Rejected"
                     : "Unreviewed"}
                 </span>
@@ -498,7 +530,7 @@ export default function VerifyFiguresPage() {
               <div className="flex justify-center items-center p-6 bg-gray-50 border-b border-gray-100" style={{ minHeight: 280 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={currentImage.public_url}
+                  src={currentImage?.public_url || ""}
                   alt={editCaption || "NCERT Figure"}
                   className="rounded-lg shadow border border-gray-200 object-contain"
                   style={{ maxWidth: 600, maxHeight: 400 }}
@@ -691,11 +723,11 @@ export default function VerifyFiguresPage() {
                 </h3>
                 <div className="space-y-1.5">
                   {[
-                    ["ID", currentImage.id.slice(0, 8) + "…"],
-                    ["Fig #", currentImage.figure_number || "—"],
-                    ["Class", String(currentImage.class_number ?? "—")],
-                    ["Subject", currentImage.subject || "—"],
-                    ["Added", currentImage.created_at ? new Date(currentImage.created_at).toLocaleDateString("en-IN") : "—"],
+                    ["ID", (currentImage?.id || "").slice(0, 8) + "…"],
+                    ["Fig #", currentImage?.figure_number || "—"],
+                    ["Class", String(currentImage?.class_number ?? "—")],
+                    ["Subject", currentImage?.subject || "—"],
+                    ["Added", currentImage?.created_at ? new Date(currentImage.created_at).toLocaleDateString("en-IN") : "—"],
                   ].map(([k, v]) => (
                     <div key={k} className="flex justify-between gap-2">
                       <span className="text-xs text-gray-400 flex-shrink-0">{k}</span>
