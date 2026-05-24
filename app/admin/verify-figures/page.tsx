@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { supabase } from "@/lib/supabase";
 
 interface NcertFigureRow {
   id: string;
@@ -49,7 +48,8 @@ const SUBJECTS_BY_CLASS: Record<number, string[]> = {
 
 export default function VerifyFiguresPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, session, loading: authLoading } = useAuth();
+  const token = session?.access_token ?? null;
 
   // Filter state
   const [selectedClass, setSelectedClass] = useState<number>(10);
@@ -86,20 +86,42 @@ export default function VerifyFiguresPage() {
     if (user.email !== "usdvisionai@gmail.com") { router.push("/"); return; }
   }, [authLoading, user, router]);
 
-  // Load chapter list whenever class+subject changes
+  // ── API helper ────────────────────────────────────────────────────────────
+
+  async function adminGet(params: Record<string, string>) {
+    const qs = new URLSearchParams(params).toString();
+    const res = await fetch(`/api/admin/figures?${qs}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    return res.json() as Promise<{ data: unknown; error: string | null }>;
+  }
+
+  async function adminPost(body: Record<string, unknown>) {
+    const res = await fetch("/api/admin/figures", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+    return res.json() as Promise<{ error: string | null }>;
+  }
+
+  // ── Chapter list ──────────────────────────────────────────────────────────
+
   useEffect(() => {
     if (!selectedSubject) { setChapters([]); setSelectedChapter(""); return; }
     (async () => {
-      const { data } = await supabase
-        .from("ncert_figures")
-        .select("chapter_number, chapter_name")
-        .eq("class_number", selectedClass)
-        .eq("subject", selectedSubject)
-        .not("chapter_number", "is", null)
-        .order("chapter_number");
-      if (!data) { setChapters([]); return; }
+      const result = await adminGet({
+        type: "chapters",
+        class: String(selectedClass),
+        subject: selectedSubject,
+      });
+      if (!result.data) { setChapters([]); return; }
+      const rows = result.data as Array<{ chapter_number: number; chapter_name: string | null }>;
       const seen = new Set<number>();
-      const unique = data.filter((r: { chapter_number: number }) => {
+      const unique = rows.filter((r) => {
         if (seen.has(r.chapter_number)) return false;
         seen.add(r.chapter_number);
         return true;
@@ -110,6 +132,8 @@ export default function VerifyFiguresPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass, selectedSubject]);
 
+  // ── Populate edit fields ──────────────────────────────────────────────────
+
   function populateEditFields(img: NcertFigureRow) {
     setEditCaption(img.figure_caption || "");
     setEditDiagramType(img.diagram_type || "diagram");
@@ -119,6 +143,8 @@ export default function VerifyFiguresPage() {
     setActionMsg("");
   }
 
+  // ── Load images ───────────────────────────────────────────────────────────
+
   async function loadImages() {
     setLoadingImages(true);
     setLoadError("");
@@ -126,86 +152,78 @@ export default function VerifyFiguresPage() {
     setCurrentIndex(0);
     setActionMsg("");
 
+    const filters = {
+      type: "figures",
+      class: String(selectedClass),
+      subject: selectedSubject,
+      chapter: selectedChapter,
+      status: statusFilter,
+    };
+    console.log("[verify-figures] loadImages filters:", filters);
+
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query: any = supabase.from("ncert_figures").select("*").eq("class_number", selectedClass);
+      const result = await adminGet(filters);
+      console.log("[verify-figures] loadImages error:", result.error);
+      console.log("[verify-figures] loadImages rows returned:", Array.isArray(result.data) ? result.data.length : result.data);
 
-      if (selectedSubject) query = query.eq("subject", selectedSubject);
-      if (selectedChapter) query = query.eq("chapter_number", parseInt(selectedChapter));
+      if (result.error) throw new Error(result.error);
 
-      if (statusFilter === "unreviewed") {
-        query = query.is("reviewed_at", null);
-      } else if (statusFilter === "verified") {
-        query = query.eq("is_active", true).not("reviewed_at", "is", null);
-      } else if (statusFilter === "rejected") {
-        query = query.eq("is_active", false);
-      }
-
-      query = query.order("created_at", { ascending: true });
-
-      const { data, error } = await query;
-      if (error) throw error;
-
-      const rows: NcertFigureRow[] = data || [];
+      const rows = (result.data as NcertFigureRow[]) || [];
       setImages(rows);
       if (rows.length > 0) populateEditFields(rows[0]);
       await loadStats();
     } catch (err) {
+      console.error("[verify-figures] loadImages exception:", err);
       setLoadError(String(err));
     } finally {
       setLoadingImages(false);
     }
   }
 
+  // ── Load stats ────────────────────────────────────────────────────────────
+
   async function loadStats() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let q: any = supabase
-      .from("ncert_figures")
-      .select("is_active, reviewed_at")
-      .eq("class_number", selectedClass);
-
-    if (selectedSubject) q = q.eq("subject", selectedSubject);
-    if (selectedChapter) q = q.eq("chapter_number", parseInt(selectedChapter));
-
-    const { data } = await q;
-    if (!data) return;
-
+    const result = await adminGet({
+      type: "stats",
+      class: String(selectedClass),
+      subject: selectedSubject,
+      chapter: selectedChapter,
+    });
+    const data = (result.data as Array<{ is_active: boolean | null; reviewed_at: string | null }>) || [];
     const total = data.length;
-    const verifiedCount = data.filter((r: { is_active: boolean | null; reviewed_at: string | null }) => r.is_active && r.reviewed_at).length;
-    const rejectedCount = data.filter((r: { is_active: boolean | null }) => r.is_active === false).length;
+    const verifiedCount = data.filter((r) => r.is_active && r.reviewed_at).length;
+    const rejectedCount = data.filter((r) => r.is_active === false).length;
     const reviewedCount = verifiedCount + rejectedCount;
-
     setStats({ total, verified: verifiedCount, rejected: rejectedCount, remaining: total - reviewedCount });
     setReviewed(reviewedCount);
   }
+
+  // ── Navigation ────────────────────────────────────────────────────────────
 
   const currentImage = images[currentIndex] ?? null;
 
   function goNext() {
     if (currentIndex < images.length - 1) {
-      const next = images[currentIndex + 1];
       setCurrentIndex((i) => i + 1);
-      populateEditFields(next);
+      populateEditFields(images[currentIndex + 1]);
     }
   }
 
   function goPrev() {
     if (currentIndex > 0) {
-      const prev = images[currentIndex - 1];
       setCurrentIndex((i) => i - 1);
-      populateEditFields(prev);
+      populateEditFields(images[currentIndex - 1]);
     }
   }
+
+  // ── Actions ───────────────────────────────────────────────────────────────
 
   async function handleReject() {
     if (!currentImage || saving) return;
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from("ncert_figures")
-        .update({ is_active: false, reviewed_at: new Date().toISOString(), review_notes: editNotes || null })
-        .eq("id", currentImage.id);
-      if (error) throw error;
+      const result = await adminPost({ action: "reject", id: currentImage.id, review_notes: editNotes });
+      if (result.error) throw new Error(result.error);
       setActionMsg("Rejected");
       setImages((prev) =>
         prev.map((img, i) =>
@@ -231,17 +249,16 @@ export default function VerifyFiguresPage() {
     setSaving(true);
     const keywords = editKeywords.split(",").map((k) => k.trim()).filter(Boolean);
     try {
-      const { error } = await supabase
-        .from("ncert_figures")
-        .update({
-          figure_caption: editCaption,
-          diagram_type: editDiagramType,
-          keywords,
-          chapter_number: editChapterNumber || null,
-          review_notes: editNotes || null,
-        })
-        .eq("id", currentImage.id);
-      if (error) throw error;
+      const result = await adminPost({
+        action: "save",
+        id: currentImage.id,
+        figure_caption: editCaption,
+        diagram_type: editDiagramType,
+        keywords,
+        chapter_number: editChapterNumber || null,
+        review_notes: editNotes,
+      });
+      if (result.error) throw new Error(result.error);
       setActionMsg("Saved ✓");
       setImages((prev) =>
         prev.map((img, i) =>
@@ -261,46 +278,26 @@ export default function VerifyFiguresPage() {
     if (!currentImage || saving) return;
     setSaving(true);
     const keywords = editKeywords.split(",").map((k) => k.trim()).filter(Boolean);
-    const now = new Date().toISOString();
     try {
-      const { error: updateErr } = await supabase
-        .from("ncert_figures")
-        .update({
-          figure_caption: editCaption,
-          diagram_type: editDiagramType,
-          keywords,
-          chapter_number: editChapterNumber || null,
-          is_active: true,
-          reviewed_at: now,
-          review_notes: editNotes || null,
-        })
-        .eq("id", currentImage.id);
-      if (updateErr) throw updateErr;
-
-      const { error: insertErr } = await supabase.from("verified_figures").upsert(
-        {
-          ncert_figure_id: currentImage.id,
-          class_number: selectedClass,
-          subject: selectedSubject || currentImage.subject,
-          chapter_number: editChapterNumber ? Number(editChapterNumber) : currentImage.chapter_number,
-          chapter_name: currentImage.chapter_name,
-          figure_caption: editCaption,
-          concept_tags: keywords,
-          suitable_for: ["study the diagram", "label the parts", "identify the parts", "name the parts shown"],
-          not_suitable_for: [],
-          public_url: currentImage.public_url,
-          verified_by: "admin",
-          is_active: true,
-        },
-        { onConflict: "ncert_figure_id" }
-      );
-      if (insertErr) throw insertErr;
-
+      const result = await adminPost({
+        action: "verify",
+        id: currentImage.id,
+        figure_caption: editCaption,
+        diagram_type: editDiagramType,
+        keywords,
+        chapter_number: editChapterNumber || null,
+        review_notes: editNotes,
+        class_number: selectedClass,
+        subject: selectedSubject || currentImage.subject,
+        chapter_name: currentImage.chapter_name,
+        public_url: currentImage.public_url,
+      });
+      if (result.error) throw new Error(result.error);
       setActionMsg("Verified ✓");
       setImages((prev) =>
         prev.map((img, i) =>
           i === currentIndex
-            ? { ...img, is_active: true, reviewed_at: now, figure_caption: editCaption, diagram_type: editDiagramType, keywords }
+            ? { ...img, is_active: true, reviewed_at: new Date().toISOString(), figure_caption: editCaption, diagram_type: editDiagramType, keywords }
             : img
         )
       );
@@ -313,7 +310,8 @@ export default function VerifyFiguresPage() {
     }
   }
 
-  // Keyboard shortcuts
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
@@ -328,6 +326,8 @@ export default function VerifyFiguresPage() {
     return () => window.removeEventListener("keydown", handler);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, images, editCaption, editDiagramType, editKeywords, editChapterNumber, editNotes, saving]);
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   const subjects = SUBJECTS_BY_CLASS[selectedClass] || [];
   const progressPct = stats.total > 0 ? Math.round((reviewed / stats.total) * 100) : 0;
