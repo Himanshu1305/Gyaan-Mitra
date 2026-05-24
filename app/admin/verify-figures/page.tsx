@@ -723,7 +723,7 @@ export default function VerifyFiguresPage() {
                 </h3>
                 <div className="space-y-1.5">
                   {[
-                    ["ID", (currentImage?.id || "").slice(0, 8) + "…"],
+                    ["ID", String(currentImage?.id ?? "").slice(0, 8) + "…"],
                     ["Fig #", currentImage?.figure_number || "—"],
                     ["Class", String(currentImage?.class_number ?? "—")],
                     ["Subject", currentImage?.subject || "—"],
