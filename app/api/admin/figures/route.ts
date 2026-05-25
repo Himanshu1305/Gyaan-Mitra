@@ -73,7 +73,14 @@ export async function GET(req: NextRequest) {
     q = q.order("created_at", { ascending: true });
 
     const { data, error } = await q;
-    return NextResponse.json({ data: data ?? [], error: error?.message ?? null });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = (data ?? []).map((row: any) => {
+      const url: string | null = row.public_url ?? null;
+      if (!url || url.startsWith("http")) return row;
+      const { data: urlData } = db.storage.from("ncert-figures").getPublicUrl(url);
+      return { ...row, public_url: urlData.publicUrl };
+    });
+    return NextResponse.json({ data: rows, error: error?.message ?? null });
   } catch (err) {
     console.error("[admin/figures GET] unhandled exception:", err);
     return NextResponse.json({ data: null, error: String(err) }, { status: 500 });

@@ -93,6 +93,8 @@ export default function VerifyFiguresPage() {
   useEffect(() => {
     const onError = (event: ErrorEvent) => {
       const msg = event.error?.message ?? String(event.error ?? event.message ?? "Unknown error");
+      // Supabase Realtime WebSocket internal error — non-actionable, suppress from banner
+      if (msg.includes("features") && (msg.includes("undefined") || msg.includes("null"))) return;
       console.error("[verify-figures] uncaught error:", event.error);
       setPageError(msg);
     };
