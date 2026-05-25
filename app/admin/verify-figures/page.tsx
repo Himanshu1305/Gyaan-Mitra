@@ -49,7 +49,7 @@ const SUBJECTS_BY_CLASS: Record<number, string[]> = {
 export default function VerifyFiguresPage() {
   const router = useRouter();
   const { user, session, loading: authLoading } = useAuth();
-  const token = session?.access_token ?? null;
+  const token = session?.access_token ? String(session.access_token) : null;
 
   // Filter state
   const [selectedClass, setSelectedClass] = useState<number>(10);
