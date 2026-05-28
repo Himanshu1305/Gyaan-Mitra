@@ -537,7 +537,9 @@ export default function VerifyFiguresPage() {
                   className="rounded-lg shadow border border-gray-200 object-contain"
                   style={{ maxWidth: 600, maxHeight: 400 }}
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src =
+                    const img = e.currentTarget as HTMLImageElement;
+                    console.error("[verify-figures] image failed to load:", img.src);
+                    img.src =
                       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='120'%3E%3Crect width='300' height='120' fill='%23f3f4f6'/%3E%3Ctext x='150' y='65' text-anchor='middle' font-family='Arial' font-size='13' fill='%236b7280'%3EImage not found%3C/text%3E%3C/svg%3E";
                   }}
                 />
