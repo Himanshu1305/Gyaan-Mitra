@@ -68,47 +68,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Safety: if getSession() hangs (e.g. slow token refresh), force-unblock
-    // the UI after 3 s so the skeleton never stays forever.
-    const fallback = setTimeout(() => setLoading(false), 3000)
-
-    const initAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        setUser(session?.user ?? null)
-        setSession(session)
-        if (session?.user) {
-          fetchProfile(session.user.id)
-        }
-      } catch (e) {
-        console.error('initAuth error:', e)
-      } finally {
-        clearTimeout(fallback)
-        setLoading(false)
-      }
-    }
-    initAuth()
-
+    // onAuthStateChange fires INITIAL_SESSION immediately from localStorage
+    // (no network call), so loading resolves on the first render cycle.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        clearTimeout(fallback)
         setUser(session?.user ?? null)
         setSession(session)
+        setLoading(false)
         if (session?.user) {
-          setLoading(false)
           fetchProfile(session.user.id)
         } else {
           setIsAdmin(false)
           setSubscriptionTier('free')
-          setLoading(false)
         }
       }
     )
 
-    return () => {
-      clearTimeout(fallback)
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, []);
 
   const signIn = async (email: string, password: string) => {
