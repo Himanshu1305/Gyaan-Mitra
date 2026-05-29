@@ -73,8 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession()
         setUser(session?.user ?? null)
         setSession(session)
+        // Fire-and-forget: don't await so setLoading(false) in finally
+        // is never blocked by a slow or hanging DB query.
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          fetchProfile(session.user.id)
         }
       } catch (e) {
         console.error('initAuth error:', e)
@@ -89,7 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null)
         setSession(session)
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          setLoading(false)           // resolve loading immediately on session
+          fetchProfile(session.user.id) // profile can update in background
         } else {
           setIsAdmin(false)
           setSubscriptionTier('free')
