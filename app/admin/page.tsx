@@ -192,6 +192,27 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* Content Tools */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="font-bold mb-4" style={{ color: "#1B3A6B" }}>Content Tools</h2>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="/admin/verify-figures"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
+                  border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                🖼️ Verify Figures
+              </a>
+              <a
+                href="/admin/extract-figures"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
+                  border border-[#1B3A6B] text-[#1B3A6B] hover:bg-blue-50 transition-colors"
+              >
+                🤖 AI Figure Extractor
+              </a>
+            </div>
+          </div>
+
           {/* Users table */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
