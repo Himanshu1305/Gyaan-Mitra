@@ -30,9 +30,12 @@ export default function Navbar() {
     }
   };
 
-  const displayName = user?.user_metadata?.full_name
-    ? (user.user_metadata.full_name as string).split(" ")[0]
-    : user?.email?.split("@")[0] ?? "";
+  const truncatedEmail = user?.email
+    ? user.email.length > 20
+      ? user.email.slice(0, 18) + "…"
+      : user.email
+    : "";
+  const isAdmin = user?.email === "usdvisionai@gmail.com";
 
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
@@ -61,55 +64,50 @@ export default function Navbar() {
 
           {/* CTA + auth + mobile toggle */}
           <div className="flex items-center gap-3">
-            {!loading && (
-              <>
-                {user ? (
-                  <div className="hidden sm:flex items-center gap-3">
+            {/* Desktop auth — always rendered; shows skeleton during load */}
+            <div className="hidden sm:flex items-center gap-3">
+              {loading ? (
+                <div className="h-5 w-24 bg-gray-100 rounded animate-pulse" />
+              ) : user ? (
+                <>
+                  <span
+                    className="text-sm font-medium text-gray-600 max-w-[160px] truncate"
+                    title={user.email ?? ""}
+                  >
+                    {truncatedEmail}
+                  </span>
+                  {isAdmin && (
                     <Link
-                      href="/dashboard"
-                      className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
+                      href="/admin"
+                      className="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors"
                     >
-                      Hi, {displayName}
+                      Admin
                     </Link>
-                    <Link
-                      href="/settings"
-                      className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
-                    >
-                      Settings
-                    </Link>
-                    {user?.email === "usdvisionai@gmail.com" && (
-                      <Link
-                        href="/admin"
-                        className="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors"
-                      >
-                        Admin
-                      </Link>
-                    )}
-                    <button
-                      onClick={handleSignOut}
-                      className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:text-secondary hover:border-secondary transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                ) : (
-                  <div className="hidden sm:flex items-center gap-2">
-                    <Link
-                      href="/login"
-                      className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
-                    >
-                      Sign In
-                    </Link>
-                    <Link
-                      href="/signup"
-                      className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
-                    >
-                      Get Started Free
-                    </Link>
-                  </div>
-                )}
-              </>
-            )}
+                  )}
+                  <button
+                    onClick={handleSignOut}
+                    className="inline-flex items-center px-3 py-1.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:text-secondary hover:border-secondary transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary-600 transition-colors"
+                  >
+                    Get Started Free
+                  </Link>
+                </>
+              )}
+            </div>
 
             {/* Hamburger */}
             <button
@@ -146,13 +144,14 @@ export default function Navbar() {
           ))}
           {user ? (
             <>
+              <p className="text-xs text-gray-400 truncate">{user.email}</p>
               <Link href="/dashboard" className="block text-sm font-medium text-secondary" onClick={() => setMenuOpen(false)}>
-                Dashboard ({displayName})
+                Dashboard
               </Link>
               <Link href="/settings" className="block text-sm font-medium text-gray-700" onClick={() => setMenuOpen(false)}>
                 Settings
               </Link>
-              {user?.email === "usdvisionai@gmail.com" && (
+              {isAdmin && (
                 <Link href="/admin" className="block text-sm font-semibold text-red-600" onClick={() => setMenuOpen(false)}>
                   Admin
                 </Link>
