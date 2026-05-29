@@ -245,6 +245,8 @@ BANNED labels (never include — they reveal answers to students):
 - "Defect: myopia", "Defect: hypermetropia" → omit defect labels
 Rule: label WHAT a structure IS, never WHAT IT MEANS or WHY it matters.
 
+CRITICAL: Use only black (#000000) for all lines, borders and text. Use only white (#ffffff) or very light grey (#f5f5f5) for fills. No colours whatsoever. This is for a printed exam paper.
+
 Ensure all text labels fit within the viewBox: start text at x=10 minimum near left edge, end text at viewBox width minus 20px near right edge.`,
         messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
       })
