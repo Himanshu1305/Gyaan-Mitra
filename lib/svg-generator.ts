@@ -136,6 +136,52 @@ function extractDiagramSvgPlaceholders(content: string): Array<{
   return results;
 }
 
+// ── Wikimedia Commons fallback ────────────────────────────────
+
+async function searchWikimediaFigure(keywords: string[]): Promise<NcertFigure | null> {
+  try {
+    const query = keywords.slice(0, 4).join(' ');
+    const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srnamespace=6&srlimit=3&format=json&origin=*`;
+    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
+    if (!searchRes.ok) return null;
+    const searchData = await searchRes.json() as {
+      query?: { search?: Array<{ title: string }> };
+    };
+    const results = searchData?.query?.search ?? [];
+
+    const mediaFile = results.find((r) => /\.(svg|png)$/i.test(r.title));
+    if (!mediaFile) return null;
+
+    const infoUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(mediaFile.title)}&prop=imageinfo&iiprop=url&format=json&origin=*`;
+    const infoRes = await fetch(infoUrl, { signal: AbortSignal.timeout(5000) });
+    if (!infoRes.ok) return null;
+    const infoData = await infoRes.json() as {
+      query?: { pages?: Record<string, { imageinfo?: Array<{ url: string }> }> };
+    };
+
+    const pages = infoData?.query?.pages ?? {};
+    const page = Object.values(pages)[0];
+    const imageUrl = page?.imageinfo?.[0]?.url;
+    if (!imageUrl) return null;
+
+    console.log('[diagram] wikimedia hit:', imageUrl);
+    const caption = mediaFile.title
+      .replace(/^File:/i, '')
+      .replace(/\.[^.]+$/, '')
+      .replace(/_/g, ' ');
+    return {
+      public_url: imageUrl,
+      figure_caption: caption,
+      figure_number: null,
+      description: query,
+      diagram_type: 'illustration',
+      match_score: 1,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // ── Search NCERT Figures ──────────────────────────────────────
 
 async function searchNcertFigure(
@@ -144,6 +190,31 @@ async function searchNcertFigure(
   subject: string,
   chapterNumber?: number
 ): Promise<NcertFigure | null> {
+  // ── Layer 1: verified_figures (curated, highest priority) ─────
+  try {
+    const { data: verified } = await getServiceClient()
+      .from('verified_figures')
+      .select('public_url, figure_caption')
+      .eq('is_active', true)
+      .textSearch('concept_tags', keywords.join(' | '))
+      .limit(1);
+    const v = verified?.[0] as { public_url?: string; figure_caption?: string } | undefined;
+    if (v?.public_url) {
+      console.log('[diagram] verified_figures hit:', v.public_url);
+      return {
+        public_url: v.public_url,
+        figure_caption: v.figure_caption || keywords.join(', '),
+        figure_number: null,
+        description: keywords.join(', '),
+        diagram_type: 'illustration',
+        match_score: 10,
+      };
+    }
+  } catch {
+    // non-fatal — fall through to ncert_figures
+  }
+
+  // ── Layer 2: ncert_figures (NCERT scanned images) ─────────────
   const strictSubjects = [
     'science', 'physics', 'chemistry', 'biology', 'mathematics', 'maths'
   ];
@@ -162,7 +233,6 @@ async function searchNcertFigure(
   };
 
   try {
-    // First try: chapter-specific search
     if (chapterNumber) {
       const { data } = await getServiceClient().rpc('search_ncert_figures', {
         p_keywords: keywords,
@@ -173,11 +243,11 @@ async function searchNcertFigure(
       });
       const filtered = filterByType(data);
       if (filtered.length > 0 && filtered[0].match_score >= 2) {
+        console.log('[diagram] ncert_figures hit:', filtered[0].public_url);
         return filtered[0];
       }
     }
 
-    // Second try: subject-wide search
     const { data: data2 } = await getServiceClient().rpc('search_ncert_figures', {
       p_keywords: keywords,
       p_class: classNumber,
@@ -187,13 +257,19 @@ async function searchNcertFigure(
     });
     const filtered2 = filterByType(data2);
     if (filtered2.length > 0 && filtered2[0].match_score >= 2) {
+      console.log('[diagram] ncert_figures hit:', filtered2[0].public_url);
       return filtered2[0];
     }
-
-    return null;
   } catch {
-    return null;
+    // non-fatal — fall through to Wikimedia
   }
+
+  // ── Layer 3: Wikimedia Commons ────────────────────────────────
+  const wikiResult = await searchWikimediaFigure(keywords);
+  if (wikiResult) return wikiResult;
+
+  console.log('[diagram] SVG fallback for:', keywords.join(', '));
+  return null;
 }
 
 // ── Retry Helper ──────────────────────────────────────────────
