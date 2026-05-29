@@ -30,11 +30,10 @@ export default function Navbar() {
     }
   };
 
-  const truncatedEmail = user?.email
-    ? user.email.length > 20
-      ? user.email.slice(0, 18) + "…"
-      : user.email
-    : "";
+  const firstName =
+    ((user?.user_metadata?.full_name as string | undefined) ?? "").split(" ")[0] ||
+    user?.email?.split("@")[0] ||
+    "";
   const isAdmin = user?.email === "usdvisionai@gmail.com";
 
   return (
@@ -70,11 +69,17 @@ export default function Navbar() {
                 <div className="h-5 w-24 bg-gray-100 rounded animate-pulse" />
               ) : user ? (
                 <>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm font-medium text-gray-600 hover:text-secondary transition-colors"
+                  >
+                    Dashboard
+                  </Link>
                   <span
-                    className="text-sm font-medium text-gray-600 max-w-[160px] truncate"
+                    className="text-sm font-medium text-gray-600 max-w-[120px] truncate"
                     title={user.email ?? ""}
                   >
-                    {truncatedEmail}
+                    {firstName}
                   </span>
                   {isAdmin && (
                     <Link
