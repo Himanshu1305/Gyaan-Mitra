@@ -125,9 +125,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "pageImage is required" }, { status: 400 });
       }
 
+      if (!process.env.ANTHROPIC_API_KEY) {
+        return NextResponse.json({ error: "ANTHROPIC_API_KEY env var is not set" }, { status: 500 });
+      }
+
+      // Strip data-URL prefix if the client accidentally included it
+      const imageData = pageImage.replace(/^data:image\/[^;]+;base64,/, "");
+
       const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
       const message = await anthropic.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5",
         max_tokens: 2048,
         messages: [
           {
@@ -138,7 +145,7 @@ export async function POST(req: NextRequest) {
                 source: {
                   type: "base64",
                   media_type: "image/png",
-                  data: pageImage,
+                  data: imageData,
                 },
               },
               {
@@ -236,6 +243,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   } catch (err) {
     console.error("[extract-figures POST] unhandled:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
+    return NextResponse.json({ error: message, stack }, { status: 500 });
   }
 }

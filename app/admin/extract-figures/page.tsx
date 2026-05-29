@@ -248,7 +248,9 @@ export default function ExtractFiguresPage() {
           });
 
           if (result.error) {
-            const errMsg = String(result.error);
+            const errMsg = result.stack
+              ? `${result.error}\n${result.stack}`
+              : String(result.error);
             console.warn(`Page ${pageNum} detection error:`, errMsg);
             setDebugLog(prev => [...prev, { page: pageNum, figureCount: 0, error: errMsg }]);
             continue;
