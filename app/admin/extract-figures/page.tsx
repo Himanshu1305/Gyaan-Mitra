@@ -46,6 +46,13 @@ interface ExtractedFigure {
   status: "pending" | "approved" | "rejected" | "skipped";
 }
 
+interface DebugEntry {
+  page: number;
+  figureCount: number;
+  error?: string;
+  raw?: string;
+}
+
 // ── Filename parser ────────────────────────────────────────────────────────────
 
 function parseFilename(name: string): { chapterNumber: number | ""; chapterName: string; bookCode: string } {
@@ -140,6 +147,9 @@ export default function ExtractFiguresPage() {
   const [uploading, setUploading] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
 
+  // Debug log — one entry per processed page
+  const [debugLog, setDebugLog] = useState<DebugEntry[]>([]);
+
   // ── Auth guard ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (authLoading) return;
@@ -213,6 +223,7 @@ export default function ExtractFiguresPage() {
     setExtractingError("");
     setFigures([]);
     setCurrentIdx(0);
+    setDebugLog([]);
 
     try {
       const arrayBuffer = await pdfFile.arrayBuffer();
@@ -237,10 +248,13 @@ export default function ExtractFiguresPage() {
           });
 
           if (result.error) {
-            console.warn(`Page ${pageNum} detection error:`, result.error);
+            const errMsg = String(result.error);
+            console.warn(`Page ${pageNum} detection error:`, errMsg);
+            setDebugLog(prev => [...prev, { page: pageNum, figureCount: 0, error: errMsg }]);
             continue;
           }
 
+          const rawResponse = typeof result.rawResponse === "string" ? result.rawResponse : "";
           const pageFigures = result.figures as Array<{
             caption: string;
             keywords: string[];
@@ -248,7 +262,12 @@ export default function ExtractFiguresPage() {
             bbox: { x: number; y: number; w: number; h: number };
           }>;
 
-          if (!Array.isArray(pageFigures)) continue;
+          if (!Array.isArray(pageFigures)) {
+            setDebugLog(prev => [...prev, { page: pageNum, figureCount: 0, error: "figures was not an array", raw: rawResponse }]);
+            continue;
+          }
+
+          setDebugLog(prev => [...prev, { page: pageNum, figureCount: pageFigures.length, raw: rawResponse }]);
 
           for (let figIdx = 0; figIdx < pageFigures.length; figIdx++) {
             const fig = pageFigures[figIdx];
@@ -268,7 +287,9 @@ export default function ExtractFiguresPage() {
             });
           }
         } catch (pageErr) {
+          const errMsg = String(pageErr);
           console.error(`Page ${pageNum} error:`, pageErr);
+          setDebugLog(prev => [...prev, { page: pageNum, figureCount: 0, error: errMsg }]);
         }
       }
 
@@ -501,6 +522,12 @@ export default function ExtractFiguresPage() {
             <p className="text-sm text-gray-500">
               Analysing page {processingPage} of {totalPages} with Claude AI
             </p>
+            {debugLog.length > 0 && (
+              <p className="text-xs text-gray-400">
+                {debugLog.reduce((s, e) => s + e.figureCount, 0)} figure(s) found so far
+                {debugLog.filter(e => e.error).length > 0 && ` · ${debugLog.filter(e => e.error).length} page error(s)`}
+              </p>
+            )}
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
                 className="bg-[#1B3A6B] h-3 rounded-full transition-all duration-500"
@@ -699,16 +726,19 @@ export default function ExtractFiguresPage() {
 
         {/* ── DONE STAGE ───────────────────────────────────────────────────── */}
         {stage === "done" && (
-          <div className="max-w-md mx-auto text-center py-16 space-y-6">
-            <p className="text-5xl">{extractingError ? "⚠️" : "🎉"}</p>
-            <h2 className="text-xl font-bold text-gray-800">
-              {extractingError ? "Extraction failed" : "Review complete!"}
-            </h2>
-            {extractingError && (
-              <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-3">{extractingError}</p>
-            )}
+          <div className="max-w-2xl mx-auto py-12 space-y-6">
+            <div className="text-center space-y-3">
+              <p className="text-5xl">{extractingError ? "⚠️" : figures.length === 0 ? "🔍" : "🎉"}</p>
+              <h2 className="text-xl font-bold text-gray-800">
+                {extractingError ? "Extraction failed" : figures.length === 0 ? "No figures detected" : "Review complete!"}
+              </h2>
+              {extractingError && (
+                <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-3">{extractingError}</p>
+              )}
+            </div>
+
             {figures.length > 0 && (
-              <div className="bg-white rounded-xl border border-gray-200 p-5 text-left space-y-3">
+              <div className="bg-white rounded-xl border border-gray-200 p-5 space-y-3">
                 {[
                   { label: "Total extracted", value: figures.length },
                   { label: "Approved & uploaded", value: approvedCount },
@@ -722,6 +752,36 @@ export default function ExtractFiguresPage() {
                 ))}
               </div>
             )}
+
+            {/* Debug log */}
+            {debugLog.length > 0 && (
+              <details className="bg-gray-900 rounded-xl overflow-hidden" open={figures.length === 0}>
+                <summary className="px-4 py-3 text-sm font-semibold text-gray-300 cursor-pointer select-none hover:text-white">
+                  Debug log — {debugLog.length} page(s) processed · {debugLog.reduce((s, e) => s + e.figureCount, 0)} figure(s) found · {debugLog.filter(e => e.error).length} error(s)
+                </summary>
+                <div className="px-4 pb-4 space-y-3 max-h-[480px] overflow-y-auto">
+                  {debugLog.map((entry) => (
+                    <div key={entry.page} className="border border-gray-700 rounded-lg p-3 text-xs">
+                      <div className="flex items-center gap-3 mb-1.5">
+                        <span className="font-bold text-white">Page {entry.page}</span>
+                        <span className={`px-2 py-0.5 rounded-full font-semibold ${entry.error ? "bg-red-900 text-red-300" : entry.figureCount > 0 ? "bg-green-900 text-green-300" : "bg-gray-700 text-gray-400"}`}>
+                          {entry.error ? `Error` : `${entry.figureCount} figure(s)`}
+                        </span>
+                      </div>
+                      {entry.error && (
+                        <p className="text-red-400 mb-1.5">{entry.error}</p>
+                      )}
+                      {entry.raw && (
+                        <pre className="text-gray-400 whitespace-pre-wrap break-all leading-relaxed max-h-40 overflow-y-auto">
+                          {entry.raw.slice(0, 600)}{entry.raw.length > 600 ? "…" : ""}
+                        </pre>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => {
@@ -729,6 +789,7 @@ export default function ExtractFiguresPage() {
                   setPdfFile(null);
                   setFigures([]);
                   setExtractingError("");
+                  setDebugLog([]);
                 }}
                 className="px-5 py-2.5 rounded-lg bg-[#1B3A6B] text-white text-sm font-semibold hover:bg-[#162d55] transition-colors"
               >

@@ -152,9 +152,11 @@ export async function POST(req: NextRequest) {
 
       const responseText =
         message.content[0].type === "text" ? message.content[0].text : "[]";
+      console.log(`[extract-figures] p${pageNum} raw (${responseText.length}c):`, responseText.slice(0, 500));
       const figures = parseFiguresFromClaude(responseText);
+      console.log(`[extract-figures] p${pageNum}: ${figures.length} figure(s) parsed`);
 
-      return NextResponse.json({ figures, error: null });
+      return NextResponse.json({ figures, rawResponse: responseText, error: null });
     }
 
     // ── action: upload ─────────────────────────────────────────────────────────
