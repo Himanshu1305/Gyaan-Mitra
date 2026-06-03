@@ -4,6 +4,15 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { resolveAllPlaceholders, generateSingleSvg } from "@/lib/svg-generator";
+import {
+  getChapterTopics,
+  getAvailableTopicImages,
+  selectImage,
+  logMissingDiagram,
+  recordImageUsage,
+  buildAvailableDiagramsPrompt,
+  type DiagramImage,
+} from "@/lib/diagram-pool";
 
 type QuestionMix = {
   mcq: number;
@@ -866,8 +875,27 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey: anthropicKey });
     const prompt = buildClaudePrompt(body, geminiOutput, isFallback);
 
-    console.log("[generate-with-chapters] Claude prompt length:", prompt.length);
-    console.log("[generate-with-chapters] Claude prompt preview:", prompt.slice(0, 300));
+    // Fetch available diagram pool images (exam-paper only, not finalise)
+    let availableImages: Record<string, DiagramImage[]> = {};
+    let diagramPromptSection = '';
+    if (generationType === 'exam-paper' && !isFinalise) {
+      const allTopicKeys: string[] = [];
+      for (let chNum = 1; chNum <= 15; chNum++) {
+        const topics = getChapterTopics(body.classNumber, body.subject, chNum);
+        allTopicKeys.push(...topics);
+      }
+      const uniqueTopicKeys = Array.from(new Set(allTopicKeys));
+      availableImages = await getAvailableTopicImages(uniqueTopicKeys);
+      diagramPromptSection = buildAvailableDiagramsPrompt(availableImages);
+      console.log('[diagram-pool] Topic keys:', uniqueTopicKeys.length, 'Available:', Object.keys(availableImages).length);
+    }
+
+    const finalPrompt = diagramPromptSection
+      ? `${prompt}\n\n${diagramPromptSection}`
+      : prompt;
+
+    console.log("[generate-with-chapters] Claude prompt length:", finalPrompt.length);
+    console.log("[generate-with-chapters] Claude prompt preview:", finalPrompt.slice(0, 300));
     console.log(`[generate-with-chapters] Claude generating ${generationType}…`);
 
     const maxTokens = generationType === "exam-paper" || isFinalise ? 8000 : 4000;
@@ -875,13 +903,75 @@ export async function POST(req: NextRequest) {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: maxTokens,
-      messages: [{ role: "user", content: prompt }],
+      messages: [{ role: "user", content: finalPrompt }],
     });
 
     const rawDraft = message.content
       .filter((b) => b.type === "text")
       .map((b) => (b as { type: "text"; text: string }).text)
       .join("\n");
+
+    // ── Process [DIAGRAM:topic_key] markers from diagram pool ────
+    let processedRawDraft = rawDraft;
+    if (generationType === 'exam-paper' && !isFinalise) {
+      const diagramRegex = /\[DIAGRAM:([a-z_]+)\]/g;
+      const usedImages: Array<{ topicKey: string; image: DiagramImage }> = [];
+      const missingTopics: string[] = [];
+
+      const markers = Array.from(rawDraft.matchAll(diagramRegex));
+      for (const match of markers) {
+        const topicKey = match[1];
+        const images = availableImages[topicKey] || [];
+        if (images.length === 0) {
+          if (!missingTopics.includes(topicKey)) missingTopics.push(topicKey);
+          console.log('[diagram] Missing:', topicKey);
+        } else {
+          const selected = selectImage(images);
+          if (selected) {
+            usedImages.push({ topicKey, image: selected });
+            processedRawDraft = processedRawDraft.replace(
+              match[0],
+              `\n![${topicKey}](${selected.image_url})\n`
+            );
+          }
+        }
+      }
+
+      for (const missingKey of missingTopics) {
+        processedRawDraft = processedRawDraft.replace(
+          new RegExp(`\\[DIAGRAM:${missingKey}\\]\\n?`, 'g'), ''
+        );
+        await logMissingDiagram(missingKey, body.classNumber, body.subject, 0);
+      }
+
+      if (missingTopics.length > 0) {
+        const regenerationPrompt = `The following questions in this exam paper had diagram markers for topics that have no approved images yet: ${missingTopics.join(', ')}
+
+Find each question that contained [DIAGRAM:${missingTopics.join('] or [DIAGRAM:')}] and rewrite ONLY those questions without any diagram requirement.
+Keep all other questions exactly the same.
+Return the complete paper with those questions rewritten.
+
+Paper:
+${processedRawDraft}`;
+        try {
+          const fixResponse = await client.messages.create({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 2000,
+            messages: [{ role: 'user', content: regenerationPrompt }],
+          });
+          processedRawDraft = fixResponse.content[0].type === 'text'
+            ? fixResponse.content[0].text
+            : processedRawDraft;
+        } catch (err) {
+          console.error('[diagram] Regeneration failed (non-fatal):', err);
+        }
+      }
+
+      const paperId = `paper_${Date.now()}`;
+      for (const { topicKey, image } of usedImages) {
+        await recordImageUsage(paperId, topicKey, image.id, body.classNumber, body.subject);
+      }
+    }
 
     // Post-process: remove examiner notes, fix answer space formatting
     let draft: string;
@@ -894,11 +984,11 @@ export async function POST(req: NextRequest) {
       // Parse cleaned paper from Call 1
       const PAPER_START = "===CLEAN PAPER START===";
       const PAPER_END = "===CLEAN PAPER END===";
-      const psi = rawDraft.indexOf(PAPER_START);
-      const pei = rawDraft.indexOf(PAPER_END);
+      const psi = processedRawDraft.indexOf(PAPER_START);
+      const pei = processedRawDraft.indexOf(PAPER_END);
       const cleanedPaper = psi !== -1 && pei > psi
-        ? rawDraft.slice(psi + PAPER_START.length, pei).trim()
-        : cleanAnswerSpaces(cleanNotes(rawDraft));
+        ? processedRawDraft.slice(psi + PAPER_START.length, pei).trim()
+        : cleanAnswerSpaces(cleanNotes(processedRawDraft));
 
       // Deterministic diagram marker insertion
       const cleanedPaperWithMarkers = insertMissingDiagramMarkers(cleanedPaper);
@@ -1060,7 +1150,7 @@ ${section.content}`;
       draft = `===CLEAN PAPER START===\n${formattedFinalPaper}\n===CLEAN PAPER END===\n\n===ANSWER KEY START===\n${resolvedAnswerKey}\n===ANSWER KEY END===`;
     } else {
       // Deterministic diagram marker insertion
-      const draftWithMarkers = insertMissingDiagramMarkers(rawDraft);
+      const draftWithMarkers = insertMissingDiagramMarkers(processedRawDraft);
 
       // Layer 1: Code validation (instant, always)
       const { issues, hasIssues } = validatePaper(draftWithMarkers);

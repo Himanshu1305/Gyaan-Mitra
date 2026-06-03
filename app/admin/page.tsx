@@ -21,6 +21,7 @@ interface Stats {
   activeThisMonth: number;
   totalGenerations: number;
   premiumUsers: number;
+  zeroImageTopics: number;
 }
 
 function monthYear(): string {
@@ -60,12 +61,15 @@ export default function AdminPage() {
     setDataLoading(true);
     const my = monthYear();
 
-    const [profilesRes, usageRes] = await Promise.all([
+    const [profilesRes, usageRes, imagePoolRes] = await Promise.all([
       supabase
         .from("profiles")
         .select("id, full_name, email, subscription_tier, is_admin, created_at")
         .order("created_at", { ascending: false }),
       supabase.from("usage_tracking").select("user_id, month_year"),
+      fetch("/api/admin/image-pool?action=topics", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      }).then(r => r.json()).catch(() => ({ topics: [] })),
     ]);
 
     const profiles: UserRow[] = profilesRes.data ?? [];
@@ -73,12 +77,15 @@ export default function AdminPage() {
     const thisMonthUsage = allUsage.filter((u) => u.month_year === my);
     const activeSet = new Set(thisMonthUsage.map((u) => u.user_id));
     const premiumCount = profiles.filter((p) => p.subscription_tier === "premium").length;
+    const imageTopics: { image_count: number }[] = imagePoolRes.topics ?? [];
+    const zeroImageTopics = imageTopics.filter((t) => t.image_count === 0).length;
 
     setStats({
       totalUsers: profiles.length,
       activeThisMonth: activeSet.size,
       totalGenerations: allUsage.length,
       premiumUsers: premiumCount,
+      zeroImageTopics,
     });
     setUsers(profiles);
     setDataLoading(false);
@@ -209,6 +216,18 @@ export default function AdminPage() {
                   border border-[#1B3A6B] text-[#1B3A6B] hover:bg-blue-50 transition-colors"
               >
                 🤖 AI Figure Extractor
+              </a>
+              <a
+                href="/admin/image-pool"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold
+                  border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                🗂️ Image Pool
+                {stats && stats.zeroImageTopics > 0 && (
+                  <span className="ml-1 text-xs px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 font-bold">
+                    {stats.zeroImageTopics} missing
+                  </span>
+                )}
               </a>
             </div>
           </div>

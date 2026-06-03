@@ -1,21 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   return _anthropic;
-}
-
-let _serviceClient: SupabaseClient | null = null;
-function getServiceClient(): SupabaseClient {
-  if (!_serviceClient) {
-    _serviceClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _serviceClient;
 }
 
 // ── Types ─────────────────────────────────────────────────────
@@ -136,144 +124,19 @@ function extractDiagramSvgPlaceholders(content: string): Array<{
   return results;
 }
 
-// ── Wikimedia Commons fallback ────────────────────────────────
-
-async function searchWikimediaFigure(keywords: string[]): Promise<NcertFigure | null> {
-  try {
-    const query = keywords.slice(0, 4).join(' ');
-    const searchUrl = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srnamespace=6&srlimit=3&format=json&origin=*`;
-    const searchRes = await fetch(searchUrl, { signal: AbortSignal.timeout(5000) });
-    if (!searchRes.ok) return null;
-    const searchData = await searchRes.json() as {
-      query?: { search?: Array<{ title: string }> };
-    };
-    const results = searchData?.query?.search ?? [];
-
-    const mediaFile = results.find((r) => /\.(svg|png)$/i.test(r.title));
-    if (!mediaFile) return null;
-
-    const infoUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(mediaFile.title)}&prop=imageinfo&iiprop=url&format=json&origin=*`;
-    const infoRes = await fetch(infoUrl, { signal: AbortSignal.timeout(5000) });
-    if (!infoRes.ok) return null;
-    const infoData = await infoRes.json() as {
-      query?: { pages?: Record<string, { imageinfo?: Array<{ url: string }> }> };
-    };
-
-    const pages = infoData?.query?.pages ?? {};
-    const page = Object.values(pages)[0];
-    const imageUrl = page?.imageinfo?.[0]?.url;
-    if (!imageUrl) return null;
-
-    console.log('[diagram] wikimedia hit:', imageUrl);
-    const caption = mediaFile.title
-      .replace(/^File:/i, '')
-      .replace(/\.[^.]+$/, '')
-      .replace(/_/g, ' ');
-    return {
-      public_url: imageUrl,
-      figure_caption: caption,
-      figure_number: null,
-      description: query,
-      diagram_type: 'illustration',
-      match_score: 1,
-    };
-  } catch {
-    return null;
-  }
-}
-
 // ── Search NCERT Figures ──────────────────────────────────────
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 async function searchNcertFigure(
   keywords: string[],
   classNumber: number,
   subject: string,
   chapterNumber?: number
 ): Promise<NcertFigure | null> {
-  // ── Layer 1: verified_figures (curated, highest priority) ─────
-  try {
-    const { data: verified } = await getServiceClient()
-      .from('verified_figures')
-      .select('public_url, figure_caption')
-      .eq('is_active', true)
-      .textSearch('concept_tags', keywords.join(' | '))
-      .limit(1);
-    const v = verified?.[0] as { public_url?: string; figure_caption?: string } | undefined;
-    if (v?.public_url) {
-      console.log('[diagram] verified_figures hit:', v.public_url);
-      return {
-        public_url: v.public_url,
-        figure_caption: v.figure_caption || keywords.join(', '),
-        figure_number: null,
-        description: keywords.join(', '),
-        diagram_type: 'illustration',
-        match_score: 10,
-      };
-    }
-  } catch {
-    // non-fatal — fall through to ncert_figures
-  }
-
-  // ── Layer 2: ncert_figures (NCERT scanned images) ─────────────
-  // TODO: NCERT figures bucket contains coloured photos.
-  // For biology diagrams (human eye etc.), prefer verified_figures
-  // or Wikimedia SVGs over ncert_figures.
-  const strictSubjects = [
-    'science', 'physics', 'chemistry', 'biology', 'mathematics', 'maths'
-  ];
-  const isStrictSubject = strictSubjects.some((s) =>
-    subject?.toLowerCase().includes(s)
-  );
-  const acceptedTypes = isStrictSubject
-    ? ['diagram', 'circuit', 'geometric_figure', 'biological_diagram',
-       'chemical_structure', 'graph', 'flowchart']
-    : null;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filterByType = (data: any[]): any[] => {
-    if (!acceptedTypes || !data) return data || [];
-    return data.filter((d) => acceptedTypes.includes(d.diagram_type));
-  };
-
-  try {
-    if (chapterNumber) {
-      const { data } = await getServiceClient().rpc('search_ncert_figures', {
-        p_keywords: keywords,
-        p_class: classNumber,
-        p_subject: subject,
-        p_chapter: chapterNumber,
-        p_limit: 10,
-      });
-      const filtered = filterByType(data);
-      if (filtered.length > 0 && filtered[0].match_score >= 2) {
-        console.log('[diagram] ncert_figures hit:', filtered[0].public_url);
-        return filtered[0];
-      }
-    }
-
-    const { data: data2 } = await getServiceClient().rpc('search_ncert_figures', {
-      p_keywords: keywords,
-      p_class: classNumber,
-      p_subject: subject,
-      p_chapter: null,
-      p_limit: 10,
-    });
-    const filtered2 = filterByType(data2);
-    if (filtered2.length > 0 && filtered2[0].match_score >= 2) {
-      console.log('[diagram] ncert_figures hit:', filtered2[0].public_url);
-      return filtered2[0];
-    }
-  } catch {
-    // non-fatal — fall through to Wikimedia
-  }
-
-  // ── Layer 3: Wikimedia Commons ────────────────────────────────
-  const wikiResult = await searchWikimediaFigure(keywords);
-  if (wikiResult) return wikiResult;
-
-  console.log('[diagram] SVG fallback for:', keywords.join(', '));
+  // Diagram pool system now handles all image lookup
   return null;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 // ── Question-type context detector ───────────────────────────
 // Looks at the 400 chars before the marker position to decide whether
@@ -325,9 +188,27 @@ export async function generateSingleSvg(
   questionType: 'study' | 'process' = 'process'
 ): Promise<string | null> {
   try {
+    const BIOLOGY_KEYWORDS = [
+      'eye', 'heart', 'brain', 'digestive', 'neuron', 'nephron',
+      'kidney', 'flower', 'stomata', 'reflex', 'excretory',
+      'reproductive', 'cell', 'tissue', 'organ', 'anatomy',
+      'biological', 'organism', 'muscle', 'nerve', 'blood',
+      'lung', 'liver', 'stomach', 'intestine', 'artery', 'vein'
+    ];
+    const descLower = description.toLowerCase();
+    const isBiology = BIOLOGY_KEYWORDS.some(kw => descLower.includes(kw));
+    if (isBiology) {
+      console.log('[SVG] Blocked biology SVG for:', description.slice(0, 80));
+      return null;
+    }
+
     console.log('[SVG] Generating for:', description.slice(0, 100), '| type:', questionType);
 
     const baseSystem = `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.
+
+Draw ONLY geometric shapes, graphs, ray diagrams with lines and arrows, or circuit diagrams with standard symbols.
+NEVER draw anatomy, biology, or organism diagrams.
+Use ONLY letters A, B, C, D as part labels — never write full anatomical or physics term names as labels on diagram parts.
 
 CRITICAL: Use only black (#000000) for all lines, borders and text. Use only white (#ffffff) or very light grey (#f5f5f5) for fills. No colours whatsoever. This is for a printed exam paper.
 

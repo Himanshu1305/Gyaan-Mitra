@@ -1,0 +1,59 @@
+{
+  "10": {
+    "Science": {
+      "1": {
+        "chapter_name": "Chemical Reactions and Equations",
+        "topics": ["electrolysis_water"]
+      },
+      "4": {
+        "chapter_name": "Carbon and its Compounds",
+        "topics": ["soap_micelle"]
+      },
+      "5": {
+        "chapter_name": "Life Processes",
+        "topics": [
+          "digestive_system",
+          "human_heart",
+          "nephron",
+          "excretory_system",
+          "stomata"
+        ]
+      },
+      "6": {
+        "chapter_name": "Control and Coordination",
+        "topics": [
+          "reflex_arc",
+          "neuron_structure",
+          "human_brain"
+        ]
+      },
+      "7": {
+        "chapter_name": "How do Organisms Reproduce",
+        "topics": ["flower_structure"]
+      },
+      "10": {
+        "chapter_name": "The Human Eye and the Colourful World",
+        "topics": [
+          "human_eye_structure",
+          "myopia_defect",
+          "myopia_correction",
+          "hypermetropia_defect",
+          "hypermetropia_correction"
+        ]
+      },
+      "11": {
+        "chapter_name": "Electricity",
+        "topics": ["series_circuit", "parallel_circuit"]
+      },
+      "12": {
+        "chapter_name": "Magnetic Effects of Electric Current",
+        "topics": [
+          "electric_motor",
+          "electric_generator",
+          "magnetic_field_straight_wire",
+          "magnetic_field_solenoid"
+        ]
+      }
+    }
+  }
+}
