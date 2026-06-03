@@ -275,6 +275,21 @@ async function searchNcertFigure(
   return null;
 }
 
+// ── Question-type context detector ───────────────────────────
+// Looks at the 400 chars before the marker position to decide whether
+// the surrounding question is "study the diagram" (identify parts)
+// or a process/explanation question (full labels OK).
+function inferQuestionType(content: string, markerIndex: number): 'study' | 'process' {
+  const before = content.slice(Math.max(0, markerIndex - 400), markerIndex).toLowerCase();
+  const studyPhrases = [
+    'study the diagram', 'study the ray diagram', 'study the figure',
+    'shown below', 'diagram shown', 'figure shown', 'diagram below',
+    'refer to the diagram', 'observe the diagram', 'shown below and answer',
+    'given below and answer', 'the following diagram',
+  ];
+  return studyPhrases.some(p => before.includes(p)) ? 'study' : 'process';
+}
+
 // ── Retry Helper ──────────────────────────────────────────────
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -305,14 +320,34 @@ async function callAnthropicWithRetry<T>(
 
 // ── Generate SVG ──────────────────────────────────────────────
 
-export async function generateSingleSvg(description: string): Promise<string | null> {
+export async function generateSingleSvg(
+  description: string,
+  questionType: 'study' | 'process' = 'process'
+): Promise<string | null> {
   try {
-    console.log('[SVG] Generating for:', description.slice(0, 100));
-    const response = await callAnthropicWithRetry(() =>
-      getAnthropic().messages.create({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 3000,
-        system: `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams with clear labels. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram — these give away answers. Only include labels and structural elements. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.
+    console.log('[SVG] Generating for:', description.slice(0, 100), '| type:', questionType);
+
+    const baseSystem = `You are an SVG diagram generator for Indian school science textbooks (CBSE Class 6-12). Output ONLY valid SVG code starting with <svg and ending with </svg>. Do not include any explanation, thinking, or markdown. Generate clean educational diagrams. Do not include 'Key Points', answer summaries, or explanatory text boxes inside the diagram. Use viewBox that fits the content — for complex diagrams with many elements use 0 0 800 500 maximum. Keep text font-size minimum 14px so it remains readable when scaled.
+
+CRITICAL: Use only black (#000000) for all lines, borders and text. Use only white (#ffffff) or very light grey (#f5f5f5) for fills. No colours whatsoever. This is for a printed exam paper.
+
+Ensure all text labels fit within the viewBox: start text at x=10 minimum near left edge, end text at viewBox width minus 20px near right edge.`;
+
+    const typeSpecific = questionType === 'study'
+      ? `
+
+DIAGRAM TYPE: STUDY / IDENTIFY
+This diagram will be shown to students who must IDENTIFY the parts.
+ABSOLUTE RULE: Use ONLY letters A, B, C, D, E as markers on parts.
+NO text labels anywhere on diagram parts except the diagram title.
+NO colour names (Violet, Red, Blue etc.)
+NO anatomical names (Retina, Cornea, Lens etc.)
+NO physics terms as labels on diagram parts.
+Students must identify these parts themselves.`
+      : `
+
+DIAGRAM TYPE: PROCESS / EXPLANATION
+This diagram explains how something works — full labels are required.
 
 BANNED labels (never include — they reveal answers to students):
 - "Image formed in front of retina" or "Image formed behind retina" → label as "Image" only
@@ -322,13 +357,13 @@ BANNED labels (never include — they reveal answers to students):
 - "Eye too long", "Eye too short", "Elongated eyeball", "Shortened eyeball" → label the structure only (e.g. "Eyeball")
 - "Rays converge before/behind retina" → draw the ray path without the explanatory text label
 - "Defect: myopia", "Defect: hypermetropia" → omit defect labels
-Rule: label WHAT a structure IS, never WHAT IT MEANS or WHY it matters.
+Rule: label WHAT a structure IS, never WHAT IT MEANS or WHY it matters.`;
 
-CRITICAL: If this diagram is for a 'study the diagram' question where students must IDENTIFY or LABEL parts, do NOT include text labels on the parts — use only letters (A, B, C, D) or numbers (1, 2, 3, 4) as markers instead. Students must name the parts themselves. Only include labels if the question explicitly requires students to understand a process (like dispersion, refraction path) rather than identify parts.
-
-CRITICAL: Use only black (#000000) for all lines, borders and text. Use only white (#ffffff) or very light grey (#f5f5f5) for fills. No colours whatsoever. This is for a printed exam paper.
-
-Ensure all text labels fit within the viewBox: start text at x=10 minimum near left edge, end text at viewBox width minus 20px near right edge.`,
+    const response = await callAnthropicWithRetry(() =>
+      getAnthropic().messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 3000,
+        system: baseSystem + typeSpecific,
         messages: [{ role: "user", content: `Generate an SVG diagram for:\n\n${description}` }],
       })
     );
@@ -485,7 +520,10 @@ export async function resolveAllPlaceholders(
   console.log('[DIAGRAM-SVG] Found:', diagramSvgPlaceholders.length);
 
   for (const placeholder of diagramSvgPlaceholders) {
-    let svgCode = await generateSingleSvg(placeholder.description);
+    const markerIndex = resolvedContent.indexOf(placeholder.fullMatch);
+    const questionType = inferQuestionType(resolvedContent, markerIndex);
+    console.log('[DIAGRAM-SVG] Question type:', questionType, 'for:', placeholder.description.slice(0, 50));
+    let svgCode = await generateSingleSvg(placeholder.description, questionType);
     if (svgCode) {
       // Post-process: strip answer-revealing text patterns
       const answerPatterns = [
