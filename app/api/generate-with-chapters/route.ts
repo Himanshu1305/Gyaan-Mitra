@@ -202,13 +202,18 @@ Add %%DIAGRAM:%% ONLY when the question says:
 "The ray diagram below shows"
 "Study the ray diagram"
 
-DO NOT ADD A MARKER when the question says:
-"Draw a diagram"
-"Draw a neat labelled diagram"
-"Draw a ray diagram"
-"With the help of a diagram"
-"Sketch a diagram"
-These are draw-yourself questions — student draws in exam.
+NEVER add %%DIAGRAM:SVG%% or %%DIAGRAM:FIGURE%% markers to
+questions that contain any of these phrases:
+- "draw a diagram"
+- "draw a neat diagram"
+- "draw a labelled diagram"
+- "draw a ray diagram"
+- "draw and label"
+- "sketch a diagram"
+- "make a diagram"
+Only add diagram markers to questions that say "study the diagram
+shown below" or "the following diagram shows" or similar phrases
+where the diagram is PROVIDED to the student — not drawn by the student.
 
 EXAMPLES:
 
@@ -649,7 +654,7 @@ function validatePaper(content: string): {
     'draw a ray diagram', 'draw a circuit', 'draw and label',
     'sketch a diagram', 'sketch the', 'with a neat diagram',
     'with the help of a diagram', 'with a labelled diagram',
-    'draw the following', 'draw a schematic',
+    'draw the following', 'draw a schematic', 'make a diagram',
   ];
 
   const studyFigurePhrases = [

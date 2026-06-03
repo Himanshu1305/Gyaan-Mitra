@@ -215,6 +215,9 @@ async function searchNcertFigure(
   }
 
   // ── Layer 2: ncert_figures (NCERT scanned images) ─────────────
+  // TODO: NCERT figures bucket contains coloured photos.
+  // For biology diagrams (human eye etc.), prefer verified_figures
+  // or Wikimedia SVGs over ncert_figures.
   const strictSubjects = [
     'science', 'physics', 'chemistry', 'biology', 'mathematics', 'maths'
   ];
@@ -320,6 +323,8 @@ BANNED labels (never include — they reveal answers to students):
 - "Rays converge before/behind retina" → draw the ray path without the explanatory text label
 - "Defect: myopia", "Defect: hypermetropia" → omit defect labels
 Rule: label WHAT a structure IS, never WHAT IT MEANS or WHY it matters.
+
+CRITICAL: If this diagram is for a 'study the diagram' question where students must IDENTIFY or LABEL parts, do NOT include text labels on the parts — use only letters (A, B, C, D) or numbers (1, 2, 3, 4) as markers instead. Students must name the parts themselves. Only include labels if the question explicitly requires students to understand a process (like dispersion, refraction path) rather than identify parts.
 
 CRITICAL: Use only black (#000000) for all lines, borders and text. Use only white (#ffffff) or very light grey (#f5f5f5) for fills. No colours whatsoever. This is for a printed exam paper.
 
