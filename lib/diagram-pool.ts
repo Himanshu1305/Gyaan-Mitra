@@ -14,9 +14,10 @@ export interface DiagramImage {
 }
 
 // Get all approved images for given topic keys
-// Returns map of topic_key -> array of DiagramImage
+// Returns map of topic_key -> array of DiagramImage, filtered by mode
 export async function getAvailableTopicImages(
-  topicKeys: string[]
+  topicKeys: string[],
+  mode: 'paper' | 'answer_key' = 'paper'
 ): Promise<Record<string, DiagramImage[]>> {
   if (!topicKeys.length) return {}
 
@@ -35,10 +36,21 @@ export async function getAvailableTopicImages(
     return {}
   }
 
-  const result: Record<string, DiagramImage[]> = {}
+  const all: Record<string, DiagramImage[]> = {}
   for (const row of data || []) {
-    if (!result[row.topic_key]) result[row.topic_key] = []
-    result[row.topic_key].push(row as DiagramImage)
+    if (!all[row.topic_key]) all[row.topic_key] = []
+    all[row.topic_key].push(row as DiagramImage)
+  }
+
+  const result: Record<string, DiagramImage[]> = {}
+  for (const [topicKey, images] of Object.entries(all)) {
+    if (mode === 'paper') {
+      const preferred = images.filter(i => i.variant === 'unlabeled' || i.variant === 'numbered')
+      result[topicKey] = preferred.length > 0 ? preferred : images
+    } else {
+      const preferred = images.filter(i => i.variant === 'labeled')
+      result[topicKey] = preferred.length > 0 ? preferred : images
+    }
   }
   return result
 }
@@ -112,9 +124,11 @@ export async function recordImageUsage(
 
 // Build the available diagrams text for Claude prompt
 export function buildAvailableDiagramsPrompt(
-  availableImages: Record<string, DiagramImage[]>
+  availableImages: Record<string, DiagramImage[]>,
+  mode: 'paper' | 'answer_key' = 'paper'
 ): string {
   const topics = Object.keys(availableImages)
+  console.log(`[diagram-pool] buildAvailableDiagramsPrompt mode=${mode} topics=${topics.length}`)
   if (topics.length === 0) {
     return 'AVAILABLE DIAGRAM TOPICS: None. Do not generate any diagram-based questions.'
   }

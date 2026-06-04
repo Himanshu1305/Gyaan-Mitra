@@ -885,8 +885,8 @@ export async function POST(req: NextRequest) {
         allTopicKeys.push(...topics);
       }
       const uniqueTopicKeys = Array.from(new Set(allTopicKeys));
-      availableImages = await getAvailableTopicImages(uniqueTopicKeys);
-      diagramPromptSection = buildAvailableDiagramsPrompt(availableImages);
+      availableImages = await getAvailableTopicImages(uniqueTopicKeys, 'paper');
+      diagramPromptSection = buildAvailableDiagramsPrompt(availableImages, 'paper');
       console.log('[diagram-pool] Topic keys:', uniqueTopicKeys.length, 'Available:', Object.keys(availableImages).length);
     }
 
@@ -1121,7 +1121,7 @@ ${section.content}`;
         const slug = match[1].trim();
         const description = DIAGRAM_SLUG_MAP[slug] || `diagram showing ${slug.replace(/-/g, ' ')}`;
         try {
-          const svgCode = await generateSingleSvg(description);
+          const svgCode = await generateSingleSvg(description, 'process', body.subject);
           if (svgCode) {
             const encoded = encodeURIComponent(svgCode);
             const imgMd = `\n![${slug}](data:image/svg+xml;charset=utf-8,${encoded})\n`;

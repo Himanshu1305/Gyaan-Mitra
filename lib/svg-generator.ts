@@ -185,8 +185,18 @@ async function callAnthropicWithRetry<T>(
 
 export async function generateSingleSvg(
   description: string,
-  questionType: 'study' | 'process' = 'process'
+  questionType: 'study' | 'process' = 'process',
+  subject?: string
 ): Promise<string | null> {
+  const nonMathsSubjects = ['Science', 'Biology', 'Chemistry', 'Physics',
+    'History', 'Geography', 'Political Science', 'Economics',
+    'Social Science', 'SST', 'English', 'Hindi']
+  if (subject && nonMathsSubjects.some(s =>
+    subject.toLowerCase().includes(s.toLowerCase()))) {
+    console.log('[SVG] Blocked: SVG disabled for subject:', subject)
+    return null
+  }
+
   try {
     const BIOLOGY_KEYWORDS = [
       'eye', 'heart', 'brain', 'digestive', 'neuron', 'nephron',
@@ -365,7 +375,7 @@ export async function resolveAllPlaceholders(
   const svgResolutions = await Promise.all(
     svgPlaceholders.map(async (p) => ({
       placeholder: p,
-      svgCode: await generateSingleSvg(p.description),
+      svgCode: await generateSingleSvg(p.description, 'process', subject),
     }))
   );
 
@@ -404,7 +414,7 @@ export async function resolveAllPlaceholders(
     const markerIndex = resolvedContent.indexOf(placeholder.fullMatch);
     const questionType = inferQuestionType(resolvedContent, markerIndex);
     console.log('[DIAGRAM-SVG] Question type:', questionType, 'for:', placeholder.description.slice(0, 50));
-    let svgCode = await generateSingleSvg(placeholder.description, questionType);
+    let svgCode = await generateSingleSvg(placeholder.description, questionType, subject);
     if (svgCode) {
       // Post-process: strip answer-revealing text patterns
       const answerPatterns = [
