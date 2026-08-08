@@ -1,0 +1,234 @@
+# C10-Sci-Ch10 — run 5/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. Show all steps and working clearly for numerical questions. Marks may be awarded for correct working even if the final answer is incorrect.
+5. Write legibly in neat handwriting.
+6. Internal choices, wherever provided, must be attempted in full.
+7. Ensure your answers are precise and to the point.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The human eye forms the image of an object at its
+
+
+(a) Cornea
+
+(b) Iris
+
+(c) Pupil
+
+(d) Retina
+
+Answer: [ ]
+
+**Q2.** The ability of the eye lens to adjust its focal length according to the distance of the object is called
+
+
+(a) Persistence of vision
+
+(b) Accommodation
+
+(c) Power of resolution
+
+(d) Dispersion
+
+Answer: [ ]
+
+**Q3.** A person with myopia can see nearby objects clearly but cannot see distant objects distinctly. Which type of lens is used to correct this defect?
+
+
+(a) Convex lens
+
+(b) Bifocal lens
+
+(c) Concave lens
+
+(d) Cylindrical lens
+
+Answer: [ ]
+
+**Q4.** The splitting of white light into its component colours when passed through a glass prism is called
+
+
+(a) Reflection
+
+(b) Refraction
+
+(c) Dispersion
+
+(d) Scattering
+
+Answer: [ ]
+
+**Q5.** The phenomenon responsible for the blue colour of the sky is
+
+
+(a) Dispersion of light
+
+(b) Reflection of light
+
+(c) Refraction of light
+
+(d) Scattering of light
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is the far point and near point of the human eye for a normal person? State the range of vision for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** What is meant by the power of accommodation of the human eye? How does the ciliary muscle help in this process?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![myopia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_defect/myopia_defect_labeled_01.png)
+
+**Q8.** The diagram above shows a defect of vision. Identify the defect shown. State one cause and one effect of this defect on a person's vision.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Explain why the Sun appears reddish at sunrise and sunset. Why does it not appear the same colour at noon?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![hypermetropia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/hypermetropia_defect/hypermetropia_defect_labeled_01.png)
+
+**Q10.** The diagram above shows another common defect of vision. Identify the defect and explain how it is corrected. Also state the nature and position of the image formed before correction in this defect.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A person is advised to wear spectacles with concave lenses of power −2.5 D.
+(i) Name the defect of vision the person is suffering from.
+(ii) Calculate the focal length of the lens prescribed.
+(iii) State what is meant by the term "power of a lens" and give its SI unit.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+
+### Part I — (1 question × 4 marks = 4 marks)
+
+**Q12.** With the help of a neat labelled diagram, describe the structure of the human eye. Explain the function of the following parts:
+(i) Cornea
+(ii) Iris
+(iii) Crystalline lens
+(iv) Retina
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+### Part II — (2 questions × 5 marks each = 10 marks)
+
+**Q13.** 
+(a) What is dispersion of light? With the help of a diagram, show how a glass prism disperses white light into its spectrum. Name the colours of the spectrum in order.
+
+
+(b) Explain the formation of a rainbow. State the two conditions necessary for the observation of a rainbow.
+
+**OR**
+
+**Q13.** 
+(a) Explain the phenomenon of atmospheric refraction with one example from daily life.
+
+
+(b) Why do stars twinkle on a clear night? Why do planets, observed from Earth, generally not twinkle?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) Define the following defects of vision and state the type of lens used for their correction:
+(i) Myopia
+(ii) Hypermetropia
+(iii) Presbyopia
+
+
+(b) A student can read a book clearly when it is held at a minimum distance of 50 cm from his eyes. The near point of a normal eye is 25 cm.
+(i) Identify the defect of vision the student is suffering from.
+(ii) Calculate the power of the corrective lens required for him to read at the normal near point of 25 cm.
+(Show complete working: given values → formula → substitution → answer with units.)
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

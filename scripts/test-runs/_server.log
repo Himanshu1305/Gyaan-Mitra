@@ -1,0 +1,830 @@
+
+> gyaan-mitra@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3010
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1408ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1712ms (683 modules)
+ GET / 200 in 2002ms
+ ✓ Compiled in 301ms (310 modules)
+ ✓ Compiled /api/generate-with-chapters in 254ms (524 modules)
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6854
+ POST /api/generate-with-chapters 200 in 26993ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6970
+ POST /api/generate-with-chapters 200 in 27484ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6278
+ POST /api/generate-with-chapters 200 in 24514ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 3 remove_marks, remove_marks, remove_marks
+[VALIDATION] Applying targeted fix...
+[VALIDATION] Fix applied
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 7623
+ POST /api/generate-with-chapters 200 in 55887ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6353
+ POST /api/generate-with-chapters 200 in 25606ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9367
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6513
+ POST /api/generate-with-chapters 200 in 25553ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9367
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6942
+ POST /api/generate-with-chapters 200 in 28244ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9367
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6712
+ POST /api/generate-with-chapters 200 in 30131ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9367
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6389
+ POST /api/generate-with-chapters 200 in 26248ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9367
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6742
+ POST /api/generate-with-chapters 200 in 25040ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 2,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9551
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 7377
+ POST /api/generate-with-chapters 200 in 30142ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 2,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9551
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 8199
+ POST /api/generate-with-chapters 200 in 34927ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 2,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9551
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 7636
+ POST /api/generate-with-chapters 200 in 29337ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6410
+ POST /api/generate-with-chapters 200 in 25098ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[generate-with-chapters] Claude prompt length: 6812
+[generate-with-chapters] Claude prompt preview: You are finalising an exam paper draft.
+
+DRAFT PAPER TO FINALISE:
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are com
+[generate-with-chapters] Claude generating exam-paper…
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[ANSWER KEY] Sections found: [ 'A', 'B', 'C', 'D' ]
+[ANSWER KEY] Section A: 1218 chars
+[ANSWER KEY] Section B: 1509 chars
+[ANSWER KEY] Section C: 2719 chars
+[ANSWER KEY] Section D: 6329 chars
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 17924
+ POST /api/generate-with-chapters 200 in 43882ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6681
+ POST /api/generate-with-chapters 200 in 26348ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[generate-with-chapters] Claude prompt length: 7083
+[generate-with-chapters] Claude prompt preview: You are finalising an exam paper draft.
+
+DRAFT PAPER TO FINALISE:
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All question
+[generate-with-chapters] Claude generating exam-paper…
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[ANSWER KEY] Sections found: [ 'A', 'B', 'C', 'D' ]
+[ANSWER KEY] Section A: 1151 chars
+[ANSWER KEY] Section B: 1750 chars
+[ANSWER KEY] Section C: 3986 chars
+[ANSWER KEY] Section D: 7177 chars
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 20482
+ POST /api/generate-with-chapters 200 in 45818ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=22
+[diagram-pool] Topic keys: 22 Available: 22
+[generate-with-chapters] Claude prompt length: 9413
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6807
+ POST /api/generate-with-chapters 200 in 25466ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[generate-with-chapters] Claude prompt length: 7209
+[generate-with-chapters] Claude prompt preview: You are finalising an exam paper draft.
+
+DRAFT PAPER TO FINALISE:
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are com
+[generate-with-chapters] Claude generating exam-paper…
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[ANSWER KEY] Sections found: [ 'A', 'B', 'C', 'D' ]
+[ANSWER KEY] Section A: 1468 chars
+[ANSWER KEY] Section B: 1480 chars
+[ANSWER KEY] Section C: 3040 chars
+[ANSWER KEY] Section D: 7777 chars
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[SVG] Blocked: SVG disabled for subject: Science
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 20827
+ POST /api/generate-with-chapters 200 in 51660ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Mathematics',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=0
+[diagram-pool] Topic keys: 0 Available: 0
+[generate-with-chapters] Claude prompt length: 7115
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6142
+ POST /api/generate-with-chapters 200 in 27866ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Mathematics',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=0
+[diagram-pool] Topic keys: 0 Available: 0
+[generate-with-chapters] Claude prompt length: 7115
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 5163
+ POST /api/generate-with-chapters 200 in 24759ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Mathematics',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=0
+[diagram-pool] Topic keys: 0 Available: 0
+[generate-with-chapters] Claude prompt length: 7115
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 5876
+ POST /api/generate-with-chapters 200 in 24141ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=0
+[diagram-pool] Topic keys: 0 Available: 0
+[generate-with-chapters] Claude prompt length: 7129
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6138
+ POST /api/generate-with-chapters 200 in 25308ms
+[generate-with-chapters] Request: {
+  generationType: 'exam-paper',
+  chapterCount: 1,
+  board: 'CBSE',
+  subject: 'Science',
+  generationMode: 'quick'
+}
+[generate-with-chapters] No auth token — guest request
+[generate-with-chapters] Skipping Gemini (quick mode or finalise)
+[generate-with-chapters] ANTHROPIC_API_KEY exists: true
+[diagram-pool] buildAvailableDiagramsPrompt mode=paper topics=0
+[diagram-pool] Topic keys: 0 Available: 0
+[generate-with-chapters] Claude prompt length: 7129
+[generate-with-chapters] Claude prompt preview: 
+You are an expert Indian school exam paper setter with 20+ years of experience
+setting papers for CBSE, ICSE, and State Board examinations for Classes 6–12.
+You have deep knowledge of NCERT curriculum, NEP 2020 guidelines, and competency-based assessment.
+
+══════════════════════════════════════════
+[generate-with-chapters] Claude generating exam-paper…
+[VALIDATION] Issues found: 0 none
+[EXTRACT-FIGURE] Found: 0
+[EXTRACT-SVG] Found: 0
+[FIGURES] Resolution results: {
+  ncertFiguresFound: 0,
+  ncertFiguresMissed: 0,
+  svgsGenerated: 0,
+  svgsFailed: 0
+}
+[generate-with-chapters] Done, draft length: 6258
+ POST /api/generate-with-chapters 200 in 26193ms
+[?25h

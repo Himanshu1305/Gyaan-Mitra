@@ -1,0 +1,252 @@
+# C10-Sci-Ch5+10 — run 1/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 36
+Time: 2 hours    Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before answering.
+3. Questions in Section A carry 1 mark each. Attempt all questions.
+4. For numerical questions, show all steps clearly: given values, formula, substitution, and final answer with units.
+5. Draw neat, well-labelled diagrams wherever necessary.
+6. Write legibly in clear, concise language.
+7. No marks will be awarded for answers without supporting working in calculation-based questions.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(6 questions × 1 mark each = 6 marks)
+
+**Q1.** Which of the following is the correct sequence of events during photosynthesis?
+
+
+(a) CO₂ fixation → Light absorption → Water splitting → ATP synthesis
+
+(b) Light absorption → Water splitting → ATP synthesis → CO₂ fixation
+
+(c) Water splitting → CO₂ fixation → Light absorption → ATP synthesis
+
+(d) ATP synthesis → Light absorption → Water splitting → CO₂ fixation
+
+Answer: [ ]
+
+**Q2.** The enzyme pepsin is secreted in the stomach and acts on:
+
+
+(a) Fats
+
+(b) Carbohydrates
+
+(c) Proteins
+
+(d) Nucleic acids
+
+Answer: [ ]
+
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_unlabeled_01.png)
+
+**Q3.** In the diagram of the human heart shown above, the chamber that receives oxygenated blood from the lungs is:
+
+
+(a) Right atrium
+
+(b) Right ventricle
+
+(c) Left atrium
+
+(d) Left ventricle
+
+Answer: [ ]
+
+**Q4.** A person is unable to see distant objects clearly but can see nearby objects without difficulty. This defect of vision is called:
+
+
+(a) Hypermetropia
+
+(b) Presbyopia
+
+(c) Myopia
+
+(d) Astigmatism
+
+Answer: [ ]
+
+**Q5.** The splitting of white light into its constituent colours when it passes through a glass prism is called:
+
+
+(a) Refraction
+
+(b) Reflection
+
+(c) Dispersion
+
+(d) Scattering
+
+Answer: [ ]
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q6.** In the diagram of the human eye shown above, the part that controls the amount of light entering the eye is:
+
+
+(a) Cornea
+
+(b) Iris
+
+(c) Retina
+
+(d) Ciliary muscles
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(4 questions × 2 marks each = 8 marks)
+
+**Q7.** State two differences between aerobic and anaerobic respiration. Give one example of an organism that carries out anaerobic respiration.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** What is the role of bile juice in the process of digestion? Where is bile produced and where does it act?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q9.** Define the term 'power of accommodation' of the human eye. What happens to this power as a person grows old?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Why does the sky appear blue on a clear day? Name the phenomenon responsible for this observation.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(4 questions × 3 marks each = 12 marks)
+
+
+![digestive_system](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/digestive_system/digestive_system_unlabeled_01.png)
+
+**Q11.** The diagram above shows the human digestive system. Name the parts labelled in the diagram. State the function of any two of these parts in the process of digestion.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q12.** Explain the process of double circulation in human beings. Why is it necessary to separate oxygenated and deoxygenated blood in mammals?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![myopia_correction](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_correction/myopia_correction_labeled_01.png)
+
+**Q13.** The diagram above shows the correction of a defect of vision. Identify the defect shown. State its cause and explain how the lens used corrects this defect. Also write the nature and focal length of the corrective lens used if the far point of a person is 2 m from the eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** Explain the term 'refraction of light through a glass prism'. What do you observe when white light passes through a triangular glass prism? Name the colours of the visible spectrum in order from the one deviated most to the one deviated least.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(2 questions × 5 marks each = 10 marks)
+
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_02.png)
+
+**Q15.** 
+(a) The diagram above shows the structure of a nephron. Briefly describe the three processes by which urine is formed in the nephron.
+
+
+(b) Name any two other organs in the human body that also perform excretory functions and state what they excrete.
+
+
+(c) How do plants get rid of the waste products they generate? Mention any two methods.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q16.** 
+(a) What is meant by 'presbyopia'? How does it differ from myopia and hypermetropia?
+
+
+(b) A student sitting in the last row of the classroom cannot read the writing on the blackboard clearly but can read his textbook without any difficulty. Answer the following:
+
+(i) Identify the type of defect the student is suffering from.
+
+(ii) With the help of a ray diagram, show how this defect can be corrected.
+
+(iii) The student's near point is 25 cm and far point is 1.5 m. Calculate the power of the corrective lens required to correct his distance vision. Use the formula:
+
+**Given:**
+Object distance (u) = −∞
+Image distance (v) = −1.5 m
+
+**Formula:** 1/f = 1/v − 1/u
+
+**Substitution and Answer:**
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

@@ -1,0 +1,264 @@
+# C10-Sci-Ch5+10 — run 3/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 36
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. Show all steps and working clearly for numerical questions.
+5. Write your answers legibly in blue or black ink.
+6. Internal choices, wherever provided, attempt only one option.
+7. Marks allotted are indicated at the section heading level only.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(6 questions × 1 mark each = 6 marks)
+
+**Q1.** Which of the following is the correct sequence of events during photosynthesis?
+
+
+(a) CO₂ fixation → Light absorption → Splitting of water → Release of O₂
+
+(b) Light absorption → Splitting of water → CO₂ fixation → Release of O₂
+
+(c) Light absorption → Splitting of water → Release of O₂ → CO₂ fixation
+
+(d) Splitting of water → Light absorption → Release of O₂ → CO₂ fixation
+
+Answer: [ ]
+
+**Q2.** The muscular walls of the heart are called:
+
+
+(a) Pericardium
+
+(b) Myocardium
+
+(c) Endocardium
+
+(d) Epicardium
+
+Answer: [ ]
+
+**Q3.** In the human kidney, the functional unit responsible for filtration of blood is:
+
+
+(a) Ureter
+
+(b) Glomerulus alone
+
+(c) Nephron
+
+(d) Collecting duct
+
+Answer: [ ]
+
+**Q4.** The human eye can see objects clearly within a certain range of distances. The nearest point at which the eye can see clearly is called the:
+
+
+(a) Far point
+
+(b) Near point
+
+(c) Focal point
+
+(d) Nodal point
+
+Answer: [ ]
+
+**Q5.** A person suffering from myopia can see:
+
+
+(a) Distant objects clearly but not nearby objects
+
+(b) Nearby objects clearly but not distant objects
+
+(c) Both nearby and distant objects clearly
+
+(d) Neither nearby nor distant objects clearly
+
+Answer: [ ]
+
+**Q6.** The phenomenon responsible for the splitting of white light into its constituent colours when passed through a glass prism is called:
+
+
+(a) Reflection
+
+(b) Refraction
+
+(c) Dispersion
+
+(d) Scattering
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(4 questions × 2 marks each = 8 marks)
+
+**Q7.** What is the role of the bile juice in the process of digestion? Where is it produced and where does it act?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.**
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_numbered_01.png)
+
+The diagram shows the structure of the human heart with certain parts numbered. Identify parts numbered 1 and 2, and state one function of each.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q9.** What is the difference between the near point and the far point of the human eye? State the values of near point and far point for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Why does the sky appear blue on a clear day? Which phenomenon of light is responsible for this?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(4 questions × 3 marks each = 12 marks)
+
+**Q11.**
+
+![stomata](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/stomata/stomata_labeled_01.png)
+
+The diagram shows a stomata as seen in a leaf. With reference to the diagram, answer the following:
+(i) State two functions of stomata.
+(ii) Describe the mechanism by which stomata open and close.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q12.**
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_01.png)
+
+Study the given diagram of a nephron and answer the questions:
+(i) Name the three basic processes involved in the formation of urine.
+(ii) What is the composition of urine? Why is it important to excrete urea from the body?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.**
+
+![myopia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_defect/myopia_defect_labeled_02.png)
+
+The diagram shows the defect of vision in a human eye.
+(i) Identify the defect shown.
+(ii) State two causes of this defect.
+(iii) Name the type of lens used to correct this defect and explain how it helps.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** During a science fair, a student observed that when sunlight passes through a glass prism, a band of colours is formed on the screen. The student also noticed that the band is always in the same order.
+(i) What is this band of colours called?
+(ii) Name the colours observed in order from top to bottom.
+(iii) Which colour is deviated the most and which is deviated the least? Give a reason for the difference.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(2 questions × 5 marks each = 10 marks)
+
+**Q15.** 
+(a) With the help of a labelled diagram, describe the structure of the human digestive system.
+
+(b) Explain the role of each of the following in the process of digestion:
+   (i) Saliva
+   (ii) Gastric juice
+   (iii) Pancreatic juice
+
+**OR**
+
+**Q15.** 
+(a) Describe the process of transportation of water and minerals in plants. Name the tissue involved and explain how it functions.
+
+(b) What is translocation? Which tissue is responsible for translocation of food in plants? Explain the process briefly.
+
+(c) How does the rate of transpiration affect the absorption of water by the roots?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q16.**
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+Study the diagram of the human eye given above and answer the following questions:
+
+(a) Label any four parts of the human eye as indicated in the diagram and state the function of each part labelled.
+
+(b) Explain with a diagram how a person suffering from hypermetropia can have their vision corrected. What type of lens is used and why?
+
+(c) What is the power of accommodation of the eye? How does it change with age and what condition results from its decrease?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+*— End of Question Paper —*

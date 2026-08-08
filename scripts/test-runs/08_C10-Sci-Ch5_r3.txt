@@ -1,0 +1,220 @@
+# C10-Sci-Ch5 — run 3/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. Show all working steps clearly for numerical questions.
+5. Write legibly in blue or black ink.
+6. Internal choice, wherever provided, must be attempted in full.
+7. Marks for each section are indicated in the section heading.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** Which of the following is the correct sequence of events during photosynthesis?
+
+
+(a) CO₂ fixation → Light absorption → Water splitting → Glucose formation
+
+(b) Light absorption → Water splitting → CO₂ fixation → Glucose formation
+
+(c) Water splitting → Glucose formation → Light absorption → CO₂ fixation
+
+(d) Glucose formation → CO₂ fixation → Water splitting → Light absorption
+
+Answer: [ ]
+
+**Q2.** In the human digestive system, which enzyme present in saliva begins the chemical digestion of starch?
+
+
+(a) Pepsin
+
+(b) Lipase
+
+(c) Salivary amylase
+
+(d) Trypsin
+
+Answer: [ ]
+
+**Q3.** The process by which the kidneys filter blood and remove waste products is called:
+
+
+(a) Transpiration
+
+(b) Osmoregulation
+
+(c) Excretion
+
+(d) Dialysis
+
+Answer: [ ]
+
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_numbered_01.png)
+
+**Q4.** The human heart acts as a double pump. Which of the following correctly describes the function of the left ventricle?
+
+
+(a) It receives oxygenated blood from the body and pumps it to the lungs
+
+(b) It receives deoxygenated blood from the body and pumps it to the lungs
+
+(c) It receives oxygenated blood from the lungs and pumps it to the body
+
+(d) It receives deoxygenated blood from the lungs and pumps it to the body
+
+Answer: [ ]
+
+**Q5.** Aerobic respiration takes place in the:
+
+
+(a) Nucleus
+
+(b) Ribosome
+
+(c) Cell membrane
+
+(d) Mitochondria
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** Define the term "transpiration." State any one significance of transpiration in plants.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** Differentiate between autotrophic and heterotrophic nutrition. Give one example of each.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![stomata](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/stomata/stomata_labeled_01.png)
+
+**Q8.** The diagram above shows the structure of stomata. State the role of stomata in gaseous exchange and mention which cells regulate the opening and closing of stomata.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Describe the process of digestion of proteins in the human digestive system. Name the enzymes involved and the products formed at the end of digestion.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_02.png)
+
+**Q10.** The diagram above shows the structure of a nephron. Explain the three basic processes involved in the formation of urine in the nephron.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** With reference to blood circulation in humans, answer the following:
+
+(i) What is the difference between pulmonary circulation and systemic circulation?
+(ii) Why is it essential that oxygenated and deoxygenated blood should not mix in the heart?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.** A student set up an experiment to show that chlorophyll is necessary for photosynthesis using a variegated leaf.
+
+(i) Draw and label the expected result when the leaf is tested with iodine solution after the experiment.
+(ii) State the observation and conclusion the student would record.
+(iii) Why is the leaf first boiled in water and then in alcohol before testing with iodine?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** Describe the process of aerobic respiration with the help of the overall balanced chemical equation. Compare aerobic and anaerobic respiration in humans and yeast by discussing: (i) site of occurrence, (ii) products formed, (iii) energy released. Also explain why aerobic respiration releases significantly more energy than anaerobic respiration.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.**
+
+
+(a) Explain how blood is transported in plants through the xylem and phloem. What are the differences in the direction of transport in each tissue?
+
+
+(b) In humans, what is the role of platelets in the blood? Name the components of blood and state the function of each component.
+
+**OR**
+
+**Q14.** Describe the human excretory system with the help of a neat labelled diagram. Explain how the kidneys maintain the water and ion balance in the body (osmoregulation). Also name two other organs involved in excretion and state the waste products they remove.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

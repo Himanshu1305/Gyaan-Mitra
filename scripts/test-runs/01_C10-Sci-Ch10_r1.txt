@@ -1,0 +1,232 @@
+# C10-Sci-Ch10 — run 1/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory unless internal choice is provided.
+2. Read each question carefully before attempting.
+3. Write legibly and show all working steps for numerical questions.
+4. Draw neat, well-labelled diagrams wherever required.
+5. Marks are indicated at the beginning of each section.
+6. Write your answers in the space provided below each question.
+7. Internal choice is indicated clearly with **OR**.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The ability of the human eye to adjust its focal length to see objects at different distances is called:
+
+
+(a) Persistence of vision
+
+(b) Power of accommodation
+
+(c) Least distance of distinct vision
+
+(d) Dispersion of light
+
+Answer: [ ]
+
+**Q2.** A person cannot see objects clearly beyond a distance of 1.5 m. He is suffering from which defect of vision?
+
+
+(a) Hypermetropia
+
+(b) Presbyopia
+
+(c) Myopia
+
+(d) Astigmatism
+
+Answer: [ ]
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q3.** The following diagram shows the structure of the human eye. Which part of the eye is responsible for changing the curvature of the eye lens?
+
+
+(a) Cornea
+
+(b) Iris
+
+(c) Ciliary muscles
+
+(d) Retina
+
+Answer: [ ]
+
+**Q4.** The phenomenon responsible for the blue colour of the sky is:
+
+
+(a) Refraction of light
+
+(b) Reflection of light
+
+(c) Dispersion of light
+
+(d) Scattering of light
+
+Answer: [ ]
+
+**Q5.** The splitting of white light into its component colours when it passes through a glass prism is called:
+
+
+(a) Reflection
+
+(b) Refraction
+
+(c) Dispersion
+
+(d) Scattering
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is the least distance of distinct vision for a normal human eye? Why do we hold a reading book at approximately that distance?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** Name the defect of vision in which a person can see nearby objects clearly but cannot see distant objects distinctly. Name the type of lens used to correct this defect.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![hypermetropia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/hypermetropia_defect/hypermetropia_defect_labeled_02.png)
+
+**Q8.** The diagram above shows a defect of vision. Identify the defect and state one cause of this defect.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Explain why the Sun appears reddish at sunrise and sunset, but appears white or yellowish-white at noon.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![myopia_correction](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_correction/myopia_correction_labeled_02.png)
+
+**Q10.** The diagram shows the correction of a defect of vision.
+
+(i) Name the defect being corrected.
+(ii) What type of lens is used for correction?
+(iii) A person with this defect has a far point of 2 m. Calculate the power of the corrective lens required.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** What is meant by dispersion of white light? Draw a neat and labelled diagram showing the dispersion of white light through a glass prism and label the colours of the spectrum formed in their correct order.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.** 
+(a) Define the term "power of accommodation" of the human eye.
+(b) A person is able to see objects clearly only when they are placed between 50 cm and 1.5 m from his eye. Identify the type of defect(s) of vision he is suffering from.
+
+(c) What changes occur in the eye lens when we shift our gaze from a distant tree to a nearby book?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** (a) With the help of a neat and labelled ray diagram, explain the defect of hypermetropia (far-sightedness). Also draw the diagram showing its correction.
+
+(b) State two causes of hypermetropia.
+
+(c) A student cannot read the blackboard clearly from the back of the classroom but can read his textbook without difficulty. Name the defect he is suffering from and suggest the corrective measure.
+
+**OR**
+
+**Q13.** 
+(a) What is meant by the "twinkling of stars"? Explain the phenomenon responsible for it.
+
+(b) Explain why planets do not twinkle.
+(c) The refractive index of the glass prism is 1.5. If the speed of light in air (vacuum) is 3 × 10⁸ m/s, calculate the speed of light in glass. Show full working.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) With reference to the human eye, explain the following terms:
+   (i) Cornea
+   (ii) Iris
+   (iii) Pupil
+   (iv) Retina
+
+(b) An elderly person is not able to see nearby objects clearly but can see distant objects without difficulty. Name the defect he is suffering from. Write two reasons for the occurrence of this defect.
+
+(c) State one difference between the defect of myopia and hypermetropia in terms of image formation on the retina.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

@@ -1,0 +1,672 @@
+# C10-Sci-Ch10-FINALISE — run 2/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever necessary.
+4. Show all steps and working clearly for numerical questions.
+5. Write legibly in blue or black ink.
+6. Internal choice, wherever provided, attempt only one option.
+7. Marks are indicated at the beginning of each section.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The ability of the human eye to focus on both near and distant objects by changing the focal length of its lens is called:
+
+
+(a) Myopia
+
+(b) Accommodation
+
+(c) Hypermetropia
+
+(d) Dispersion
+
+Answer: [ ]
+
+**Q2.** A person is unable to see distant objects clearly but can see nearby objects clearly. Which type of lens is used to correct this defect?
+
+
+(a) Convex lens
+
+(b) Bifocal lens
+
+(c) Concave lens
+
+(d) Cylindrical lens
+
+Answer: [ ]
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q3.** In the diagram of the human eye shown above, the part responsible for changing the curvature of the eye lens is:
+
+
+(a) Cornea
+
+(b) Iris
+
+(c) Ciliary muscles
+
+(d) Retina
+
+Answer: [ ]
+
+**Q4.** The splitting of white light into its component colours when passed through a glass prism is called:
+
+
+(a) Reflection
+
+(b) Refraction
+
+(c) Dispersion
+
+(d) Scattering
+
+Answer: [ ]
+
+**Q5.** The phenomenon responsible for the blue colour of the sky is:
+
+
+(a) Dispersion of light
+
+(b) Reflection of light
+
+(c) Scattering of light by atmospheric particles
+
+(d) Refraction of light by the atmosphere
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is the far point and near point of a normal human eye? State the least distance of distinct vision for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** A person with a myopic eye cannot see objects beyond 1.5 m. Calculate the power of the corrective lens required to enable him to see distant objects clearly.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Why does the sky appear dark (or black) to an astronaut even during the day? Give reason in terms of scattering of light.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+
+![myopia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_defect/myopia_defect_labeled_02.png)
+
+**Q9.** The diagram above shows the defect of vision known as myopia. (i) State the cause of this defect. (ii) Draw a neat labelled diagram to show how this defect can be corrected using a suitable lens. (iii) Name the type of lens used for correction.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![hypermetropia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/hypermetropia_defect/hypermetropia_defect_labeled_01.png)
+
+**Q10.** The diagram above shows the defect of vision known as hypermetropia. (i) Explain why a person suffering from hypermetropia cannot see nearby objects clearly. (ii) What is the range of the near point for such a person compared to a normal person? (iii) Name the type of corrective lens used and explain how it helps.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** (i) What is the angle of incidence of a ray of light that enters one face of a glass prism and undergoes dispersion? (ii) Explain, with the help of a labelled diagram drawn by you, how a glass prism disperses white light into its constituent colours. (iii) Name the colour that undergoes the maximum deviation and the one that undergoes the minimum deviation during dispersion.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.** 
+(a) List any two causes of presbyopia. 
+(b) How does the ciliary muscle help in the process of accommodation of the eye? 
+(c) What happens to the power of accommodation as a person ages?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** 
+(a) Explain the structure and functioning of the human eye with the help of a labelled diagram drawn by you. 
+(b) A student is reading a book kept 25 cm away from his eyes. Explain the role of the eye lens and ciliary muscles during this activity. 
+(c) State why two eyes are better than one eye for clear vision.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) What is the Tyndall effect? Give one example from daily life where it is observed. 
+(b) Explain why the sun appears red at sunrise and sunset but white at noon. 
+(c) A glass prism is held in sunlight and a spectrum is obtained on a screen. If a second identical prism is placed inverted behind the first prism, what will be observed on the screen? What conclusion does this lead to? 
+(d) Name the scientist who first demonstrated that white light consists of seven colours.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+===== FINALISED (HTTP 200) =====
+===CLEAN PAPER START===
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever necessary.
+4. Show all steps and working clearly for numerical questions.
+5. Write legibly in blue or black ink.
+6. Internal choice, wherever provided, attempt only one option.
+7. Marks are indicated at the beginning of each section.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The ability of the human eye to focus on both near and distant objects by changing the focal length of its lens is called:
+
+
+(a) Myopia
+
+
+(b) Accommodation
+
+
+(c) Hypermetropia
+
+
+(d) Dispersion
+
+Answer: [ ]
+
+**Q2.** A person is unable to see distant objects clearly but can see nearby objects clearly. Which type of lens is used to correct this defect?
+
+
+(a) Convex lens
+
+
+(b) Bifocal lens
+
+
+(c) Concave lens
+
+
+(d) Cylindrical lens
+
+Answer: [ ]
+
+**Q3.** In the diagram of the human eye shown above, the part responsible for changing the curvature of the eye lens is:
+
+
+(a) Cornea
+
+
+(b) Iris
+
+
+(c) Ciliary muscles
+
+
+(d) Retina
+
+Answer: [ ]
+
+**Q4.** The splitting of white light into its component colours when passed through a glass prism is called:
+
+
+(a) Reflection
+
+
+(b) Refraction
+
+
+(c) Dispersion
+
+
+(d) Scattering
+
+Answer: [ ]
+
+**Q5.** The phenomenon responsible for the blue colour of the sky is:
+
+
+(a) Dispersion of light
+
+
+(b) Reflection of light
+
+
+(c) Scattering of light by atmospheric particles
+
+
+(d) Refraction of light by the atmosphere
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is the far point and near point of a normal human eye? State the least distance of distinct vision for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** A person with a myopic eye cannot see objects beyond 1.5 m. Calculate the power of the corrective lens required to enable him to see distant objects clearly.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Why does the sky appear dark (or black) to an astronaut even during the day? Give reason in terms of scattering of light.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** The diagram above shows the defect of vision known as myopia. (i) State the cause of this defect. (ii) Draw a neat labelled diagram to show how this defect can be corrected using a suitable lens. (iii) Name the type of lens used for correction.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** The diagram above shows the defect of vision known as hypermetropia. (i) Explain why a person suffering from hypermetropia cannot see nearby objects clearly. (ii) What is the range of the near point for such a person compared to a normal person? (iii) Name the type of corrective lens used and explain how it helps.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** (i) What is the angle of incidence of a ray of light that enters one face of a glass prism and undergoes dispersion? (ii) Explain, with the help of a labelled diagram drawn by you, how a glass prism disperses white light into its constituent colours. (iii) Name the colour that undergoes the maximum deviation and the one that undergoes the minimum deviation during dispersion.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.**
+
+(a) List any two causes of presbyopia.
+
+(b) How does the ciliary muscle help in the process of accommodation of the eye?
+
+(c) What happens to the power of accommodation as a person ages?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.**
+
+(a) Explain the structure and functioning of the human eye with the help of a labelled diagram drawn by you.
+
+(b) A student is reading a book kept 25 cm away from his eyes. Explain the role of the eye lens and ciliary muscles during this activity.
+
+(c) State why two eyes are better than one eye for clear vision.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.**
+
+(a) What is the Tyndall effect? Give one example from daily life where it is observed.
+
+(b) Explain why the sun appears red at sunrise and sunset but white at noon.
+
+(c) A glass prism is held in sunlight and a spectrum is obtained on a screen. If a second identical prism is placed inverted behind the first prism, what will be observed on the screen? What conclusion does this lead to?
+
+(d) Name the scientist who first demonstrated that white light consists of seven colours.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+===CLEAN PAPER END===
+
+===ANSWER KEY START===
+## ANSWER KEY — SECTION A
+
+## SECTION A — Answer Key
+
+---
+
+**Q1. (b) Accommodation**
+The eye's ciliary muscles adjust the curvature (and thus focal length) of the eye lens to focus on objects at varying distances — this ability is called accommodation.
+
+---
+
+**Q2. (c) Concave lens**
+Myopia (inability to see distant objects clearly) is corrected using a concave (diverging) lens, which shifts the image of distant objects back onto the retina.
+
+---
+
+**Q3. (c) Ciliary muscles**
+The ciliary muscles are attached to the eye lens and contract or relax to change the curvature of the lens, thereby adjusting its focal length for near or distant vision.
+
+---
+
+**Q4. (c) Dispersion**
+When white light passes through a glass prism, different colours (wavelengths) refract by different amounts, causing them to spread out into a spectrum — this phenomenon is called dispersion of light.
+
+---
+
+**Q5. (c) Scattering of light by atmospheric particles**
+Fine particles and gas molecules in the atmosphere scatter shorter wavelengths (blue light) much more strongly than longer wavelengths (red light); this preferential scattering of blue light in all directions makes the sky appear blue.
+
+---
+
+## ANSWER KEY — SECTION B
+
+# SECTION B — Answer Key
+
+---
+
+**Q6.**
+
+- The **far point** of a normal human eye is at **infinity** — it is the farthest point at which the eye can see objects clearly.
+- The **near point** of a normal human eye is at **25 cm** from the eye — it is the closest point at which the eye can see objects clearly without strain.
+- The **least distance of distinct vision** for a normal human eye is **25 cm** (also called the near point distance).
+
+---
+
+**Q7.**
+
+**Given:**
+- The person cannot see beyond 1.5 m, so their far point = 1.5 m
+- For a myopic eye, the corrective lens must form the image of a distant object (at infinity) at the person's far point (1.5 m)
+
+**Using the lens formula:**
+
+$$\frac{1}{f} = \frac{1}{v} - \frac{1}{u}$$
+
+- Object distance: u = −∞ (distant object)
+- Image distance: v = −1.5 m (image must form at far point, on same side as object, so negative)
+
+$$\frac{1}{f} = \frac{1}{-1.5} - \frac{1}{-\infty} = \frac{-1}{1.5} - 0 = \frac{-1}{1.5}$$
+
+**Power of lens:**
+
+$$P = \frac{1}{f} = \frac{-1}{1.5} = \textbf{−0.67 D}$$
+
+The required corrective lens has a power of **−0.67 D** (a concave/diverging lens).
+
+---
+
+**Q8.**
+
+In outer space, there is **no atmosphere** and therefore **no air molecules** to scatter sunlight. Scattering of light by atmospheric particles is responsible for the blue colour and brightness of the sky as seen from Earth. Since astronauts are above the Earth's atmosphere, there are no particles to scatter sunlight in their surroundings. Light from the Sun travels in a straight line and does not get scattered in any direction. As a result, when an astronaut looks away from the Sun, no scattered light reaches their eyes from the surrounding space, and the sky appears **completely dark (black)**.
+
+---
+
+## ANSWER KEY — SECTION C
+
+# SECTION C — Answer Key
+
+---
+
+## Q9. Myopia (Short-sightedness)
+
+**(i) Cause of Myopia:**
+Myopia is caused either by the eyeball being too long (elongated) from front to back, or by the eye lens being too thick/curved, resulting in excessive converging power. Because of this, parallel rays of light from distant objects converge and focus at a point **in front of the retina** instead of on it.
+
+**(ii) Correction Diagram:**
+
+
+*[Refer to NCERT textbook: physics myopia correction]*
+
+
+**(iii) Type of lens used for correction:**
+A **concave lens** (diverging lens) is used to correct myopia. It diverges the incoming parallel rays before they enter the eye, so that the eye lens can now focus them correctly onto the retina.
+
+---
+
+## Q10. Hypermetropia (Far-sightedness)
+
+**(i) Why nearby objects cannot be seen clearly:**
+In a person with hypermetropia, the eyeball is too short (shorter than normal from front to back) or the eye lens is too thin/flat with insufficient converging power. When light rays from a nearby object enter the eye, they are not converged strongly enough and would focus at a point **behind the retina** rather than on it. The image formed on the retina is therefore blurred, making nearby objects appear unclear.
+
+**(ii) Range of the near point:**
+The near point of a normal human eye is **25 cm** (the least distance of distinct vision). For a person suffering from hypermetropia, the near point is **farther than 25 cm** — it may be at 1 m or even more — meaning the person must hold objects much further away than normal to see them with any clarity.
+
+**(iii) Corrective lens and how it helps:**
+A **convex lens** (converging lens) is used to correct hypermetropia. The convex lens converges the diverging rays from a nearby object before they enter the eye. This effectively shifts the image of the nearby object to a greater distance (at or beyond the person's near point), so the eye's own lens can then focus the rays comfortably onto the retina, producing a clear image.
+
+---
+
+## Q11. Dispersion of White Light through a Glass Prism
+
+**(i) Angle of incidence:**
+The question refers to the angle at which a ray enters one face of the prism. For dispersion to occur, the ray must enter at an angle other than 0° (i.e., it must not be along the normal). In a standard demonstration, the ray strikes the prism face at an **oblique angle of incidence** (commonly taken as **30°–60°** depending on the prism used). There is **no single fixed angle** specified in the question; what matters is that the angle of incidence is greater than 0° so refraction and dispersion occur. The ray bends **toward the normal** on entering the denser glass medium.
+
+**(ii) Dispersion of white light — Diagram and Explanation:**
+
+**Explanation:**
+White light is composed of seven constituent colours (VIBGYOR). When a ray of white light strikes the surface of a glass prism obliquely, it undergoes **refraction** (bending) at the first surface. Different colours (wavelengths) of light travel at slightly different speeds in glass, giving each colour a slightly different refractive index. Because each colour has a different refractive index in glass, each colour bends by a **different amount** at both the first and second surfaces of the prism. Violet light, having the shortest wavelength, has the highest refractive index and bends the most. Red light, having the longest wavelength, has the lowest refractive index and bends the least. As a result, the colours spread out and emerge from the second face at different angles, forming a band of colours called the **spectrum**: Violet, Indigo, Blue, Green, Yellow, Orange, Red (VIBGYOR).
+
+
+*[Refer to NCERT textbook: physics prism dispersion]*
+
+
+**(iii) Colours with maximum and minimum deviation:**
+
+- **Maximum deviation:** **Violet** light (shortest wavelength, highest refractive index in glass, bends the most).
+- **Minimum deviation:** **Red** light (longest wavelength, lowest refractive index in glass, bends the least).
+
+---
+
+## ANSWER KEY — SECTION D
+
+# SECTION D — Answer Key
+
+---
+
+## Q12.
+
+**(a) Two causes of presbyopia:**
+
+1. With advancing age, the ciliary muscles gradually weaken and lose their ability to contract effectively.
+2. The eye lens becomes rigid, hard, and loses its flexibility, reducing its ability to change curvature.
+
+---
+
+**(b) Role of ciliary muscles in accommodation:**
+
+The ciliary muscles are attached to the eye lens and control its curvature. When we look at a nearby object, the ciliary muscles contract, causing the lens to become thicker and more curved, which increases its converging power. When we look at a distant object, the ciliary muscles relax, the lens becomes thinner and less curved, decreasing its power. This ability of the eye lens to adjust its focal length by changing curvature — controlled by the ciliary muscles — is called accommodation.
+
+---
+
+**(c) Power of accommodation with age:**
+
+As a person ages, the power of accommodation of the eye decreases progressively. The ciliary muscles become weaker and the lens becomes less elastic, so it cannot change its shape as effectively as before. This means the eye struggles to focus on nearby objects (near point recedes) and eventually on distant objects as well. In old age, the power of accommodation may be nearly lost, leading to presbyopia, where the person requires bifocal lenses to see both near and distant objects clearly.
+
+---
+
+## Q13.
+
+**(a) Structure and functioning of the human eye:**
+
+**Structure:**
+The human eye is a roughly spherical organ approximately 2.3 cm in diameter. Its main parts are:
+
+- **Cornea:** The transparent, curved outermost layer at the front of the eye. It does most of the initial refraction of incoming light.
+- **Iris:** The coloured, opaque muscular diaphragm behind the cornea that controls the size of the pupil.
+- **Pupil:** The small circular opening in the centre of the iris through which light enters the eye. It dilates in dim light and constricts in bright light.
+- **Eye lens:** A transparent, flexible, biconvex lens made of a jelly-like material. It fine-tunes the focusing of light by changing its curvature.
+- **Ciliary muscles:** Muscles attached to the eye lens that control its curvature for accommodation.
+- **Retina:** The light-sensitive inner layer at the back of the eye containing photoreceptor cells — rods (sensitive to dim light) and cones (sensitive to colour and bright light).
+- **Optic nerve:** Carries visual signals from the retina to the brain.
+- **Vitreous humour:** Transparent jelly filling the space between the lens and retina, maintaining the eye's shape.
+- **Aqueous humour:** Watery fluid between the cornea and the lens.
+
+**Functioning:**
+Light from an object enters through the cornea, passes through the aqueous humour, pupil, and lens. The cornea and lens refract the light so that a real, inverted, and diminished image is formed on the retina. The photoreceptor cells on the retina convert light into electrical signals, which are sent via the optic nerve to the brain. The brain interprets these signals and perceives the image as upright.
+
+
+*[Refer to NCERT textbook: biology human eye anatomy]*
+
+
+---
+
+**(b) Role of eye lens and ciliary muscles while reading at 25 cm:**
+
+25 cm is a near distance (approximately equal to the least distance of distinct vision). When the student reads the book at this distance, the ciliary muscles contract strongly, causing the eye lens to become thicker and more curved (more convex). This increases the focal length — correction: this **decreases the focal length** and increases the power of the lens, so that the light rays from the nearby book converge correctly onto the retina to form a sharp, clear image. The eye is working at or near its maximum power of accommodation during this activity.
+
+---
+
+**(c) Why two eyes are better than one eye:**
+
+Two eyes positioned slightly apart on the face give overlapping but slightly different views of the same object. The brain combines these two slightly different images to create a single three-dimensional (3D) perception. This is called **binocular vision** and provides:
+
+1. **Depth perception** — the ability to judge the distance and depth of objects accurately.
+2. A **wider field of view** compared to a single eye.
+3. Better judgment of the relative distances of different objects.
+
+A single eye provides only a two-dimensional image with no depth perception, making it difficult to accurately judge distances.
+
+---
+
+## Q14.
+
+**(a) Tyndall Effect:**
+
+When a beam of light passes through a colloidal solution or a medium containing fine suspended particles, the particles scatter the light in all directions, making the path of the light beam visible. This phenomenon of scattering of light by colloidal or suspended particles is called the **Tyndall Effect**.
+
+**Daily life example:** When sunlight passes through a canopy of trees in a forest (or through a smoke-filled or dusty room), the beam of light becomes clearly visible as a bright shaft. The fine dust or smoke particles scatter the light, illuminating the path of the beam.
+
+---
+
+**(b) Sun appears red at sunrise/sunset but white at noon:**
+
+At **sunrise and sunset**, the sun is near the horizon. Sunlight must travel through a much greater thickness (longer path) of the Earth's atmosphere to reach our eyes. During this long journey, shorter wavelengths of light — violet, blue, and green — are scattered away almost completely by atmospheric particles. Only the longer wavelengths — orange and red — survive the journey and reach our eyes, making the sun appear red or orange.
+
+At **noon**, the sun is almost directly overhead. Sunlight travels through the shortest possible path through the atmosphere. Very little scattering occurs overall, and all wavelengths of visible light reach our eyes in nearly equal amounts. Since all colours are present together, the sun appears white (or pale yellow).
+
+---
+
+**(c) Second inverted prism placed behind the first prism:**
+
+**Observation:** When the second identical prism is placed inverted (in an inverted position, i.e., with its apex pointing downward) immediately behind the first prism, the spectrum produced by the first prism recombines and **white light is obtained on the screen**. No spectrum or coloured band is seen; instead, a single beam of white light emerges.
+
+**Conclusion:** This experiment demonstrates that white light is composed of seven colours (VIBGYOR). The first prism disperses white light into its constituent colours, and the second inverted prism recombines all these colours back into white light. This proves that dispersion by the first prism is not a property added by the glass — the colours were already present in white light itself, and the prism merely separates them. White light is therefore not a single colour but a mixture of all seven colours of the visible spectrum.
+
+---
+
+**(d) Scientist who first demonstrated white light consists of seven colours:**
+
+**Sir Isaac Newton** was the first scientist to demonstrate, through his famous prism experiment (around 1666), that white light is composed of seven constituent colours: Violet, Indigo, Blue, Green, Yellow, Orange, and Red (VIBGYOR).
+===ANSWER KEY END===

@@ -1,0 +1,239 @@
+# C10-Sci-Ch10 — run 2/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, labelled diagrams wherever required.
+4. Show complete step-by-step working for all numerical questions, including formula, substitution, and units.
+5. Write legibly in clear, concise language.
+6. Internal choice, wherever provided, attempt only one option per question.
+7. Marks are indicated at the section heading level only.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The ability of the human eye to focus on both near and distant objects by changing the focal length of its lens is called:
+
+
+(a) Persistence of vision
+
+(b) Power of accommodation
+
+(c) Hypermetropia
+
+(d) Dispersion of light
+
+Answer: [ ]
+
+**Q2.** The minimum distance of distinct vision for a normal human eye is:
+
+
+(a) 2.5 cm
+
+(b) 15 cm
+
+(c) 25 cm
+
+(d) 50 cm
+
+Answer: [ ]
+
+
+![myopia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_defect/myopia_defect_labeled_01.png)
+
+**Q3.** The diagram above shows a defect of vision in the human eye. In this defect, the image of a distant object is formed:
+
+
+(a) Behind the retina
+
+(b) On the retina
+
+(c) In front of the retina
+
+(d) On the cornea
+
+Answer: [ ]
+
+**Q4.** Which of the following colours of light has the highest refractive index in glass?
+
+
+(a) Red
+
+(b) Yellow
+
+(c) Green
+
+(d) Violet
+
+Answer: [ ]
+
+**Q5.** The phenomenon responsible for the bluish appearance of the sky is:
+
+
+(a) Reflection of light
+
+(b) Dispersion of light
+
+(c) Scattering of light
+
+(d) Refraction of light
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is meant by the "far point" and "near point" of the human eye? State their values for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** A person with myopia can see nearby objects clearly but cannot see distant objects. Name the type of lens used to correct this defect and explain why it is suitable for correction.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Why does the sky appear dark (black) to an astronaut even during daytime? Give a scientific reason.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+
+![hypermetropia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/hypermetropia_defect/hypermetropia_defect_labeled_01.png)
+
+**Q9.** The diagram above shows a defect of the human eye.
+
+(i) Identify the defect shown.
+(ii) State any two causes of this defect.
+(iii) Name the type of corrective lens used and explain how it helps.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Explain the dispersion of white light through a glass prism. What is the sequence of colours observed in the spectrum so formed, and what is this band of colours called?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A person is advised to wear spectacles with concave lenses of focal length 200 cm.
+
+(i) Which defect of vision does this person suffer from?
+(ii) Calculate the power of the corrective lens prescribed.
+(iii) What is the far point of this person?
+
+_(Given: Power P = 1/f, where f is in metres)_
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+
+### Part D1
+(1 question × 4 marks = 4 marks)
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q12.** The diagram above shows the structure of the human eye.
+
+(i) Identify and state the function of the part that controls the amount of light entering the eye.
+(ii) Name the part that is responsible for the sharpest vision and explain why.
+(iii) What role does the ciliary muscle play in the functioning of the eye?
+(iv) Why is the human eye considered similar to a camera? Give one point of similarity.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+### Part D2
+(2 questions × 5 marks each = 10 marks)
+
+
+![myopia_correction](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_correction/myopia_correction_labeled_02.png)
+
+**Q13.** The diagram above shows the correction of a vision defect.
+
+(i) Name the defect of vision shown and state its two main causes.
+(ii) A student cannot see objects beyond 80 cm clearly. Calculate the power of the corrective lens required for this student to see distant objects.
+(iii) With the help of the diagram, explain how the corrective lens brings about proper focusing of the image on the retina.
+(iv) State one precaution a student should take to maintain good eyesight.
+
+_(Given: For correction of myopia — lens must form image of object at infinity at the far point of the eye. Use P = 1/f, f in metres)_
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) What is atmospheric refraction? Explain with the help of one natural phenomenon how atmospheric refraction affects the apparent position of stars at night.
+
+
+(b) Explain why the sun is visible to us about 2 minutes before the actual sunrise and about 2 minutes after the actual sunset. What is this phenomenon called?
+
+
+(c) State the difference between the scattering of light by fine particles and large particles, with reference to the colour of sunlight observed during sunrise and sunset.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+*— End of Question Paper —*

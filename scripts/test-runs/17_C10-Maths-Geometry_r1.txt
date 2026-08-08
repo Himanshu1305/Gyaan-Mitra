@@ -1,0 +1,243 @@
+# C10-Maths-Geometry — run 1/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+# [SCHOOL NAME]
+## UNIT TEST EXAMINATION (2026)
+
+**Class:** 10      **Subject:** Mathematics      **Max. Marks:** 34
+**Time:** 2 Hours                                     **Date:** ___________
+
+**Name:** ___________________________      **Roll No.:** _______
+
+---
+
+### GENERAL INSTRUCTIONS:
+
+1. All questions are compulsory unless internal choice is provided.
+2. This question paper consists of **14 questions** divided into **four sections — A, B, C, and D**.
+3. Write legibly and show all working steps clearly for full credit.
+4. For numerical questions, write: Given → Formula → Substitution → Answer with units.
+5. Internal choice has been provided in **Section D** only.
+6. Use of calculators is **not** permitted.
+7. Marks are indicated at the beginning of each section.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** If in triangles ABC and PQR, AB/QR = BC/PR = CA/PQ, then:
+
+
+(a) △ABC ~ △PQR
+
+(b) △CBA ~ △PRQ
+
+(c) △BAC ~ △RPQ
+
+(d) △ABC ~ △QPR
+
+Answer: [ ]
+
+**Q2.** It is given that △ABC ~ △PQR with BC/QR = 1/4. Then the ratio of ar(△ABC) to ar(△PQR) is:
+
+
+(a) 1 : 2
+
+(b) 1 : 4
+
+(c) 1 : 8
+
+(d) 1 : 16
+
+Answer: [ ]
+
+**Q3.** In △ABC, DE ∥ BC where D is on AB and E is on AC. If AD/DB = 2/3, then AE/EC is:
+
+
+(a) 3/2
+
+(b) 2/5
+
+(c) 2/3
+
+(d) 3/5
+
+Answer: [ ]
+
+**Q4.** If △ABC ~ △QRP, ar(△ABC)/ar(△QRP) = 9/4, AB = 18 cm and BC = 15 cm, then the length of PR is:
+
+
+(a) 8 cm
+
+(b) 9 cm
+
+(c) 10 cm
+
+(d) 12 cm
+
+Answer: [ ]
+
+**Q5.** A ladder 10 m long reaches a window 8 m above the ground. The distance of the foot of the ladder from the base of the wall is:
+
+
+(a) 4 m
+
+(b) 5 m
+
+(c) 6 m
+
+(d) 7 m
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** In the figure, if PQ ∥ RS, prove that △POQ ~ △SOR, where O is the point of intersection of PS and QR.
+
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** In △ABC, DE ∥ BC. If AD = 4 cm, DB = 6 cm, and AE = 3.2 cm, find AC.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Two poles of heights 6 m and 11 m stand on a plane ground. If the distance between the feet of the poles is 12 m, find the distance between their tops.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** State and prove the Basic Proportionality Theorem (Thales' Theorem).
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** In the figure, ABCD is a trapezium with AB ∥ DC. If the diagonals AC and BD intersect each other at point O, prove that: AO/OC = BO/OD.
+
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** D is a point on the side BC of triangle ABC such that ∠ADC = ∠BAC. Prove that CA² = CB × CD.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks; 2 questions × 5 marks each = 10 marks)
+
+**Q12.** Prove that the ratio of the areas of two similar triangles is equal to the square of the ratio of their corresponding sides.
+
+*(Use this result to find: If △ABC ~ △DEF, AB = 6 cm, and DE = 4 cm, find the ratio ar(△ABC) : ar(△DEF).)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** Prove that in a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides (Pythagoras' Theorem).
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**OR**
+
+**Q13.** Prove the converse of Pythagoras' Theorem: In a triangle, if the square of one side is equal to the sum of the squares of the other two sides, then the angle opposite the first side is a right angle.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** In △ABC, ∠B = 90°. D is a point on BC such that BD = 3 cm and DC = 4 cm. If AB = 5 cm, verify that:
+
+**(i)** △ABD ~ △ACB
+
+**(ii)** △ACD ~ △ACB
+
+**(iii)** AD² + AC² = DC × (BD + DC + AC)
+
+*(Hint: First find all sides using Pythagoras' Theorem, then verify each part step by step.)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+*— End of Question Paper —*

@@ -1,0 +1,220 @@
+# C9-Sci-Unseeded — run 2/2
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+# [SCHOOL NAME]
+## UNIT TEST EXAMINATION (2026)
+
+**Class:** 9      **Subject:** Science      **Max. Marks:** 34
+
+**Time:** 2 Hours      **Date:** ___________
+
+**Name:** _____________________________      **Roll No.:** _______
+
+---
+
+### GENERAL INSTRUCTIONS:
+
+1. All questions are compulsory.
+2. Read each question carefully before answering.
+3. Show all working steps clearly for numerical questions; answers without working will not receive full credit.
+4. Write neatly and legibly in the space provided.
+5. Marks are indicated at the beginning of each section and apply equally to all questions in that section.
+6. No marks will be deducted for wrong answers in Section A.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** Which of the following is NOT a characteristic of matter?
+
+
+(a) Matter is made up of particles
+
+(b) Particles of matter have spaces between them
+
+(c) Particles of matter are stationary
+
+(d) Particles of matter attract each other
+
+Answer: [ ]
+
+**Q2.** A gas fills the vessel completely in which it is kept. This property of gases is best explained by:
+
+
+(a) Very high density of gas particles
+
+(b) Very large intermolecular forces of attraction
+
+(c) Negligible intermolecular forces and high kinetic energy of particles
+
+(d) Fixed shape and fixed volume of gas
+
+Answer: [ ]
+
+**Q3.** The process by which a solid directly converts into vapour without passing through the liquid state is called:
+
+
+(a) Evaporation
+
+(b) Condensation
+
+(c) Sublimation
+
+(d) Vaporisation
+
+Answer: [ ]
+
+**Q4.** On a hot summer day, a bottle of cold water kept on a table shows droplets of water on its outer surface. This is due to:
+
+
+(a) Evaporation of water from inside the bottle
+
+(b) Condensation of water vapour present in air
+
+(c) Sublimation of ice inside the bottle
+
+(d) Seepage of water through the glass
+
+Answer: [ ]
+
+**Q5.** The SI unit of temperature is:
+
+(a) Celsius (°C)
+(b) Fahrenheit (°F)
+(c) Kelvin (K)
+(d) Joule (J)
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** Define evaporation. State any two factors that affect the rate of evaporation.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** Why does a gas exert pressure on the walls of its container? Explain briefly.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Sugar disappears when dissolved in water, yet the solution tastes sweet throughout. What does this suggest about the nature of matter? Explain.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Differentiate between evaporation and boiling on the basis of: (i) temperature at which it occurs, (ii) surface of liquid involved, and (iii) rate of the process.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Arrange the following in increasing order of intermolecular forces of attraction and justify your answer:
+**Water, Common salt, Oxygen gas**
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A student observes that when she sprays perfume in one corner of the room, its fragrance is soon detected throughout the room. Name the phenomenon responsible for this. State the effect of temperature on this phenomenon and give one more example from everyday life.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+
+*(Q12 carries 4 marks; Q13 and Q14 carry 5 marks each)*
+
+(1 question × 4 marks = 4 marks)
+
+**Q12.** With the help of a labelled temperature–heat graph (description), explain the changes of state that take place when ice at −10°C is heated continuously until it completely converts to steam.
+State the terms used for the heat absorbed during the change of state, and explain why the temperature does not rise during those changes.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+(2 questions × 5 marks each = 10 marks)
+
+**Q13.** 
+(a) Define latent heat of vaporisation and latent heat of fusion.
+
+
+(b) The latent heat of vaporisation of water is 2260 kJ/kg and its latent heat of fusion is 334 kJ/kg. Which change of state requires more energy — melting of ice or boiling of water — for the same mass? Calculate the difference in energy required for 1 kg of water in both cases and comment on why one is larger than the other in terms of intermolecular forces.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) State the three states of matter and compare them on the basis of the following properties:
+(i) Shape and volume
+(ii) Compressibility
+(iii) Rate of diffusion
+(iv) Intermolecular space
+(v) Fluidity
+
+
+(b) Give one example of each state of matter from everyday life.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

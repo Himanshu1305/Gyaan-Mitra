@@ -1,0 +1,76 @@
+
+=== Diagram system E2E test — MODE=full — 2026-08-06T17:26:47.657Z ===
+Service key: present (P1/P2/N8 active)
+Planned runs: 21
+↑ Starting "next dev" on port 3010 (logs → /Users/hidixit/Desktop/AI/Gyaan Mitra/gyaan-mitra-app/scripts/test-runs/_server.log) …
+✓ Server ready at http://localhost:3010
+
+▶ [1] C10-Sci-Ch10 (run 1/5)
+   saved 01_C10-Sci-Ch10_r1.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [2] C10-Sci-Ch10 (run 2/5)
+   saved 02_C10-Sci-Ch10_r2.txt | images=4 pool=4 svg=0 markers=0
+
+▶ [3] C10-Sci-Ch10 (run 3/5)
+   saved 03_C10-Sci-Ch10_r3.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [4] C10-Sci-Ch10 (run 4/5)
+   saved 04_C10-Sci-Ch10_r4.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [5] C10-Sci-Ch10 (run 5/5)
+   saved 05_C10-Sci-Ch10_r5.txt | images=2 pool=2 svg=0 markers=0
+
+▶ [6] C10-Sci-Ch5 (run 1/5)
+   saved 06_C10-Sci-Ch5_r1.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [7] C10-Sci-Ch5 (run 2/5)
+   saved 07_C10-Sci-Ch5_r2.txt | images=4 pool=4 svg=0 markers=0
+
+▶ [8] C10-Sci-Ch5 (run 3/5)
+   saved 08_C10-Sci-Ch5_r3.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [9] C10-Sci-Ch5 (run 4/5)
+   saved 09_C10-Sci-Ch5_r4.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [10] C10-Sci-Ch5 (run 5/5)
+   saved 10_C10-Sci-Ch5_r5.txt | images=4 pool=4 svg=0 markers=0
+
+▶ [11] C10-Sci-Ch5+10 (run 1/3)
+   saved 11_C10-Sci-Ch5+10_r1.txt | images=5 pool=5 svg=0 markers=0
+
+▶ [12] C10-Sci-Ch5+10 (run 2/3)
+   saved 12_C10-Sci-Ch5+10_r2.txt | images=4 pool=4 svg=0 markers=0
+
+▶ [13] C10-Sci-Ch5+10 (run 3/3)
+   saved 13_C10-Sci-Ch5+10_r3.txt | images=5 pool=5 svg=0 markers=0
+
+▶ [14] C10-Sci-Ch10-FINALISE (run 1/3) + FINALISE
+   … finalising for answer key
+   saved 14_C10-Sci-Ch10-FINALISE_r1.txt | images=0 pool=0 svg=0 markers=0
+
+▶ [15] C10-Sci-Ch10-FINALISE (run 2/3) + FINALISE
+   … finalising for answer key
+   saved 15_C10-Sci-Ch10-FINALISE_r2.txt | images=0 pool=0 svg=0 markers=0
+
+▶ [16] C10-Sci-Ch10-FINALISE (run 3/3) + FINALISE
+   … finalising for answer key
+   saved 16_C10-Sci-Ch10-FINALISE_r3.txt | images=3 pool=3 svg=0 markers=0
+
+▶ [17] C10-Maths-Geometry (run 1/3)
+   saved 17_C10-Maths-Geometry_r1.txt | images=0 pool=0 svg=0 markers=0
+
+▶ [18] C10-Maths-Geometry (run 2/3)
+   saved 18_C10-Maths-Geometry_r2.txt | images=0 pool=0 svg=0 markers=0
+
+▶ [19] C10-Maths-Geometry (run 3/3)
+   saved 19_C10-Maths-Geometry_r3.txt | images=0 pool=0 svg=0 markers=0
+
+▶ [20] C9-Sci-Unseeded (run 1/2)
+   saved 20_C9-Sci-Unseeded_r1.txt | images=0 pool=0 svg=0 markers=0
+
+▶ [21] C9-Sci-Unseeded (run 2/2)
+   saved 21_C9-Sci-Unseeded_r2.txt | images=0 pool=0 svg=0 markers=0
+■ Stopped dev server we started.
+
+=== DONE. 21 runs. ===
+Report: /Users/hidixit/Desktop/AI/Gyaan Mitra/gyaan-mitra-app/scripts/test-results.md

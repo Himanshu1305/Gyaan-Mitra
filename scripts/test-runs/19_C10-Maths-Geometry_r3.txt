@@ -1,0 +1,229 @@
+# C10-Maths-Geometry — run 3/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Mathematics    Max. Marks: 34
+Time: 2 Hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory unless internal choice is provided.
+2. Read each question carefully before attempting.
+3. Show all steps and working clearly for full credit in numerical questions.
+4. Internal choice is provided in some questions; attempt only one option from each.
+5. Marks are indicated at the beginning of each section, not against individual questions.
+6. Write neatly and legibly throughout your answer.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** If in two triangles, corresponding angles are equal, then the triangles are:
+
+
+(a) Congruent
+
+(b) Similar
+
+(c) Equal in area
+
+(d) Right-angled
+
+Answer: [ ]
+
+**Q2.** In △ABC and △DEF, if AB/DE = BC/EF = CA/FD, then the two triangles are similar by the criterion:
+
+
+(a) AA similarity
+
+(b) SAS similarity
+
+(c) SSS similarity
+
+(d) RHS similarity
+
+Answer: [ ]
+
+**Q3.** A line drawn parallel to one side of a triangle divides the other two sides proportionally. This theorem is known as:
+
+
+(a) Pythagoras Theorem
+
+(b) Mid-Point Theorem
+
+(c) Basic Proportionality Theorem
+
+(d) Angle Bisector Theorem
+
+Answer: [ ]
+
+**Q4.** In △ABC, DE ∥ BC where D is on AB and E is on AC. If AD = 4 cm, DB = 6 cm, and AE = 3 cm, then EC is equal to:
+
+
+(a) 4 cm
+
+(b) 4.5 cm
+
+(c) 5 cm
+
+(d) 3.5 cm
+
+Answer: [ ]
+
+**Q5.** The ratio of the areas of two similar triangles is equal to the:
+
+
+(a) Ratio of their corresponding sides
+
+(b) Square of the ratio of their corresponding sides
+
+(c) Cube of the ratio of their corresponding sides
+
+(d) Ratio of their corresponding perimeters
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** In △ABC, DE ∥ BC such that AD = 1.5 cm, DB = 3 cm, and AE = 1 cm. Find the length of EC. Also verify that DE divides the two sides in the same ratio.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** State and write the converse of the Basic Proportionality Theorem (Thales' Theorem).
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** In the given figure description: △ABC ~ △PQR. If AB = 6 cm, BC = 8 cm, and PQ = 4.5 cm, find the length of QR.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Prove that if a line is drawn parallel to one side of a triangle, it divides the other two sides in the same ratio. *(Statement and proof only; no diagram required)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** In △ABC and △AMP, ∠ABC = ∠AMP = 90°, and ∠A is common. Prove that △ABC ~ △AMP. Hence find BC if AC = 10 cm, AP = 6 cm, and MP = 4 cm.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** The areas of two similar triangles ABC and PQR are 64 cm² and 121 cm² respectively. If QR = 15.4 cm, find BC.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+
+### Part I
+(1 question × 4 marks = 4 marks)
+
+**Q12.** In a right triangle ABC, right-angled at C, if CD is the altitude drawn from C to AB, prove that:
+
+**(i)** △ACD ~ △ABC
+
+**(ii)** △BCD ~ △BAC
+
+Hence prove that CD² = AD × BD.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+### Part II
+(2 questions × 5 marks each = 10 marks)
+
+**Q13.** Prove the Pythagoras Theorem: *"In a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides."*
+
+**OR**
+
+**Q13.** Prove the converse of the Pythagoras Theorem: *"In a triangle, if the square of one side is equal to the sum of the squares of the other two sides, then the angle opposite to the first side is a right angle."*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** In △ABC, D is the mid-point of BC and AE ⊥ BC. Prove that:
+
+AB² + AC² = 2AD² + 2DC²
+
+*(This result is known as Apollonius's theorem or the Median Property.)*
+
+**OR**
+
+**Q14.** Sides AB and BC and median AD of a triangle ABC are respectively proportional to sides PQ and QR and median PM of △PQR. Prove that △ABC ~ △PQR.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+*— End of Question Paper —*

@@ -1,0 +1,220 @@
+# C10-Sci-Ch5 — run 4/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. Show all working steps clearly for numerical questions.
+5. Write answers legibly in the space provided.
+6. Internal choice, wherever provided, must be attempted in full.
+7. Marks for each section are indicated in the section heading.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** Which of the following is the correct sequence of events during photosynthesis?
+
+
+(a) Absorption of light → Splitting of water → Fixation of CO₂ → Release of O₂
+
+(b) Absorption of light → Fixation of CO₂ → Splitting of water → Release of O₂
+
+(c) Absorption of light → Splitting of water → Release of O₂ → Fixation of CO₂
+
+(d) Splitting of water → Absorption of light → Fixation of CO₂ → Release of O₂
+
+Answer: [ ]
+
+**Q2.** The enzyme pepsin, secreted in the stomach, acts on:
+
+
+(a) Carbohydrates
+
+(b) Fats
+
+(c) Proteins
+
+(d) Nucleic acids
+
+Answer: [ ]
+
+**Q3.**
+
+![stomata](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/stomata/stomata_labeled_01.png)
+
+In the diagram of a stomatal pore shown above, the opening and closing of stomata is controlled by:
+
+
+(a) Root hair cells
+
+(b) Guard cells
+
+(c) Epidermal cells
+
+(d) Mesophyll cells
+
+Answer: [ ]
+
+**Q4.** Which blood vessel carries oxygenated blood from the lungs to the heart?
+
+
+(a) Pulmonary artery
+
+(b) Aorta
+
+(c) Pulmonary vein
+
+(d) Vena cava
+
+Answer: [ ]
+
+**Q5.** In the human excretory system, the functional unit of the kidney is the:
+
+
+(a) Nephron
+
+(b) Neuron
+
+(c) Ureter
+
+(d) Glomerulus
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** State two differences between aerobic and anaerobic respiration.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** What is the role of bile juice in the process of digestion? Where is bile juice produced and where is it stored?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Why is it necessary to separate oxygenated and deoxygenated blood in mammals and birds? How does the four-chambered heart help in achieving this?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Explain the process of nutrition in Amoeba with the help of suitable points. How is this different from the mode of nutrition in human beings?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.**
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_02.png)
+
+The diagram above shows a nephron — the structural and functional unit of the kidney. With reference to the diagram, answer the following:
+
+(i) Name the process by which blood is filtered in the glomerulus.
+(ii) Which substances are reabsorbed from the filtrate as it passes through the tubules?
+(iii) What is the fluid called that collects in the Bowman's capsule after filtration?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A student observed that the leaves of a potted plant kept in a dark room for 72 hours turned pale yellow, but when the same plant was placed in sunlight for a day, the leaves turned green again.
+
+(i) Name the pigment responsible for the green colour of leaves.
+(ii) Write the overall chemical equation for photosynthesis.
+(iii) Name the two stages of photosynthesis and state where each occurs within the chloroplast.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks, 2 questions × 5 marks each = 10 marks)
+
+**Q12.** Describe the process of digestion of food in the small intestine. Name the various digestive juices that act in the small intestine, state their sources, and mention the specific substrates they act upon.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.**
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_unlabeled_01.png)
+
+The diagram above shows the human heart.
+
+(i) Name the four chambers of the heart as seen in the diagram.
+(ii) Trace the path of blood from the right atrium to the lungs and back to the left atrium.
+(iii) What is meant by 'double circulation'? Why is it considered advantageous for the human body?
+(iv) Name the valves present between the atria and ventricles on both sides of the heart and state their function.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) What are the components of the transport system in human beings? Describe the composition and functions of blood.
+
+**OR**
+
+
+(b) Explain the process of transpiration in plants. What is its significance? How does the rate of transpiration vary with environmental conditions such as temperature, humidity, and wind speed? Also draw a neat labelled diagram of a stomatal pore.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+*— End of Question Paper —*

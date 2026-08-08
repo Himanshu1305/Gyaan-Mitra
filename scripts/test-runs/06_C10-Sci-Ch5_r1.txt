@@ -1,0 +1,230 @@
+# C10-Sci-Ch5 — run 1/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, labelled diagrams wherever required.
+4. Write legibly and show all working for numerical questions.
+5. Internal choice is provided in Section D; attempt only one question from each choice.
+6. Marks are indicated at the beginning of each section and apply equally to all questions in that section.
+7. Maintain cleanliness and write within the space provided.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** Which of the following is the correct sequence of events during photosynthesis?
+
+
+(a) Sunlight absorbed → Water split → CO₂ fixed → Glucose formed
+
+(b) CO₂ fixed → Sunlight absorbed → Water split → Glucose formed
+
+(c) Water split → CO₂ fixed → Sunlight absorbed → Glucose formed
+
+(d) Glucose formed → Sunlight absorbed → Water split → CO₂ fixed
+
+Answer: [ ]
+
+**Q2.** The inner lining of the small intestine has finger-like projections called villi. What is their primary function?
+
+
+(a) Secretion of digestive enzymes
+
+(b) Absorption of digested food
+
+(c) Peristaltic movement of food
+
+(d) Production of bile juice
+
+Answer: [ ]
+
+**Q3.** In the human body, which blood vessel carries oxygenated blood from the lungs to the heart?
+
+
+(a) Pulmonary artery
+
+(b) Aorta
+
+(c) Pulmonary vein
+
+(d) Vena cava
+
+Answer: [ ]
+
+**Q4.** Which of the following is the functional unit of the kidney responsible for filtration and urine formation?
+
+
+(a) Neuron
+
+(b) Nephron
+
+(c) Alveolus
+
+(d) Villus
+
+Answer: [ ]
+
+**Q5.** The breakdown of glucose into pyruvate takes place in which part of the cell?
+
+
+(a) Mitochondria
+
+(b) Nucleus
+
+(c) Cytoplasm
+
+(d) Chloroplast
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** Differentiate between aerobic and anaerobic respiration with one example of each.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** What is the role of the epiglottis and the diaphragm in the process of breathing in humans?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![stomata](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/stomata/stomata_labeled_01.png)
+
+**Q8.** The diagram above shows the structure of a stoma. State two functions of stomata in plants and name the cells that regulate the opening and closing of stomata.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** With the help of a labelled diagram, describe the structure of the human excretory system. Name the two major nitrogenous waste products removed by the kidneys.
+
+*(Draw the diagram in the space below)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Explain the process of nutrition in Amoeba. How does it differ from the mode of nutrition in human beings? Name this mode of nutrition in Amoeba.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_unlabeled_01.png)
+
+**Q11.** The diagram above shows the structure of the human heart. Answer the following:
+
+(i) Name the chambers of the heart that receive blood from the body and from the lungs respectively.
+(ii) Why is the wall of the left ventricle thicker than that of the right ventricle?
+(iii) What is the significance of the four-chambered heart in humans?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.** Draw a neat, labelled diagram of the human digestive system. Describe the role of the following in digestion:
+
+(i) Saliva
+(ii) Gastric juice
+(iii) Bile
+(iv) Pancreatic juice
+
+*(Draw the diagram in the space below)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** Describe the process of urine formation in the human kidney. Mention the three main steps involved and state where each step occurs. Also explain what would happen if the kidneys fail to perform their function.
+
+**OR**
+
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_01.png)
+
+The diagram above shows the structure of a nephron. Answer the following questions based on the diagram:
+
+(i) Name the parts labelled 1, 2, 3, and 4 in the diagram.
+(ii) Where does filtration of blood take place in the nephron?
+(iii) Name two substances that are reabsorbed from the filtrate back into the blood.
+(iv) What is the composition of the final urine formed?
+(v) Name the tube through which urine travels from the kidney to the urinary bladder.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) What is photosynthesis? Write the overall chemical equation for photosynthesis.
+
+
+(b) Explain the role of the following in the process of photosynthesis:
+    (i) Chlorophyll
+    (ii) Sunlight
+    (iii) Carbon dioxide
+    (iv) Water
+
+
+(c) Name the two stages of photosynthesis and state where each stage occurs inside the chloroplast.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

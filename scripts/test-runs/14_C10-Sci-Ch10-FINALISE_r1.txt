@@ -1,0 +1,713 @@
+# C10-Sci-Ch10-FINALISE — run 1/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. For numerical questions, write all given values, formula used, substitution, and final answer with units.
+5. Write legibly and show all working clearly.
+6. Internal choice, wherever provided, is indicated clearly.
+7. Marks are indicated at the beginning of each section heading.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The least distance of distinct vision for a normal human eye is:
+
+
+(a) 25 cm
+
+(b) 50 cm
+
+(c) 2.5 cm
+
+(d) 2.5 m
+
+Answer: [ ]
+
+**Q2.** A person is unable to see distant objects clearly but can see nearby objects distinctly. Which defect of vision does this person have?
+
+
+(a) Hypermetropia
+
+(b) Presbyopia
+
+(c) Myopia
+
+(d) Astigmatism
+
+Answer: [ ]
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q3.** In the diagram of the human eye shown above, the part responsible for changing the curvature of the lens to focus on objects at different distances is the:
+
+
+(a) Cornea
+
+(b) Retina
+
+(c) Iris
+
+(d) Ciliary muscles
+
+Answer: [ ]
+
+**Q4.** Which of the following colours of white light is deviated the most when passed through a glass prism?
+
+
+(a) Red
+
+(b) Yellow
+
+(c) Green
+
+(d) Violet
+
+Answer: [ ]
+
+**Q5.** The phenomenon responsible for the blue colour of the sky is:
+
+
+(a) Reflection of sunlight
+
+(b) Refraction of sunlight
+
+(c) Scattering of sunlight by atmospheric particles
+
+(d) Total internal reflection of sunlight
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is meant by the 'power of accommodation' of the human eye? State the range of vision for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** Differentiate between myopia and hypermetropia on the basis of (i) the nature of the defect, and (ii) the type of lens used for correction.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![myopia_correction](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_correction/myopia_correction_labeled_02.png)
+
+**Q8.** The diagram above shows the correction of a vision defect using a lens. Identify the defect being corrected and name the type of lens used. State one cause of this defect.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Explain why the Sun appears reddish at sunrise and sunset but appears white at noon. Use the concept of light scattering in your answer.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![hypermetropia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/hypermetropia_defect/hypermetropia_defect_labeled_01.png)
+
+**Q10.** The diagram above shows a vision defect in the human eye.
+
+(i) Identify the defect shown.
+(ii) State two possible causes of this defect.
+(iii) With the help of a ray diagram description, explain how this defect is corrected.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A glass prism is able to split white light into its component colours. 
+
+(i) Name this phenomenon.
+(ii) Name the colours observed and state the colour that appears at the top and at the bottom of the spectrum on a screen.
+(iii) Why does this splitting of light occur in a prism?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.** The far point of a myopic person is 80 cm in front of the eye.
+
+(i) What is the nature of the lens required to correct this defect?
+(ii) Calculate the power of the lens required to correct the defect.
+(iii) What does a negative value of power of a lens indicate?
+
+*(Show complete working: Given → Formula → Substitution → Answer with units)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** 
+(a) Describe the structure of the human eye with the help of a labelled diagram. In your answer, mention the functions of the following parts:
+(i) Cornea
+(ii) Iris
+(iii) Crystalline lens
+(iv) Retina
+
+
+(b) Why is the normal eye unable to see objects closer than 25 cm?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) What is meant by dispersion of white light? With the help of a diagram, show the dispersion of white light through a glass prism and label the colours of the spectrum in order.
+
+
+(b) Explain the formation of a rainbow in the sky. Under what conditions can a rainbow be observed?
+
+
+(c) Twinkling of stars is an atmospheric phenomenon — justify this statement in two points.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+===== FINALISED (HTTP 200) =====
+===CLEAN PAPER START===
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. For numerical questions, write all given values, formula used, substitution, and final answer with units.
+5. Write legibly and show all working clearly.
+6. Internal choice, wherever provided, is indicated clearly.
+7. Marks are indicated at the beginning of each section heading.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The least distance of distinct vision for a normal human eye is:
+
+
+(a) 25 cm
+
+
+(b) 50 cm
+
+
+(c) 2.5 cm
+
+
+(d) 2.5 m
+
+Answer: [ ]
+
+**Q2.** A person is unable to see distant objects clearly but can see nearby objects distinctly. Which defect of vision does this person have?
+
+
+(a) Hypermetropia
+
+
+(b) Presbyopia
+
+
+(c) Myopia
+
+
+(d) Astigmatism
+
+Answer: [ ]
+
+**Q3.** In the diagram of the human eye shown above, the part responsible for changing the curvature of the lens to focus on objects at different distances is the:
+
+
+(a) Cornea
+
+
+(b) Retina
+
+
+(c) Iris
+
+
+(d) Ciliary muscles
+
+Answer: [ ]
+
+**Q4.** Which of the following colours of white light is deviated the most when passed through a glass prism?
+
+
+(a) Red
+
+
+(b) Yellow
+
+
+(c) Green
+
+
+(d) Violet
+
+Answer: [ ]
+
+**Q5.** The phenomenon responsible for the blue colour of the sky is:
+
+
+(a) Reflection of sunlight
+
+
+(b) Refraction of sunlight
+
+
+(c) Scattering of sunlight by atmospheric particles
+
+
+(d) Total internal reflection of sunlight
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is meant by the 'power of accommodation' of the human eye? State the range of vision for a normal human eye.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** Differentiate between myopia and hypermetropia on the basis of (i) the nature of the defect, and (ii) the type of lens used for correction.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** The diagram above shows the correction of a vision defect using a lens. Identify the defect being corrected and name the type of lens used. State one cause of this defect.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Explain why the Sun appears reddish at sunrise and sunset but appears white at noon. Use the concept of light scattering in your answer.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** The diagram above shows a vision defect in the human eye.
+
+(i) Identify the defect shown.
+(ii) State two possible causes of this defect.
+(iii) With the help of a ray diagram description, explain how this defect is corrected.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A glass prism is able to split white light into its component colours.
+
+(i) Name this phenomenon.
+(ii) Name the colours observed and state the colour that appears at the top and at the bottom of the spectrum on a screen.
+(iii) Why does this splitting of light occur in a prism?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks | 2 questions × 5 marks each = 10 marks)
+
+**Q12.** The far point of a myopic person is 80 cm in front of the eye.
+
+(i) What is the nature of the lens required to correct this defect?
+(ii) Calculate the power of the lens required to correct the defect.
+(iii) What does a negative value of power of a lens indicate?
+
+*(Show complete working: Given → Formula → Substitution → Answer with units)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.**
+
+(a) Describe the structure of the human eye with the help of a labelled diagram. In your answer, mention the functions of the following parts:
+(i) Cornea
+(ii) Iris
+(iii) Crystalline lens
+(iv) Retina
+
+
+(b) Why is the normal eye unable to see objects closer than 25 cm?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.**
+
+(a) What is meant by dispersion of white light? With the help of a diagram, show the dispersion of white light through a glass prism and label the colours of the spectrum in order.
+
+
+(b) Explain the formation of a rainbow in the sky. Under what conditions can a rainbow be observed?
+
+
+(c) Twinkling of stars is an atmospheric phenomenon — justify this statement in two points.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+===CLEAN PAPER END===
+
+===ANSWER KEY START===
+## ANSWER KEY — SECTION A
+
+## SECTION A — Answer Key
+
+---
+
+**Q1. (a) 25 cm**
+The normal human eye can see objects most clearly at a minimum distance of 25 cm, which is defined as the least distance of distinct vision.
+
+---
+
+**Q2. (c) Myopia**
+In myopia (nearsightedness), the image of distant objects forms in front of the retina instead of on it, so the person can see nearby objects clearly but distant objects appear blurred.
+
+---
+
+**Q3. (d) Ciliary muscles**
+The ciliary muscles surround the eye lens and contract or relax to change the curvature (and thus the focal length) of the lens, allowing the eye to focus on objects at varying distances — a process called accommodation.
+
+---
+
+**Q4. (d) Violet**
+Violet light has the shortest wavelength among the visible colours and travels slowest in glass, causing it to bend (refract) the most when passing through a prism, while red light deviates the least.
+
+---
+
+**Q5. (c) Scattering of sunlight by atmospheric particles**
+When sunlight passes through the atmosphere, fine particles and gas molecules scatter shorter wavelengths (blue light) much more strongly than longer wavelengths (red light) — a phenomenon called Rayleigh scattering — making the sky appear blue to an observer on Earth.
+
+---
+
+## ANSWER KEY — SECTION B
+
+# SECTION B — Answer Key
+
+---
+
+**Q6.**
+
+**Power of accommodation** is the ability of the eye lens to adjust its focal length (by changing its curvature using the ciliary muscles) in order to focus clearly on objects at varying distances.
+
+**Range of vision for a normal human eye:** from **25 cm** (the near point, also called the least distance of distinct vision) to **infinity** (the far point).
+
+---
+
+**Q7.**
+
+| | **Myopia (Short-sightedness)** | **Hypermetropia (Long-sightedness)** |
+|---|---|---|
+| **(i) Nature of defect** | The person can see nearby objects clearly but cannot see distant objects clearly. The image of a distant object is formed **in front of** the retina. | The person can see distant objects clearly but cannot see nearby objects clearly. The image of a nearby object is formed **behind** the retina. |
+| **(ii) Lens used for correction** | **Concave lens** (diverging lens) of suitable focal length is used. | **Convex lens** (converging lens) of suitable focal length is used. |
+
+---
+
+**Q8.**
+
+**Defect being corrected:** Hypermetropia (Long-sightedness / Far-sightedness)
+
+**Type of lens used:** Convex lens (converging lens)
+
+**One cause of this defect:** The eyeball is too short (decreased length of eyeball), so the image of nearby objects falls behind the retina instead of on it. *(Alternatively accepted: the focal length of the eye lens is too long / the eye lens becomes too thin and loses converging power.)*
+
+
+*[Refer to NCERT textbook: physics hypermetropia correction]*
+
+
+---
+
+## ANSWER KEY — SECTION C
+
+# SECTION C — Answer Key
+
+---
+
+**Q9.**
+
+At sunrise and sunset, the Sun is near the horizon, so sunlight must travel through a much greater thickness of the Earth's atmosphere to reach our eyes. During this long path, shorter wavelengths of light (violet, blue, and green) are scattered away in all directions by air molecules and fine particles. Only the longer wavelengths — red and orange — survive the journey and reach the observer, making the Sun appear reddish.
+
+At noon, the Sun is directly overhead, so sunlight travels through the shortest possible path through the atmosphere. Very little scattering occurs, and almost all wavelengths (colours) reach the observer together. The combination of all colours of visible light appears white, so the Sun looks white (or pale yellow) at noon.
+
+---
+
+**Q10.**
+
+**(i)** The defect shown is **Myopia** (near-sightedness / short-sightedness). The image of a distant object is formed in front of the retina instead of on it.
+
+**(ii) Two possible causes:**
+- The eyeball is too elongated (the distance between the lens and retina is greater than normal).
+- The eye lens is too thick or too converging, giving it a shorter-than-normal focal length.
+
+**(iii) Correction:**
+A **concave (diverging) lens** of suitable focal length is placed in front of the myopic eye. Parallel rays coming from a distant object first diverge after passing through the concave lens, so they appear to come from the far point of the myopic eye. The eye lens then converges these diverging rays and focuses them exactly on the retina, producing a clear image.
+
+
+*[Refer to NCERT textbook: physics myopia correction]*
+
+
+---
+
+**Q11.**
+
+**(i)** The phenomenon is called **Dispersion of light** (dispersion of white light).
+
+**(ii)** The colours observed form a spectrum known by the acronym **VIBGYOR**:
+Violet, Indigo, Blue, Green, Yellow, Orange, Red.
+
+- The colour that appears at the **top** of the spectrum (least deviated) is **Red**.
+- The colour that appears at the **bottom** of the spectrum (most deviated) is **Violet**.
+
+**(iii)** White light is made up of seven colours, each having a different wavelength. When white light enters the glass prism, each colour travels at a slightly different speed inside the glass, because the refractive index of glass is different for different wavelengths. Violet light (shortest wavelength) slows down the most and is bent (refracted) the most, while red light (longest wavelength) slows down the least and is bent the least. Because each colour is refracted by a different angle at both surfaces of the prism, they spread out and emerge as a band of separate colours — producing the visible spectrum.
+
+
+*[Refer to NCERT textbook: physics prism dispersion]*
+
+
+---
+
+## ANSWER KEY — SECTION D
+
+# SECTION D — Complete Answer Key
+
+---
+
+## Q12.
+
+**Given:**
+Far point of myopic person = 80 cm = 0.80 m
+The person cannot see objects beyond 80 cm, so the lens must form the image of an object at infinity at the far point (80 cm in front of the eye).
+
+Object distance, u = −∞
+Image distance, v = −80 cm = −0.80 m (negative because image forms on same side as object, i.e., virtual image)
+
+---
+
+**(i) Nature of lens required:**
+A **concave lens (diverging lens)** is required to correct myopia. It diverges the incoming parallel rays so that they appear to come from the far point of the myopic eye.
+
+---
+
+**(ii) Calculation of Power:**
+
+**Formula:**
+$$\frac{1}{f} = \frac{1}{v} - \frac{1}{u}$$
+
+**Substitution:**
+$$\frac{1}{f} = \frac{1}{-0.80} - \frac{1}{-\infty}$$
+
+$$\frac{1}{f} = \frac{1}{-0.80} - 0$$
+
+$$\frac{1}{f} = \frac{-1}{0.80}$$
+
+$$f = -0.80 \text{ m}$$
+
+**Power:**
+$$P = \frac{1}{f} = \frac{1}{-0.80}$$
+
+$$\boxed{P = -1.25 \text{ D}}$$
+
+---
+
+**(iii) Significance of negative power:**
+A negative value of power of a lens indicates that the lens is a **concave (diverging) lens**, which diverges the light rays passing through it and has a negative (virtual) focal length.
+
+---
+
+## Q13.
+
+**(a) Structure of the Human Eye:**
+
+The human eye is a roughly spherical organ that functions like a natural camera. Its main parts and their functions are:
+
+**(i) Cornea:**
+The cornea is the transparent, curved front surface of the eye. It is the primary refracting surface and is responsible for most of the refraction (bending) of incoming light. It acts as a protective window for the eye.
+
+**(ii) Iris:**
+The iris is the coloured, circular, muscular diaphragm located behind the cornea. It controls the size of the pupil and thereby regulates the amount of light entering the eye. In bright light the iris contracts the pupil; in dim light it dilates the pupil.
+
+**(iii) Crystalline Lens:**
+The crystalline lens is a transparent, biconvex, flexible structure located behind the iris. It fine-tunes the focusing of light onto the retina. The ciliary muscles attached to it can change its curvature (a process called **accommodation**), allowing the eye to focus on objects at varying distances.
+
+**(iv) Retina:**
+The retina is the light-sensitive inner layer at the back of the eye. It contains two types of photoreceptor cells — **rods** (sensitive to dim light) and **cones** (sensitive to colour and bright light). The retina converts the optical image into electrical nerve impulses that are sent to the brain via the optic nerve, where the image is interpreted.
+
+
+*[Refer to NCERT textbook: biology human eye anatomy]*
+
+
+---
+
+**(b) Why the normal eye cannot see objects closer than 25 cm:**
+
+The ciliary muscles of the eye can increase the curvature of the crystalline lens only up to a maximum limit. When an object is brought closer than 25 cm (the **near point** of the normal eye), the ciliary muscles are fully contracted and the lens is at its maximum curvature. The lens can no longer increase its converging power sufficiently to form a sharp image on the retina. Therefore, the image becomes blurred and the normal eye is unable to see objects clearly closer than 25 cm. This minimum distance for clear vision is called the **least distance of distinct vision**.
+
+---
+
+## Q14.
+
+**(a) Dispersion of White Light:**
+
+**Definition:**
+The splitting of white light into its constituent seven colours (spectrum) on passing through a transparent medium like a glass prism is called **dispersion of white light**. It occurs because different colours (wavelengths) of light travel at different speeds in glass and are therefore refracted (bent) by different amounts — violet is deviated the most and red the least.
+
+**The seven colours of the spectrum in order (VIBGYOR):**
+Violet → Indigo → Blue → Green → Yellow → Orange → Red
+
+(Red is at the top and Violet at the bottom when light enters from the left face of the prism.)
+
+
+*[Refer to NCERT textbook: physics prism dispersion]*
+
+
+---
+
+**(b) Formation of a Rainbow:**
+
+A rainbow is a natural spectrum of sunlight formed in the sky due to the **dispersion, refraction, and total internal reflection** of sunlight by water droplets suspended in the atmosphere after rain.
+
+**Process of formation:**
+1. Sunlight enters a spherical water droplet and is **refracted** at the surface, splitting into its constituent colours.
+2. This refracted light undergoes **total internal reflection** at the inner back surface of the droplet.
+3. The reflected light is again **refracted** as it exits the droplet from the front surface, dispersing the colours further.
+4. Different colours emerge at different angles (red at ~42° and violet at ~40° to the incident sunlight), forming the coloured arc visible to the observer.
+
+**Conditions for observing a rainbow:**
+- The **Sun must be behind the observer** and there must be rain or water droplets in front.
+- It is most commonly seen in the **early morning or late afternoon** when the Sun is low in the sky.
+- There must be **sunshine and rainfall simultaneously** in the same part of the sky.
+
+
+*[Refer to NCERT textbook: physics rainbow formation]*
+
+
+---
+
+**(c) Twinkling of Stars — Justified as an Atmospheric Phenomenon:**
+
+**Point 1 — Cause lies in the atmosphere, not in the star:**
+Stars are so far away that they act as point sources of light. As starlight travels through the Earth's atmosphere, it passes through layers of air with continuously changing temperatures, densities, and refractive indices. This causes the light to bend (refract) by varying amounts at different moments. As a result, the amount of starlight reaching the observer's eye fluctuates rapidly, making the star appear to twinkle. Since the effect is entirely caused by the Earth's atmosphere, it is an atmospheric phenomenon.
+
+**Point 2 — Planets do not twinkle, confirming the atmospheric explanation:**
+Planets are much closer to Earth and appear as extended sources (small discs) rather than point sources. The fluctuations in refraction caused by the atmosphere affect different parts of the planet's disc at the same time, and these variations average out. Therefore, planets do not twinkle. This contrast confirms that twinkling is not a property of the light source itself but is caused purely by the turbulent, refracting layers of the Earth's atmosphere.
+===ANSWER KEY END===

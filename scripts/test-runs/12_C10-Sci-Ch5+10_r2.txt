@@ -1,0 +1,262 @@
+# C10-Sci-Ch5+10 — run 2/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 36
+Time: 2 Hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, labelled diagrams wherever required.
+4. For numerical questions, show all steps clearly — given data, formula, substitution, and answer with units.
+5. Write answers legibly in the space provided.
+6. Marks are indicated at the beginning of each section heading only.
+7. Internal choice, wherever provided, must be attempted in full.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(6 questions × 1 mark each = 6 marks)
+
+**Q1.** Which of the following is the correct sequence of events during photosynthesis?
+
+
+(a) CO₂ fixation → Light absorption → Water splitting → Sugar formation
+
+(b) Light absorption → Water splitting → CO₂ fixation → Sugar formation
+
+(c) Water splitting → CO₂ fixation → Light absorption → Sugar formation
+
+(d) Sugar formation → Light absorption → Water splitting → CO₂ fixation
+
+Answer: [ ]
+
+**Q2.** In the human digestive system, which enzyme is present in saliva that begins the digestion of starch?
+
+
+(a) Pepsin
+
+(b) Trypsin
+
+(c) Salivary amylase
+
+(d) Lipase
+
+Answer: [ ]
+
+**Q3.** The process by which the kidneys filter blood and produce urine is called:
+
+
+(a) Transpiration
+
+(b) Osmoregulation
+
+(c) Excretion
+
+(d) Dialysis
+
+Answer: [ ]
+
+**Q4.** The power of accommodation of the human eye is due to the ability of the:
+
+
+(a) Cornea to change its curvature
+
+(b) Ciliary muscles to change the focal length of the eye lens
+
+(c) Retina to adjust sensitivity to light
+
+(d) Pupil to change its size
+
+Answer: [ ]
+
+**Q5.** A person is unable to see distant objects clearly. Which type of lens should be used to correct this defect?
+
+
+(a) Convex lens
+
+(b) Bifocal lens
+
+(c) Concave lens
+
+(d) Cylindrical lens
+
+Answer: [ ]
+
+**Q6.** The phenomenon responsible for the blue colour of the sky is:
+
+
+(a) Reflection of light
+
+(b) Dispersion of light
+
+(c) Refraction of light
+
+(d) Scattering of light
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(4 questions × 2 marks each = 8 marks)
+
+**Q7.** Name the two main components of the transport system in human beings. State one function of each.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** What is the role of the epiglottis during swallowing? How does the stomach prevent the digestion of its own walls?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q9.** Define the term "power of accommodation" of the human eye. What is the far point of a normal human eye?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** A student observes that the white light passing through a glass prism splits into seven colours. Name this phenomenon and write the correct sequence of colours obtained from the top of the band.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(4 questions × 3 marks each = 12 marks)
+
+
+![digestive_system](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/digestive_system/digestive_system_unlabeled_01.png)
+
+**Q11.** The diagram above shows the human digestive system. Identify the parts numbered in the diagram and state the digestive juice secreted by any two of the labelled organs and the role of each juice in digestion.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q12.** Explain the process of urine formation in the kidneys. Name the functional unit of the kidney. What is the composition of the fluid finally collected as urine?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![myopia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_defect/myopia_defect_labeled_03.png)
+
+**Q13.** The diagram above shows a common eye defect. Identify the defect shown, state its cause, and explain how it can be corrected with the help of a suitable lens. Draw a ray diagram to show the correction.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** A ray of white light enters a glass prism and undergoes dispersion.
+
+(i) What is meant by dispersion of white light?
+(ii) Which colour deviates the most and which deviates the least on passing through a prism?
+(iii) How does the formation of a rainbow in the sky relate to the dispersion of light?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(2 questions × 5 marks each = 10 marks)
+
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_unlabeled_01.png)
+
+**Q15.** The diagram shows the human heart.
+
+
+(a) Identify and name the four chambers of the heart as labelled in the diagram.
+
+(b) Trace the path of oxygenated blood from the lungs to the rest of the body, naming the vessels and chambers involved.
+
+(c) Why is it important that oxygenated and deoxygenated blood do not mix in the human heart?
+
+(d) What is the role of valves in the heart? Name the type of blood vessel that carries blood away from the heart.
+
+**OR**
+
+**Q15.** (a) Define the following terms: (i) Autotrophs (ii) Heterotrophs
+
+(b) With the help of a labelled diagram, describe the structure of a stomata and explain how it helps in gaseous exchange during photosynthesis.
+
+(c) Write the overall chemical equation for photosynthesis. What are the raw materials required and where does the plant obtain each of them from?
+
+(d) State any two ways in which respiration in plants differs from respiration in animals.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q16.** The diagram shows the structure of the human eye.
+
+
+(a) Identify and name any four parts of the human eye shown in the diagram, stating the function of each.
+
+(b) A person has a near point of 1 m instead of the normal 25 cm. Name the defect the person is suffering from and state two causes of this defect.
+(c) Calculate the power of the lens required to correct this defect. (Assume the person wants to read a book placed at 25 cm. Use the lens formula.)
+
+**Given:**
+Object distance (u) = −25 cm
+Image distance (v) = −100 cm
+
+**OR**
+
+**Q16.** 
+(a) What is meant by refraction of light through the atmosphere? Explain why the sun is visible about 2 minutes before actual sunrise.
+
+(b) Explain the Tyndall effect with an example from daily life. Why does the sky appear blue but the sun appears red at sunrise and sunset?
+
+(c) A glass slab with parallel faces is placed in the path of a ray of light. Draw a ray diagram to show the path of light through the slab and explain why the emergent ray is parallel to the incident ray but laterally displaced.
+
+(d) Name the phenomenon due to which stars appear to twinkle at night. Does the same phenomenon apply to planets? Give reason.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

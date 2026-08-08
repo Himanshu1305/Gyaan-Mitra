@@ -1,0 +1,240 @@
+# C10-Sci-Ch5 — run 5/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, labelled diagrams wherever necessary.
+4. For numerical questions, show all steps including formula, substitution, and units.
+5. Write answers clearly and legibly.
+6. Internal choices are indicated within the respective questions.
+7. Marks are indicated at the beginning of each section.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** Which of the following is the correct sequence of steps in nutrition in organisms?
+
+
+(a) Ingestion → Digestion → Absorption → Assimilation → Egestion
+
+(b) Digestion → Ingestion → Absorption → Assimilation → Egestion
+
+(c) Ingestion → Absorption → Digestion → Assimilation → Egestion
+
+(d) Ingestion → Digestion → Assimilation → Absorption → Egestion
+
+Answer: [ ]
+
+**Q2.** The tiny pores present on the surface of a leaf through which gaseous exchange takes place are called:
+
+
+(a) Lenticels
+
+(b) Stomata
+
+(c) Root hair
+
+(d) Hydathodes
+
+Answer: [ ]
+
+**Q3.** In the human respiratory system, which of the following structures prevents food from entering the windpipe during swallowing?
+
+
+(a) Trachea
+
+(b) Larynx
+
+(c) Epiglottis
+
+(d) Pharynx
+
+Answer: [ ]
+
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_numbered_01.png)
+
+**Q4.** The chamber of the human heart that pumps oxygenated blood to all parts of the body is the:
+
+
+(a) Right auricle
+
+(b) Left auricle
+
+(c) Right ventricle
+
+(d) Left ventricle
+
+Answer: [ ]
+
+**Q5.** Which of the following waste products is excreted through the lungs in humans?
+
+
+(a) Urea
+
+(b) Uric acid
+
+(c) Carbon dioxide
+
+(d) Ammonia
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is the role of hydrochloric acid (HCl) in the stomach during the process of digestion?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** Distinguish between aerobic and anaerobic respiration. Give one example of an organism that carries out anaerobic respiration.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** What is the function of valves in the human heart? Why are they important for the circulatory system?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+
+![stomata](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/stomata/stomata_labeled_01.png)
+
+**Q9.** With the help of the diagram above, explain how stomata help in the process of transpiration. Also state two conditions under which stomata open and close.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Describe the process of urine formation in the human kidneys. Name the structural and functional unit of the kidney involved in this process.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** What is translocation in plants? Why is it essential for plant survival? Name the tissue responsible for translocation and state the direction in which transport occurs.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks, 2 questions × 5 marks each = 10 marks)
+
+**Q12.** The table below shows the oxygen consumption (in mL/min) of a student at rest, during light exercise, and during heavy exercise:
+
+| Condition | Oxygen Consumed (mL/min) |
+|---|---|
+| At Rest | 250 |
+| Light Exercise | 700 |
+| Heavy Exercise | 1800 |
+
+
+(a) What happens to the rate of breathing as exercise intensity increases? Give a reason.
+
+(b) During very heavy exercise, muscles sometimes respire anaerobically. What substance is produced, and what effect does it have on the body?
+
+(c) Write the chemical equation for aerobic respiration.
+
+(d) Why is it important that the breathing rate returns to normal after exercise stops?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.**
+
+
+![digestive_system](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/digestive_system/digestive_system_numbered_01.png)
+
+
+(a) Identify and state the functions of any three digestive glands associated with the human digestive system shown in the diagram.
+
+(b) Where does the digestion of proteins begin in the human body, and which enzyme is responsible?
+
+(c) What is the role of villi in the small intestine?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.**
+
+
+(a) Explain the double circulation of blood in humans. Why is this type of circulation essential for humans?
+
+(b) Name the blood vessels that carry blood to and from the lungs. State whether the blood in each vessel is oxygenated or deoxygenated.
+
+(c) What is the role of platelets in the blood?
+
+**OR**
+
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_02.png)
+
+
+(a) With reference to the diagram of a nephron, describe the three processes involved in urine formation: filtration, reabsorption, and secretion.
+
+(b) Name the two organs, other than kidneys, through which excretion takes place in humans. State one substance excreted by each.
+
+(c) What is dialysis? Under what condition is it required?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

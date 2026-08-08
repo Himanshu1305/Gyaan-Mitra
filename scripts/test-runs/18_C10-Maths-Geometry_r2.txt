@@ -1,0 +1,201 @@
+# C10-Maths-Geometry — run 2/3
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+# [SCHOOL NAME]
+## UNIT TEST EXAMINATION (2026)
+
+**Class:** 10 &emsp;&emsp;&emsp; **Subject:** Mathematics &emsp;&emsp;&emsp; **Max. Marks:** 34
+**Time:** 2 Hours &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; **Date:** ___________
+
+**Name:** _____________________________ &emsp; **Roll No.:** _______
+
+---
+
+### GENERAL INSTRUCTIONS:
+
+1. All questions are compulsory unless internal choice is provided.
+2. Read each question carefully before answering.
+3. Show all steps and working clearly for full credit.
+4. Write neatly and legibly throughout the paper.
+5. Internal choice is provided in Section D where indicated.
+6. Marks are indicated at the beginning of each section.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** If ΔABC ~ ΔPQR and the ratio of their corresponding sides is 3 : 5, then the ratio of their areas is:
+
+
+(a) 3 : 5
+
+(b) 9 : 25
+
+(c) 6 : 10
+
+(d) 27 : 125
+
+Answer: [ ]
+
+**Q2.** In ΔABC, DE ∥ BC where D is on AB and E is on AC. If AD = 3 cm, DB = 6 cm, and AE = 2 cm, then EC is:
+
+
+(a) 2 cm
+
+(b) 6 cm
+
+(c) 4 cm
+
+(d) 3 cm
+
+Answer: [ ]
+
+**Q3.** A ladder 10 m long reaches a window 8 m above the ground. The distance of the foot of the ladder from the base of the wall is:
+
+
+(a) 4 m
+
+(b) 8 m
+
+(c) 6 m
+
+(d) 7 m
+
+Answer: [ ]
+
+**Q4.** Sides of two similar triangles are in the ratio 4 : 9. The ratio of their areas will be:
+
+
+(a) 2 : 3
+
+(b) 4 : 9
+
+(c) 16 : 81
+
+(d) 81 : 16
+
+Answer: [ ]
+
+**Q5.** In ΔABC, if ∠ACB = 90° and CD ⊥ AB, where D lies on AB, then which of the following is correct?
+
+
+(a) BC² = AC × AD
+
+(b) AC² = BC × BD
+
+(c) BC² = BD × AB
+
+(d) CD² = BD × AD
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** In ΔPQR, ST ∥ QR. If PS = 4 cm, SQ = 8 cm, and PT = 3 cm, find TR.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** State the Basic Proportionality Theorem (Thales' Theorem). Write its converse as well.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** The areas of two similar triangles ΔABC and ΔDEF are 64 cm² and 121 cm² respectively. If EF = 15.4 cm, find BC.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** In ΔABC, DE ∥ BC where D is on AB and E is on AC. If AD/DB = 3/4, and AC = 14 cm, find AE and EC. Also verify that DE divides AB and AC in the same ratio.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Prove that in a right triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides. (State the theorem and write the proof outline with all key steps.)
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** In the figure, ΔOAB ~ ΔOCD. If OA = 4 cm, OB = 6 cm, OC = 2 cm, and AB = 5 cm, find OD and CD.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+
+**(Q12: 4 marks)**
+
+**Q12.** In ΔABC, ∠ABC = 90° and BD ⊥ AC where D lies on AC.
+
+(i) Prove that ΔABD ~ ΔABC.
+(ii) Prove that ΔBDC ~ ΔABC.
+(iii) Hence, prove that BD² = AD × DC.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**(Q13 and Q14: 5 marks each)**
+
+**Q13.** In a trapezium ABCD, AB ∥ DC and the diagonals AC and BD intersect at point O. Prove that:
+
+$$\frac{OA}{OC} = \frac{OB}{OD}$$
+
+Using this result, if OA = (3x − 1) cm, OC = (x + 1) cm, OB = (2x + 1) cm, and OD = (x + 3) cm, find the value of x.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** Prove that if a line is drawn parallel to one side of a triangle, it divides the other two sides in the same ratio (Basic Proportionality Theorem / Thales' Theorem).
+
+**OR**
+
+Prove that the ratio of the areas of two similar triangles is equal to the ratio of the squares of their corresponding sides.
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

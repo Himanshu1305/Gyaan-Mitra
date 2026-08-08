@@ -1,0 +1,238 @@
+# C10-Sci-Ch10 — run 4/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, labelled diagrams wherever required.
+4. Show all steps and working clearly for numerical questions.
+5. Write legibly in the space provided below each question.
+6. Internal choice, wherever provided, must be attempted in full.
+7. Marks are indicated at the beginning of each section — not repeated for individual questions.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The ability of the eye to focus on both near and far objects by changing the focal length of its lens is called:
+
+
+(a) Persistence of vision
+
+(b) Power of accommodation
+
+(c) Least distance of distinct vision
+
+(d) Range of vision
+
+Answer: [ ]
+
+**Q2.** A person cannot see objects clearly beyond 2 m. The defect of vision he is suffering from and the type of lens required to correct it are:
+
+
+(a) Hypermetropia; convex lens
+
+(b) Myopia; convex lens
+
+(c) Myopia; concave lens
+
+(d) Hypermetropia; concave lens
+
+Answer: [ ]
+
+**Q3.** The splitting of white light into its component colours when it passes through a glass prism is called:
+
+
+(a) Reflection
+
+(b) Refraction
+
+(c) Dispersion
+
+(d) Scattering
+
+Answer: [ ]
+
+
+![human_eye_structure](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_eye_structure/human_eye_structure_unlabeled_01.png)
+
+**Q4.** In the diagram of the human eye given above, the part that controls the amount of light entering the eye is the:
+
+
+(a) Cornea
+
+(b) Retina
+
+(c) Iris
+
+(d) Ciliary muscles
+
+Answer: [ ]
+
+**Q5.** The colour of sky appears blue during the day because:
+
+
+(a) Blue light has the longest wavelength and is least scattered
+
+(b) Blue light has a shorter wavelength and is scattered more by atmospheric particles
+
+(c) The sun emits only blue light during daytime
+
+(d) Red light is completely absorbed by the atmosphere
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** What is the near point and far point of a normal human eye? Why is the near point of the eye also called the least distance of distinct vision?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** State two differences between the defects of vision — myopia and hypermetropia — in terms of their cause and the type of corrective lens used.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Why does the sun appear reddish at sunrise and sunset but white or yellowish-white when it is overhead at noon?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+
+![myopia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/myopia_defect/myopia_defect_labeled_03.png)
+
+**Q9.** The diagram above shows the defect of myopia in a human eye.
+
+(i) State the two causes of myopia.
+(ii) A myopic person has a far point at 80 cm from the eye. What is the power of the corrective lens required? (Show complete working with formula, substitution, and units.)
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![hypermetropia_defect](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/hypermetropia_defect/hypermetropia_defect_labeled_02.png)
+
+**Q10.** The diagram above shows the defect of hypermetropia in a human eye.
+
+(i) State the two causes of hypermetropia.
+(ii) Where does the image form in a hypermetropic eye when the person tries to see a near object?
+(iii) What type of lens is used to correct this defect and why?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** Explain, with the help of a labelled ray diagram, the dispersion of white light through a glass prism. Name the colours of the spectrum obtained in order from top to bottom, and state which colour deviates the most and which deviates the least.
+
+*(Draw a neat, labelled diagram as part of your answer.)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks, 2 questions × 5 marks each = 10 marks)
+
+**Q12.**
+
+With a neat labelled diagram, describe the structure of the human eye. Name any three important parts and state the function of each.
+
+*(Draw a neat, labelled diagram as part of your answer.)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.**
+
+
+(a) What is presbyopia? State its cause and how it is corrected.
+
+
+(b) A student is unable to see clearly the words written on the blackboard placed at a distance of 4 m from her, but she can read her textbook without any difficulty. Answer the following:
+   (i) Name the defect of vision she is suffering from.
+   (ii) With the help of a labelled ray diagram, show how this defect can be corrected.
+   (iii) The student's doctor prescribes a corrective lens of power −0.5 D. Calculate the focal length of this lens.
+
+*(Draw a neat, labelled diagram for part (ii) as part of your answer.)*
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.**
+
+Read the following passage and answer the questions that follow:
+
+*Twinkling of stars is a common phenomenon observed on clear nights. When starlight enters the Earth's atmosphere, it undergoes continuous refraction through layers of air of varying densities. This causes the apparent position of the star to shift slightly and its brightness to fluctuate. Planets, on the other hand, do not twinkle. The scattering of light by the atmosphere also explains why the sky appears blue during the day, while the sun and the horizon appear red or orange at sunset.*
+
+(i) Why do stars appear to twinkle but planets do not?
+
+(ii) State Tyndall effect. Give one example of Tyndall effect observed in everyday life other than those mentioned in the passage.
+
+(iii) The danger signals and traffic lights are made in red colour. Give a scientific reason for this choice based on the concepts of scattering of light.
+
+(iv) On the basis of scattering of light, explain why the clouds appear white.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---

@@ -1,0 +1,228 @@
+# C9-Sci-Unseeded — run 1/2
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 9 | Subject: Science | Max. Marks: 34
+Time: 2 Hours | Date: ___________
+Name: ___________________________ | Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Show all working/steps clearly for numerical questions; marks may be awarded for correct method even if the final answer is incorrect.
+4. Write neatly and legibly.
+5. Use of calculators is not permitted.
+6. Marks are indicated at the beginning of each section and apply equally to all questions in that section.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** Which of the following substances has the highest compressibility?
+
+
+(a) Steel
+
+(b) Water
+
+(c) Air
+
+(d) Mercury
+
+Answer: [ ]
+
+**Q2.** A diver is able to cut through water in a swimming pool. Which property of matter does this illustrate?
+
+
+(a) High density of water
+
+(b) Lack of rigidity and low viscosity of water
+
+(c) The fluidity and less inter-particle force of attraction in water
+
+(d) High surface tension of water
+
+Answer: [ ]
+
+**Q3.** On a hot summer day, a shopkeeper sprinkles water on the floor of his shop. He does this because —
+
+
+(a) water is a good conductor of heat
+
+(b) water has a high specific heat capacity
+
+(c) evaporation of water causes cooling of the surroundings
+
+(d) water absorbs sunlight effectively
+
+Answer: [ ]
+
+**Q4.** The temperature at which a solid melts to become a liquid at atmospheric pressure is called its —
+
+
+(a) Boiling point
+
+(b) Latent heat
+
+(c) Melting point
+
+(d) Condensation point
+
+Answer: [ ]
+
+**Q5.** Which of the following correctly describes the arrangement of particles in a solid?
+
+
+(a) Particles are far apart and move randomly
+
+(b) Particles are closely packed in an irregular arrangement
+
+(c) Particles are closely packed in a regular arrangement with negligible movement
+
+(d) Particles are moderately spaced and move freely past one another
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** Define latent heat of vaporisation. Why does steam at 100°C cause more severe burns than boiling water at the same temperature?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** What is the effect of pressure on the boiling point of a liquid? Give one example from everyday life to support your answer.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q8.** Explain why a gas fills completely the container in which it is kept, whereas a liquid does not.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** Convert the following temperatures:
+
+(i) 300 K to Celsius
+(ii) 45°C to Kelvin
+(iii) A substance has a melting point of 0°C. Express this temperature in Kelvin and state the physical state of water at this temperature.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q10.** Describe an activity to demonstrate that there is space between the particles of matter. Also state what conclusion can be drawn from this activity.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** Compare the three states of matter — solid, liquid, and gas — on the basis of: (i) shape, (ii) volume, and (iii) compressibility.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+
+### Part I
+(1 question × 4 marks = 4 marks)
+
+**Q12.** Explain the following observations in terms of the properties of particles of matter:
+
+(i) A wooden table is called a solid.
+(ii) We can easily move our hand through air but not through a wall.
+(iii) The smell of hot food reaches us from several metres away faster than the smell of cold food.
+(iv) Gases exert pressure on the walls of their container.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+### Part II
+(2 questions × 5 marks each = 10 marks)
+
+**Q13.** 
+(a) Define evaporation. List any **three** factors that affect the rate of evaporation and explain each factor briefly.
+
+
+(b) How does evaporation differ from boiling? Give **two** points of difference.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q14.** 
+(a) What is sublimation? Name **two** substances that undergo sublimation and state one practical application of this process.
+
+
+(b) The following data is given for a substance X:
+
+- Melting point: 0°C
+- Boiling point: 100°C
+- Latent heat of fusion: 334 J/g
+- Latent heat of vaporisation: 2260 J/g
+
+(i) Identify substance X.
+(ii) Calculate the amount of heat energy required to convert **50 g** of substance X from solid at 0°C to liquid at 0°C.
+(iii) State the physical state of substance X at 50°C and at 150°C (at atmospheric pressure).
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+*— End of Question Paper —*

@@ -1,0 +1,232 @@
+# C10-Sci-Ch5 — run 2/5
+# HTTP 200 ok=true success=true
+# ncertFiguresFound=0 svgsGenerated=0
+
+===== DRAFT =====
+[SCHOOL NAME]
+UNIT TEST EXAMINATION (2026)
+Class: 10    Subject: Science    Max. Marks: 34
+Time: 2 hours         Date: ___________
+Name: ___________________________    Roll No.: _______
+
+---
+
+**GENERAL INSTRUCTIONS:**
+
+1. All questions are compulsory.
+2. Read each question carefully before attempting.
+3. Draw neat, well-labelled diagrams wherever required.
+4. Show all steps and working clearly for questions involving calculations.
+5. Write answers in clear and legible handwriting.
+6. Internal choices, wherever provided, attempt only one option per question.
+7. Marks for each section are indicated in the section heading.
+
+---
+
+## SECTION A — Multiple Choice Questions
+(5 questions × 1 mark each = 5 marks)
+
+**Q1.** The process by which green plants synthesise food using sunlight, water, and carbon dioxide is called:
+
+
+(a) Respiration
+
+(b) Photosynthesis
+
+(c) Transpiration
+
+(d) Digestion
+
+Answer: [ ]
+
+**Q2.** Which of the following is the correct equation for aerobic respiration?
+
+
+(a) C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ + Energy
+
+(b) C₆H₁₂O₆ + 6O₂ → 6CO₂ + 6H₂O + Energy
+
+(c) 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂
+
+(d) C₆H₁₂O₆ → 2C₃H₆O₃ + Energy
+
+Answer: [ ]
+
+
+![stomata](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/stomata/stomata_labeled_01.png)
+
+**Q3.** The diagram above shows a stoma and its guard cells. Which of the following correctly explains why stomata open during the day?
+
+
+(a) Guard cells lose water and become flaccid
+
+(b) Guard cells gain water, become turgid, and the pore opens
+
+(c) Guard cells shrink due to loss of carbon dioxide
+
+(d) Stomata open because of decreased light intensity
+
+Answer: [ ]
+
+**Q4.** In the human digestive system, bile juice is produced by the liver and stored in the:
+
+
+(a) Pancreas
+
+(b) Small intestine
+
+(c) Gall bladder
+
+(d) Stomach
+
+Answer: [ ]
+
+**Q5.** Which type of blood vessel carries oxygenated blood from the lungs to the heart?
+
+
+(a) Pulmonary artery
+
+(b) Aorta
+
+(c) Pulmonary vein
+
+(d) Vena cava
+
+Answer: [ ]
+
+---
+
+## SECTION B — Short Answer Questions
+(3 questions × 2 marks each = 6 marks)
+
+**Q6.** Differentiate between aerobic and anaerobic respiration. Give one example of an organism that uses anaerobic respiration.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q7.** What is the role of the following in the human digestive system?
+(i) Saliva
+(ii) Hydrochloric acid in the stomach
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![excretory_system](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/excretory_system/excretory_system_labeled_01.png)
+
+**Q8.** The diagram above shows the human excretory system. Name the two main nitrogenous waste products removed by the kidneys. Also state the term used to describe the process by which kidneys filter blood to produce urine.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION C — Short Answer Questions
+(3 questions × 3 marks each = 9 marks)
+
+**Q9.** With reference to transportation in plants, explain:
+(i) The role of xylem in water transport
+(ii) The role of phloem in food transport
+(iii) What is meant by the term "transpiration pull"?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![human_heart](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/human_heart/human_heart_numbered_01.png)
+
+**Q10.** The diagram above shows the human heart. Describe the double circulation of blood in humans. Why is double circulation considered more efficient than single circulation?
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q11.** A student observes that yeast cells placed in a sugar solution in a sealed container produce bubbles of gas and a certain liquid over time.
+
+(i) Name the type of respiration occurring in this process.
+(ii) Write the chemical equation for this reaction.
+(iii) Name the gas and liquid produced, and state one industrial use of this process.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+## SECTION D — Long Answer Questions
+(1 question × 4 marks = 4 marks, 2 questions × 5 marks each = 10 marks)
+
+**Q12.** Describe the process of photosynthesis under the following headings:
+(i) Raw materials required
+(ii) Site of photosynthesis in the plant cell
+(iii) The two main stages of photosynthesis (light reaction and dark reaction) — briefly explain each
+(iv) The overall chemical equation for photosynthesis
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+**Q13.** Draw a neat and well-labelled diagram of the human digestive system. Describe the digestion of food as it passes through the following parts:
+(i) Mouth
+(ii) Stomach
+(iii) Small intestine
+
+Also explain how the small intestine is specifically adapted for the absorption of digested food.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+
+![nephron](https://bpvakrgthezixqzslmng.supabase.co/storage/v1/object/public/ncert-figures/diagram-pool/nephron/nephron_labeled_02.png)
+
+**Q14.** The diagram above shows the structure of a nephron — the functional unit of the kidney.
+
+(i) Name the process by which blood is filtered in the glomerulus, and identify the fluid produced at this stage.
+(ii) What happens to glucose, water, and useful salts after filtration? Name this process.
+(iii) What is the composition of the final urine that is collected in the renal pelvis?
+(iv) Name two other organs (apart from the kidneys) through which excretion takes place in humans, and state the waste substance removed by each.
+(v) What is osmoregulation? State its importance in the human body.
+
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+_____________________________
+
+---
+
+*— End of Question Paper —*
