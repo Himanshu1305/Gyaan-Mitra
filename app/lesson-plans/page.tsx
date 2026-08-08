@@ -74,7 +74,9 @@ export default function LessonPlansPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
-  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("quick");
+  // BACKLOG: speed toggle hidden pending final decision — generation forced to "accurate".
+  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("accurate");
+  const SHOW_SPEED_TOGGLE = false; // BACKLOG: speed toggle hidden pending final decision
   const [loadingProgressStep, setLoadingProgressStep] = useState(0);
 
   // Custom prompt state
@@ -103,6 +105,8 @@ export default function LessonPlansPage() {
 
   const appendToCustom = (text: string) => setCustomPrompt((p) => p ? p + " " + text : text);
   const atLimit = user && !isPremium && usage >= FREE_LIMIT;
+  // When the selected subject is Hindi, render the plan-framing headings in Devanagari (not English).
+  const planIsHindi = /hindi|हिंदी/i.test(chapterResult?.subject || "");
 
   useEffect(() => {
     if (!loading) return;
@@ -133,7 +137,7 @@ export default function LessonPlansPage() {
     setChapterError("");
     setRevisionInstructions("");
     setChapterPreviewMode("preview");
-    setGenerationMode("quick");
+    setGenerationMode("accurate"); // BACKLOG: speed toggle hidden pending final decision — always accurate
   };
 
   const handleGenerate = async () => {
@@ -243,7 +247,7 @@ export default function LessonPlansPage() {
           board: chapterResult.board,
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
-          generationMode,
+          generationMode: "accurate", // BACKLOG: speed toggle hidden pending final decision — always accurate
         }),
       });
       const data = await res.json();
@@ -384,8 +388,8 @@ export default function LessonPlansPage() {
                   </div>
                 )}
 
-                {/* Quick / Accurate toggle */}
-                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
+                {/* Quick / Accurate toggle — BACKLOG: speed toggle hidden pending final decision. Restore by setting SHOW_SPEED_TOGGLE = true. */}
+                {SHOW_SPEED_TOGGLE && chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
                   <div>
                     <div className="flex bg-gray-100 rounded-xl p-1">
                       <button onClick={() => setGenerationMode("quick")}
@@ -444,7 +448,7 @@ export default function LessonPlansPage() {
                       Start Fresh
                     </button>
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-secondary">Draft Lesson Plan</h3>
+                      <h3 className="font-bold text-secondary">{planIsHindi ? "पाठ योजना (प्रारूप)" : "Draft Lesson Plan"}</h3>
                       <div className="flex items-center gap-2">
                         <div className="flex bg-gray-100 rounded-lg p-0.5">
                           <button onClick={() => setChapterPreviewMode("preview")}
@@ -496,7 +500,7 @@ export default function LessonPlansPage() {
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                       Start Fresh
                     </button>
-                    <h3 className="font-bold text-secondary">Final Lesson Plan</h3>
+                    <h3 className="font-bold text-secondary">{planIsHindi ? "अंतिम पाठ योजना" : "Final Lesson Plan"}</h3>
                     <div className="flex gap-2 flex-wrap no-print">
                       {[
                         { label: "Copy", action: () => navigator.clipboard.writeText(chapterFinal) },

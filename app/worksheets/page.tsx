@@ -87,7 +87,9 @@ export default function WorksheetsPage() {
   const [revisionInstructions, setRevisionInstructions] = useState("");
   const [chapterDraftReady, setChapterDraftReady] = useState(false);
   const [chapterFinalReady, setChapterFinalReady] = useState(false);
-  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("quick");
+  // BACKLOG: speed toggle hidden pending final decision — generation forced to "accurate".
+  const [generationMode, setGenerationMode] = useState<"quick" | "accurate">("accurate");
+  const SHOW_SPEED_TOGGLE = false; // BACKLOG: speed toggle hidden pending final decision
   const [loadingProgressStep, setLoadingProgressStep] = useState(0);
 
   // Custom prompt state
@@ -151,7 +153,7 @@ export default function WorksheetsPage() {
     setChapterError("");
     setRevisionInstructions("");
     setChapterPreviewMode("preview");
-    setGenerationMode("quick");
+    setGenerationMode("accurate"); // BACKLOG: speed toggle hidden pending final decision — always accurate
   };
 
   const handleGenerate = async () => {
@@ -282,7 +284,7 @@ export default function WorksheetsPage() {
           classNumber: chapterResult.classNumber,
           subject: chapterResult.subject,
           questionMix: chapterResult.questionMix,
-          generationMode,
+          generationMode: "accurate", // BACKLOG: speed toggle hidden pending final decision — always accurate
         }),
       });
       const data = await res.json();
@@ -412,8 +414,8 @@ export default function WorksheetsPage() {
                   locked={chapterDraftReady || chapterFinalReady}
                 />
 
-                {/* Quick / Accurate toggle */}
-                {chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
+                {/* Quick / Accurate toggle — BACKLOG: speed toggle hidden pending final decision. Restore by setting SHOW_SPEED_TOGGLE = true. */}
+                {SHOW_SPEED_TOGGLE && chapterResult && chapterResult.chapters.length > 0 && !chapterDraftReady && (
                   <div>
                     <div className="flex bg-gray-100 rounded-xl p-1">
                       <button onClick={() => setGenerationMode("quick")}
